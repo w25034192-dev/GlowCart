@@ -172,7 +172,7 @@ export const CatalogPage: React.FC = () => {
                 <option value="">All Brands</option>
                 {brands?.map((b) => (
                   <option key={b.id} value={b.slug}>
-                    {b.name}
+                    {b.name}{b.country_of_origin ? ` (${b.country_of_origin})` : ''}
                   </option>
                 ))}
               </select>

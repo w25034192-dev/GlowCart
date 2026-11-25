@@ -288,9 +288,10 @@ def test_ensure_initial_data_seeds_when_empty_and_creates_default_admin(db_sessi
 
 
 def test_all_seeded_categories_and_skincare_endpoint_consistency(client, db_session):
-    from app.db.seed import CATEGORIES_DATA, seed_demo_data
+    from app.db.seed import CATEGORIES_DATA, CATALOG_BLUEPRINT, seed_demo_data
 
     seed_demo_data(db_session)
+    expected_skincare = len([e for e in CATALOG_BLUEPRINT if e[0] == "Skincare"])
 
     cat_res = client.get("/api/v1/categories")
     assert cat_res.status_code == 200
@@ -312,7 +313,7 @@ def test_all_seeded_categories_and_skincare_endpoint_consistency(client, db_sess
         assert prod_res.status_code == 200
         body = prod_res.json()
         assert body["total"] > 0, f"Expected > 0 products for category {cat['slug']}"
-        assert len(body["items"]) == body["total"]
+        assert len(body["items"]) == min(body["total"], 50)
         for item in body["items"]:
             assert item["category_id"] == cat["id"]
             assert item["category_name"] == cat["name"]
@@ -323,16 +324,16 @@ def test_all_seeded_categories_and_skincare_endpoint_consistency(client, db_sess
 
     skincare_res = client.get("/api/v1/products", params={"category_slug": "skincare"})
     assert skincare_res.status_code == 200
-    assert skincare_res.json()["total"] == 12
+    assert skincare_res.json()["total"] == expected_skincare
 
     # Case-insensitive and whitespace-trimmed slug lookup
     mixed_res = client.get("/api/v1/products", params={"category_slug": " Skincare "})
     assert mixed_res.status_code == 200
-    assert mixed_res.json()["total"] == 12
+    assert mixed_res.json()["total"] == expected_skincare
 
 
 def test_ensure_initial_data_recovers_missing_skincare_when_other_products_exist(db_session):
-    from app.db.seed import ensure_initial_data
+    from app.db.seed import CATALOG_BLUEPRINT, ensure_initial_data
     from app.models import Brand, Category, Product
 
     makeup = Category(name="Makeup", slug="makeup", sort_order=1, is_active=True)
@@ -361,31 +362,35 @@ def test_ensure_initial_data_recovers_missing_skincare_when_other_products_exist
     skincare_products = (
         db_session.query(Product).filter(Product.category_id == skincare_cat.id).all()
     )
-    assert len(skincare_products) == 12
+    expected_skincare = len([e for e in CATALOG_BLUEPRINT if e[0] == "Skincare"])
+    assert len(skincare_products) == expected_skincare
     # Existing product preserved with zero duplicates
     assert db_session.query(Product).filter(Product.slug == "custom-lip-oil").count() == 1
 
 
 def test_all_50_seeded_products_accessible_via_pagination(client, db_session):
-    from app.db.seed import seed_demo_data
+    from app.db.seed import CATALOG_BLUEPRINT, seed_demo_data
 
     seed_demo_data(db_session)
+    total_expected = len(CATALOG_BLUEPRINT)
+    page_size = 12
+    total_pages = (total_expected + page_size - 1) // page_size
 
     collected_ids: set[str] = set()
-    for page in range(1, 6):
-        res = client.get("/api/v1/products", params={"page": page, "page_size": 12})
+    for page in range(1, total_pages + 1):
+        res = client.get("/api/v1/products", params={"page": page, "page_size": page_size})
         assert res.status_code == 200
         payload = res.json()
-        assert payload["total"] == 50
+        assert payload["total"] == total_expected
         assert payload["page"] == page
-        assert payload["page_size"] == 12
-        assert payload["total_pages"] == 5
-        expected_len = 12 if page < 5 else 2
+        assert payload["page_size"] == page_size
+        assert payload["total_pages"] == total_pages
+        expected_len = page_size if page < total_pages else (total_expected - (page - 1) * page_size)
         assert len(payload["items"]) == expected_len
         for item in payload["items"]:
             collected_ids.add(item["id"])
 
-    assert len(collected_ids) == 50
+    assert len(collected_ids) == total_expected
 
 
 

@@ -55,6 +55,16 @@ BRANDS_DATA = [
     ("Olaplex", "olaplex", "USA", False),
     ("Dior", "dior", "France", True),
     ("Sol de Janeiro", "sol-de-janeiro", "USA", False),
+    # Popular Local Brands (Myanmar)
+    ("Shwe Pyi Nann", "shwe-pyi-nann", "Myanmar", True),
+    ("Bella Cosmetics", "bella-cosmetics", "Myanmar", True),
+    ("Bell", "bell", "Myanmar", True),
+    ("Heritage Herbal", "heritage-herbal", "Myanmar", True),
+    # Top Global Popular Brands
+    ("Laneige", "laneige", "South Korea", True),
+    ("Innisfree", "innisfree", "South Korea", True),
+    ("NARS", "nars", "France", True),
+    ("Yves Saint Laurent", "ysl", "France", True),
 ]
 
 CATALOG_BLUEPRINT = [
@@ -108,6 +118,28 @@ CATALOG_BLUEPRINT = [
     ("Makeup Sets", "Fenty Beauty", "Fenty Beauty Glossy Posse Trio Set", "fenty-glossy-posse-set", ["all"], "sizes", "42.00"),
     ("Makeup Sets", "COSRX", "COSRX Snail Glass Skin Starter Kit", "cosrx-glass-skin-kit", ["dry", "all"], "sizes", "38.00"),
     ("Makeup Sets", "Beauty of Joseon", "Beauty of Joseon Hanbang Discovery Bundle", "boj-hanbang-bundle", ["all", "sensitive"], "sizes", "45.00"),
+    # --- Authentic Popular Local Cosmetics & Skincare (Myanmar) ---
+    ("Skincare", "Shwe Pyi Nann", "Shwe Pyi Nann Natural Bark Thanakha Pudding Face Pack", "shwe-pyi-nann-thanakha-pudding", ["all", "oily", "acne-prone"], "volumes", "12.50"),
+    ("Skincare", "Shwe Pyi Nann", "Shwe Pyi Nann Lime Natural Thanakha Purifying Cream", "shwe-pyi-nann-lime-thanakha", ["oily", "combination", "acne-prone"], "volumes", "9.50"),
+    ("Sun Care", "Shwe Pyi Nann", "Shwe Pyi Nann Herbal Natural UV Protection Thanakha", "shwe-pyi-nann-sun-shield", ["all", "sensitive"], "sizes", "11.00"),
+    ("Body Care", "Shwe Pyi Nann", "Shwe Pyi Nann Golden Thanakha Nourishing Body Lotion", "shwe-pyi-nann-body-lotion", ["all", "dry"], "volumes", "13.50"),
+    ("Makeup", "Bella Cosmetics", "Bella Matte Velvet Lip Crayon", "bella-matte-velvet-lip-crayon", ["all"], "shades_lip", "8.50"),
+    ("Makeup", "Bella Cosmetics", "Bella Glow Cushion Foundation SPF50+", "bella-glow-cushion-foundation", ["normal", "combination"], "shades_foundation", "14.99"),
+    ("Makeup", "Bella Cosmetics", "Bella Ultra Fine HD Translucent Powder", "bella-ultra-fine-hd-powder", ["oily", "combination"], "shades_powder", "10.00"),
+    ("Makeup", "Bell", "Bell Silk Matte Oil-Control Compact Powder", "bell-silk-matte-compact-powder", ["all", "oily"], "shades_powder", "7.50"),
+    ("Hair Care", "Heritage Herbal", "Tayaw Kinpun Natural Herbal Hair Shampoo & Cleanser", "tayaw-kinpun-herbal-shampoo", ["all"], "volumes", "12.00"),
+    ("Fragrance", "Heritage Herbal", "Royal Inle Jasmine & Sandalwood Botanical Body Mist", "royal-inle-jasmine-mist", ["all"], "volumes", "22.00"),
+    ("Beauty Tools", "Bell", "Bell Flawless Teardrop Velvet Beauty Sponge", "bell-flawless-beauty-sponge", ["all"], "sizes", "5.50"),
+    ("Makeup Sets", "Bella Cosmetics", "Bella Iconic Yangon Glam Beauty Starter Set", "bella-yangon-glam-set", ["all"], "sizes", "28.00"),
+    # --- Top Global Popular Cosmetic Cult Favorites ---
+    ("Skincare", "Laneige", "Laneige Lip Sleeping Mask Intense Hydration", "laneige-lip-sleeping-mask", ["all", "dry"], "sizes", "24.00"),
+    ("Skincare", "Laneige", "Laneige Water Bank Blue Hyaluronic Moisture Cream", "laneige-water-bank-cream", ["dry", "dehydrated", "sensitive"], "volumes", "40.00"),
+    ("Skincare", "Innisfree", "Innisfree Green Tea Seed Hyaluronic Serum", "innisfree-green-tea-serum", ["all", "combination"], "volumes", "30.00"),
+    ("Sun Care", "Innisfree", "Innisfree Daily UV Defense Sunscreen Broad Spectrum SPF36", "innisfree-daily-uv-defense", ["all"], "volumes", "18.00"),
+    ("Makeup", "NARS", "NARS Radiant Creamy Concealer", "nars-radiant-creamy-concealer", ["all"], "shades_foundation", "32.00"),
+    ("Makeup", "NARS", "NARS Orgasm Powder Blush", "nars-orgasm-powder-blush", ["all"], "shades_blush", "34.00"),
+    ("Makeup", "Yves Saint Laurent", "YSL Rouge Pur Couture The Slim Velvet Radical Lipstick", "ysl-rouge-pur-couture-slim", ["all"], "shades_lip", "45.00"),
+    ("Fragrance", "Yves Saint Laurent", "YSL Libre Eau De Parfum", "ysl-libre-eau-de-parfum", ["all"], "volumes", "98.00"),
 ]
 
 VARIANT_TEMPLATES = {
@@ -390,30 +422,14 @@ def seed_demo_data(db: Session) -> None:
 
 
 def ensure_initial_data(db: Session) -> bool:
-    """Ensure default admin exists and auto-seed demo catalog if products or Skincare catalog are empty."""
+    """Ensure default admin exists and ensure all canonical categories, brands, and catalog items exist without duplicating."""
     ensure_default_admin_and_roles(db)
-    if db.query(Product).count() == 0:
-        seed_demo_data(db)
+    cat_map, brand_map = _ensure_categories_and_brands(db)
+    all_blueprint_entries = list(enumerate(CATALOG_BLUEPRINT, start=1))
+    created = _seed_blueprint_entries(db, all_blueprint_entries, cat_map, brand_map)
+    if created > 0:
+        db.commit()
         return True
-
-    has_skincare = (
-        db.query(Product)
-        .join(Product.category)
-        .filter(func.lower(Category.slug) == "skincare")
-        .count()
-        > 0
-    )
-    if not has_skincare:
-        cat_map, brand_map = _ensure_categories_and_brands(db)
-        skincare_entries = [
-            (idx, entry)
-            for idx, entry in enumerate(CATALOG_BLUEPRINT, start=1)
-            if entry[0] == "Skincare"
-        ]
-        created = _seed_blueprint_entries(db, skincare_entries, cat_map, brand_map)
-        if created > 0:
-            db.commit()
-            return True
     return False
 
 
