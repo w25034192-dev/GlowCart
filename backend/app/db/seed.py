@@ -615,19 +615,26 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
         product = db.query(Product).filter(Product.slug == slug).first()
         if product is None:
             cat = cat_map.get(item["category"]) or cat_map["Skincare"]
-            brand = brand_map.get(item["brand"])
+            brand_slug = re.sub(r"[^a-z0-9]+", "-", item["brand"].lower()).strip("-")
+            brand = (
+                brand_map.get(item["brand"])
+                or next((b for b in brand_map.values() if b.slug == brand_slug or b.name.lower() == item["brand"].lower()), None)
+            )
             if brand is None:
                 brand = Brand(
-                    name=item["brand"],
-                    slug=re.sub(r"[^a-z0-9]+", "-", item["brand"].lower()).strip("-"),
+                    name=item["brand"].title() if item["brand"].isupper() else item["brand"],
+                    slug=brand_slug,
                     country_of_origin="International",
                     is_featured=True,
                     is_active=True,
-                    description=f"Studio brand {item['brand']}",
+                    description=f"Curated brand {item['brand']}",
                 )
                 db.add(brand)
                 db.flush()
                 brand_map[item["brand"]] = brand
+
+            raw_skin = item.get("skin_type", "all").lower()
+            skin_types_val = ["all"] if ("all" in raw_skin or not raw_skin) else [raw_skin]
 
             product = Product(
                 category_id=cat.id,
@@ -635,15 +642,15 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
                 name=item["name"],
                 slug=slug,
                 short_description=f"Curated studio formulation — {item['name']}.",
-                description=f"{item['name']} by {item['brand']}. Authentic cosmetic atelier formulation with batch-verified freshness.",
-                skin_types=["all"],
+                description=f"{item['name']} by {brand.name}. Authentic formulation with batch-verified freshness.",
+                skin_types=skin_types_val,
                 specifications={
                     "origin": brand.country_of_origin or "International",
-                    "edition": "Studio Atelier 100 Edition",
+                    "edition": "Studio Atelier Edition",
                 },
                 is_featured=item.get("is_popular", False),
                 is_best_seller=item.get("is_popular", False),
-                is_new_arrival=True,
+                is_new_arrival=item.get("is_new_arrival", True),
                 is_demo=True,
                 is_active=True,
             )
@@ -651,13 +658,13 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
             db.flush()
             created_count += 1
 
-            # Variant with exact price and shade_hex
+            # Variant with exact price, shade_name, and shade_hex
             sku = f"GC-GEN-{idx:03d}"
             variant = ProductVariant(
                 product_id=product.id,
                 sku=sku,
                 price=Decimal(str(item["price"])),
-                shade_name=f"Shade #{idx}",
+                shade_name=item.get("shade_name", f"Shade #{idx}"),
                 hex_color=item.get("shade_hex", "#F3D6BE"),
                 status="ACTIVE",
                 is_available=True,
@@ -665,8 +672,8 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
             db.add(variant)
             db.flush()
 
-            # Primary Real Image
-            real_url = resolve_seed_image_url(cat.name, item["name"], slug)
+            # Primary Real Image (custom image_url or resolved unsplash)
+            real_url = item.get("image_url") or resolve_seed_image_url(cat.name, item["name"], slug)
             db.add(
                 ProductImage(
                     product_id=product.id,
