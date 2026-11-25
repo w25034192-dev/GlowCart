@@ -19,7 +19,6 @@ import {
 import { catalogApi } from '@/services/api';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { SkinRoutineBuilder } from '@/components/customer/SkinRoutineBuilder';
-import { RotatingVideoStudio } from '@/components/customer/RotatingVideoStudio';
 import { Badge, Button, Card, StarRating } from '@/components/common/UI';
 
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -31,16 +30,6 @@ const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>
   fragrance: Sparkles,
   'beauty-tools': Award,
   'makeup-sets': Gift,
-};
-
-const COUNTRY_FLAGS: Record<string, string> = {
-  Myanmar: '🇲🇲',
-  'South Korea': '🇰🇷',
-  France: '🇫🇷',
-  USA: '🇺🇸',
-  Canada: '🇨🇦',
-  UK: '🇬🇧',
-  UAE: '🇦🇪',
 };
 
 const TESTIMONIALS = [
@@ -86,24 +75,10 @@ export const HomePage: React.FC = () => {
     queryKey: ['categories'],
     queryFn: catalogApi.getCategories,
   });
-  const { data: brands } = useQuery({
-    queryKey: ['brands'],
-    queryFn: catalogApi.getBrands,
-  });
   const { data: promotions } = useQuery({
     queryKey: ['promotions'],
     queryFn: catalogApi.getPromotions,
   });
-
-  const [brandFilter, setBrandFilter] = useState<'all' | 'local' | 'global'>('all');
-  const localBrands = brands?.filter((b) => b.country_of_origin === 'Myanmar') || [];
-  const globalBrands = brands?.filter((b) => b.country_of_origin !== 'Myanmar') || [];
-  const displayedBrands =
-    brandFilter === 'local'
-      ? localBrands
-      : brandFilter === 'global'
-        ? globalBrands
-        : brands || [];
 
   return (
     <div className="space-y-16">
@@ -150,13 +125,6 @@ export const HomePage: React.FC = () => {
                 className="touch-target inline-flex cursor-pointer items-center rounded-xl border border-border bg-card/90 px-5 py-3.5 text-sm font-semibold text-primary backdrop-blur-sm transition-all duration-200 hover:border-primary hover:bg-card shadow-sm"
               >
                 Build Skin Routine
-              </a>
-              <a
-                href="#rotating-video-studio"
-                className="touch-target inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-rose/30 bg-blush/40 px-4 py-3.5 text-sm font-semibold text-rose backdrop-blur-sm transition-all duration-200 hover:bg-blush shadow-sm"
-              >
-                <Sparkles className="h-4 w-4" />
-                <span>360° Studio</span>
               </a>
             </div>
           </div>
@@ -320,105 +288,6 @@ export const HomePage: React.FC = () => {
             {newArrivals.items.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
-          </div>
-        </section>
-      )}
-
-      {/* Interactive 360° Rotating Beauty & Short Video Studio */}
-      <RotatingVideoStudio />
-
-      {/* Featured & Popular Brands with Local Favorites */}
-      {brands && brands.length > 0 && (
-        <section aria-labelledby="featured-brands-heading" className="space-y-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                Curated Cosmetic Brands
-              </p>
-              <h2 id="featured-brands-heading" className="font-serif text-3xl font-bold">
-                Featured Brands &amp; Local Favorites
-              </h2>
-              <p className="mt-1 text-sm text-muted-fg">
-                Explore iconic international beauty powerhouses alongside authentic Myanmar local skincare and cosmetics.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setBrandFilter('all')}
-                className={`touch-target cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                  brandFilter === 'all'
-                    ? 'bg-primary text-primary-fg shadow-sm'
-                    : 'border border-border bg-card text-foreground hover:bg-blush/30 hover:text-primary'
-                }`}
-              >
-                All Brands ({brands.length})
-              </button>
-              {localBrands.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setBrandFilter('local')}
-                  className={`touch-target cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                    brandFilter === 'local'
-                      ? 'bg-primary text-primary-fg shadow-sm'
-                      : 'border border-border bg-card text-foreground hover:bg-blush/30 hover:text-primary'
-                  }`}
-                >
-                  🇲🇲 Myanmar Local ({localBrands.length})
-                </button>
-              )}
-              {globalBrands.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setBrandFilter('global')}
-                  className={`touch-target cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                    brandFilter === 'global'
-                      ? 'bg-primary text-primary-fg shadow-sm'
-                      : 'border border-border bg-card text-foreground hover:bg-blush/30 hover:text-primary'
-                  }`}
-                >
-                  🌍 Global Icons ({globalBrands.length})
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {displayedBrands.map((b) => {
-              const flag = b.country_of_origin ? COUNTRY_FLAGS[b.country_of_origin] || '✨' : '✨';
-              const isLocal = b.country_of_origin === 'Myanmar';
-              return (
-                <Link
-                  key={b.id}
-                  to={`/brand/${b.slug}`}
-                  className="group relative flex flex-col justify-between rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
-                >
-                  <div>
-                    <div className="mb-2 flex items-center justify-between text-xs text-muted-fg">
-                      <span className="text-base" role="img" aria-label={b.country_of_origin || 'Origin'}>
-                        {flag}
-                      </span>
-                      {isLocal ? (
-                        <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
-                          Local Gem
-                        </span>
-                      ) : b.is_featured ? (
-                        <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                          Popular
-                        </span>
-                      ) : null}
-                    </div>
-                    <span className="block text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
-                      {b.name}
-                    </span>
-                  </div>
-                  <span className="mt-3 flex items-center justify-between text-[11px] text-muted-fg transition-colors group-hover:text-primary">
-                    <span>{b.country_of_origin || 'Cosmetics'}</span>
-                    <ArrowRight className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                  </span>
-                </Link>
-              );
-            })}
           </div>
         </section>
       )}
