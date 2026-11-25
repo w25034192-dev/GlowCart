@@ -393,4 +393,24 @@ def test_all_50_seeded_products_accessible_via_pagination(client, db_session):
     assert len(collected_ids) == total_expected
 
 
+def test_generate_100_products_and_seeder(db_session):
+    from app.db.seed import BRANDS, CATEGORIES, generate_100_products, seed_generated_products
+    from app.models import Product, ProductVariant, InventoryBatch
+
+    products = generate_100_products()
+    assert len(products) == 100
+    assert all(p["brand"] in BRANDS for p in products)
+    assert all(p["category"] in CATEGORIES for p in products)
+    assert all(18.0 <= p["price"] <= 68.0 for p in products)
+    assert all(20 <= p["stock"] <= 120 for p in products)
+    assert sum(1 for p in products if p["is_popular"]) == 20
+
+    # Seed subset into db to verify model persistence
+    created = seed_generated_products(db_session, products[:10])
+    assert created == 10
+    assert db_session.query(Product).count() >= 10
+    assert db_session.query(ProductVariant).count() >= 10
+    assert db_session.query(InventoryBatch).count() >= 10
+
+
 

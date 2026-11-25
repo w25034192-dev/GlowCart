@@ -1,5 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
+import random
+import re
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -65,6 +67,13 @@ BRANDS_DATA = [
     ("Innisfree", "innisfree", "South Korea", True),
     ("NARS", "nars", "France", True),
     ("Yves Saint Laurent", "ysl", "France", True),
+    # Studio Atelier Brands
+    ("Atelier Lab", "atelier-lab", "France", True),
+    ("GlowCart Studio", "glowcart-studio", "International", True),
+    ("Solis Botanica", "solis-botanica", "USA", True),
+    ("KeraFlora", "keraflora", "South Korea", True),
+    ("Velvet Veil", "velvet-veil", "UK", True),
+    ("Lumière Skin", "lumiere-skin", "France", True),
 ]
 
 CATALOG_BLUEPRINT = [
@@ -540,9 +549,159 @@ def ensure_initial_data(db: Session) -> bool:
     return False
 
 
+# ---------------------------------------------------------------------------
+# Generated 100 Products Catalog Engine
+# ---------------------------------------------------------------------------
+BRANDS = ["Atelier Lab", "GlowCart Studio", "Solis Botanica", "KeraFlora", "Velvet Veil", "Lumière Skin"]
+CATEGORIES = ["Skincare", "Makeup", "Sun Care", "Hair Care", "Fragrance"]
+ADJECTIVES = ["Barrier Restore", "Hydra-Glow", "Velvet Matte", "Peptide Repair", "Botanical Dew", "Silk Touch", "Daily Shield", "Radiance"]
+ITEM_TYPES = ["Serum", "Cream", "Lip Tint", "Cushion Foundation", "UV Gel SPF50", "Hair Elixir", "Toner Essence", "Cleansing Balm"]
+SHADE_HEXES = ["#F3D6BE", "#E5B88E", "#C88E62", "#D98A7C", "#B85D4F", "#8E3B33", "#EADBC8"]
+
+
+def generate_100_products():
+    products = []
+    for i in range(1, 101):
+        brand = random.choice(BRANDS)
+        category = random.choice(CATEGORIES)
+        name = f"{random.choice(ADJECTIVES)} {random.choice(ITEM_TYPES)} #{i}"
+        price = round(random.uniform(18.0, 68.0), 2)
+        
+        products.append({
+            "name": name,
+            "brand": brand,
+            "category": category,
+            "price": price,
+            "stock": random.randint(20, 120),
+            "shade_hex": random.choice(SHADE_HEXES),
+            "is_popular": True if i <= 20 else False, 
+        })
+    return products
+
+
+def seed_generated_products(db: Session, products: list[dict] | None = None) -> int:
+    """Seed the 100 generated products into PostgreSQL with full variants, inventory batches, and real images."""
+    if products is None:
+        products = generate_100_products()
+
+    cat_map, brand_map = _ensure_categories_and_brands(db)
+    today = date.today()
+    created_count = 0
+
+    for idx, item in enumerate(products, start=1):
+        raw_slug = f"{item['brand']}-{item['name']}".lower()
+        slug = re.sub(r"[^a-z0-9]+", "-", raw_slug).strip("-")
+
+        product = db.query(Product).filter(Product.slug == slug).first()
+        if product is None:
+            cat = cat_map.get(item["category"]) or cat_map["Skincare"]
+            brand = brand_map.get(item["brand"])
+            if brand is None:
+                brand = Brand(
+                    name=item["brand"],
+                    slug=re.sub(r"[^a-z0-9]+", "-", item["brand"].lower()).strip("-"),
+                    country_of_origin="International",
+                    is_featured=True,
+                    is_active=True,
+                    description=f"Studio brand {item['brand']}",
+                )
+                db.add(brand)
+                db.flush()
+                brand_map[item["brand"]] = brand
+
+            product = Product(
+                category_id=cat.id,
+                brand_id=brand.id,
+                name=item["name"],
+                slug=slug,
+                short_description=f"Curated studio formulation — {item['name']}.",
+                description=f"{item['name']} by {item['brand']}. Authentic cosmetic atelier formulation with batch-verified freshness.",
+                skin_types=["all"],
+                specifications={
+                    "origin": brand.country_of_origin or "International",
+                    "edition": "Studio Atelier 100 Edition",
+                },
+                is_featured=item.get("is_popular", False),
+                is_best_seller=item.get("is_popular", False),
+                is_new_arrival=True,
+                is_demo=True,
+                is_active=True,
+            )
+            db.add(product)
+            db.flush()
+            created_count += 1
+
+            # Variant with exact price and shade_hex
+            sku = f"GC-GEN-{idx:03d}"
+            variant = ProductVariant(
+                product_id=product.id,
+                sku=sku,
+                price=Decimal(str(item["price"])),
+                shade_name=f"Shade #{idx}",
+                hex_color=item.get("shade_hex", "#F3D6BE"),
+                status="ACTIVE",
+                is_available=True,
+            )
+            db.add(variant)
+            db.flush()
+
+            # Primary Real Image
+            real_url = resolve_seed_image_url(cat.name, item["name"], slug)
+            db.add(
+                ProductImage(
+                    product_id=product.id,
+                    image_url=real_url,
+                    is_primary=True,
+                    sort_order=0,
+                )
+            )
+
+            # Inventory & FEFO Batch
+            inv = Inventory(
+                variant_id=variant.id,
+                available_quantity=item["stock"],
+                reserved_quantity=0,
+                low_stock_threshold=10,
+            )
+            db.add(inv)
+            db.flush()
+
+            batch = InventoryBatch(
+                variant_id=variant.id,
+                batch_number=f"GEN-BATCH-{idx:03d}",
+                manufacture_date=today - timedelta(days=60),
+                expiry_date=today + timedelta(days=540),
+                initial_quantity=item["stock"],
+                remaining_quantity=item["stock"],
+                received_date=today - timedelta(days=5),
+            )
+            db.add(batch)
+            db.flush()
+
+            db.add(
+                InventoryMovement(
+                    variant_id=variant.id,
+                    batch_id=batch.id,
+                    movement_type="RECEIVED",
+                    quantity_delta=item["stock"],
+                    reference_type="generated_seed",
+                    reference_id=batch.batch_number,
+                    reason="Initial 100 generated products stock",
+                )
+            )
+
+    if created_count > 0:
+        db.commit()
+    return created_count
+
+
 if __name__ == "__main__":
+    import sys
     from app.db.session import SessionLocal
 
     with SessionLocal() as session:
         seed_demo_data(session)
+        if "--generate-100" in sys.argv or "-g" in sys.argv:
+            gen_count = seed_generated_products(session)
+            print(f"Generated and seeded {gen_count} additional products.")
         print("GlowCart demo data seeded successfully.")
