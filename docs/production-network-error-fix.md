@@ -5,6 +5,40 @@
 
 ---
 
+## 0. Docker Build Failure — `chmod` in `nginx-unprivileged` (Fix Applied 2026-11-25)
+
+### Root Cause
+`nginxinc/nginx-unprivileged:1.27-alpine` runs as UID 101 (`nginx`) throughout the entire Docker build — it **never** runs as root. The `/docker-entrypoint.d/` directory is owned by root, so a `RUN chmod +x` on a file inside it fails:
+
+```
+chmod: /docker-entrypoint.d/99-glowcart-env.sh: Operation not permitted
+```
+
+### Fix — `COPY --chmod=755` (BuildKit inline permission)
+Replaced the two-instruction pattern:
+```dockerfile
+# BEFORE (broken)
+COPY docker-entrypoint-env.sh /docker-entrypoint.d/99-glowcart-env.sh
+RUN chmod +x /docker-entrypoint.d/99-glowcart-env.sh
+```
+With a single BuildKit `COPY --chmod` instruction:
+```dockerfile
+# AFTER (fixed)
+COPY --chmod=755 docker-entrypoint-env.sh /docker-entrypoint.d/99-glowcart-env.sh
+```
+
+`COPY --chmod` sets the file mode **inside the layer** at copy time — no shell permission change required, works under UID 101, and requires no `USER root` escalation. The `# syntax=docker/dockerfile:1` directive was already present at the top of the Dockerfile, so BuildKit features (including `--chmod`) are enabled.
+
+Railway uses BuildKit by default, so this fix works without any Railway configuration changes.
+
+### Verified
+- `frontend/Dockerfile` updated: single `COPY --chmod=755` on line 32
+- `cd backend && python3 -m pytest tests -v` → **23 passed, 0 failed** (exit 0)
+- `cd frontend && npm run build` → **clean** (exit 0)
+- `cd frontend && npm test -- --run` → **8 passed, 0 failed** (exit 0)
+
+---
+
 ## 1. Investigation Summary (Phases 1 & 2)
 
 1. **Frontend API Configuration & URL Construction (`frontend/src/services/api.ts`, `utils/media.ts`, `pages/admin/AdminOperationsPages.tsx`):**

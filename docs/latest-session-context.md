@@ -1,7 +1,7 @@
 # Latest Session Context — GlowCart
 
-> **Updated:** 2026-11-25  
-> **Current Focus:** Production Frontend `"Network Error"` Root-Cause Fix & Deployment Verification
+> **Updated:** 2026-11-25 (Session 2 — Docker Build Fix)
+> **Current Focus:** Railway Docker build failure fixed (`COPY --chmod=755`); ready for push + redeploy
 
 ## What Was Fixed
 1. **Runtime + Build-Time API URL Resolution & Normalization:**
