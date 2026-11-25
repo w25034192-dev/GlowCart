@@ -413,4 +413,22 @@ def test_generate_100_products_and_seeder(db_session):
     assert db_session.query(InventoryBatch).count() >= 10
 
 
+def test_products_data_json_and_loader():
+    from app.db.seed import load_products_from_json
+    products = load_products_from_json()
+    assert isinstance(products, list)
+    assert len(products) >= 2
+    assert products[0]["name"] == "Barrier Restore Peptide Serum"
+    assert products[0]["brand"] == "Atelier Lab"
+    assert products[0]["category"] == "Skincare"
+    assert products[0]["price"] == 38.0
+    assert products[0]["stock"] == 50
+
+    assert products[1]["name"] == "Velvet Cloud Lip & Cheek Tint"
+    assert products[1]["brand"] == "GlowCart Studio"
+    assert products[1]["category"] == "Makeup"
+    assert products[1]["price"] == 24.0
+    assert products[1]["stock"] == 80
+
+
 

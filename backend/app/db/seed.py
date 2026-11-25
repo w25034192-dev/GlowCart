@@ -1,5 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
+import json
+from pathlib import Path
 import random
 import re
 from sqlalchemy import func
@@ -579,6 +581,24 @@ def generate_100_products():
     return products
 
 
+def load_products_from_json(file_path: str | Path | None = None) -> list[dict]:
+    """Load products data from a JSON file, checking given or standard candidate paths."""
+    candidates: list[Path] = []
+    if file_path:
+        candidates.append(Path(file_path))
+    candidates.extend([
+        Path(__file__).parent / "products_data.json",
+        Path("backend/app/db/products_data.json"),
+        Path("db/products_data.json"),
+        Path("../db/products_data.json"),
+    ])
+    for cand in candidates:
+        if cand.is_file():
+            with open(cand, "r", encoding="utf-8") as f:
+                return json.load(f)
+    raise FileNotFoundError("Could not find products_data.json in candidate locations.")
+
+
 def seed_generated_products(db: Session, products: list[dict] | None = None) -> int:
     """Seed the 100 generated products into PostgreSQL with full variants, inventory batches, and real images."""
     if products is None:
@@ -701,7 +721,11 @@ if __name__ == "__main__":
 
     with SessionLocal() as session:
         seed_demo_data(session)
-        if "--generate-100" in sys.argv or "-g" in sys.argv:
+        if "--json" in sys.argv:
+            json_prods = load_products_from_json()
+            gen_count = seed_generated_products(session, json_prods)
+            print(f"Seeded {gen_count} products from products_data.json.")
+        elif "--generate-100" in sys.argv or "-g" in sys.argv:
             gen_count = seed_generated_products(session)
             print(f"Generated and seeded {gen_count} additional products.")
         print("GlowCart demo data seeded successfully.")
