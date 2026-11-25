@@ -157,21 +157,20 @@ function renderAt(path: string) {
 }
 
 describe('GlowCart Frontend', () => {
-  it('renders storefront hero, featured categories, best sellers, routine builder, and testimonials', async () => {
+  it('renders storefront hero, trust bar, best sellers, and interactive shade finder', async () => {
     useAuthStore.setState({ user: null, isLoading: false });
     const user = userEvent.setup();
     renderAt('/');
-    expect(await screen.findByText(/Curated Skincare, Shades/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Featured Categories/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Best Sellers/i)).toBeInTheDocument();
-    expect(screen.getByText(/Build Your Skin-Type Routine/i)).toBeInTheDocument();
-    expect(screen.getByText(/Customer Testimonials/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Colour That/i)).toBeInTheDocument();
+    expect(screen.getByText(/Feels Like You\./i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Shop Cosmetics/i })).toHaveAttribute('href', '/products');
+    expect(screen.getByText(/Vegan & Cruelty-Free/i)).toBeInTheDocument();
+    expect(screen.getByText(/Our Most-Loved Shades/i)).toBeInTheDocument();
+    expect(screen.getByText(/Find Your Perfect Match/i)).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Sensitive' }));
-    expect(screen.getByRole('link', { name: /Shop Sensitive Skin Formulas/i })).toHaveAttribute(
-      'href',
-      '/catalog?skin_type=sensitive'
-    );
+    await user.click(screen.getByRole('button', { name: 'Deep' }));
+    expect(screen.getByText(/Rich Plum/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Take the Full Quiz/i })).toHaveAttribute('href', '/products');
   });
 
   it('redirects unauthenticated visitors away from protected admin routes', async () => {

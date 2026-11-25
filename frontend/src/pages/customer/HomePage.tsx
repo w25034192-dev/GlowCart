@@ -1,365 +1,442 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, CheckCircle2, Quote } from 'lucide-react';
 import { catalogApi } from '@/services/api';
-import { ProductCard } from '@/components/customer/ProductCard';
-import { SkinRoutineBuilder } from '@/components/customer/SkinRoutineBuilder';
-import { Button, Card, StarRating } from '@/components/common/UI';
 
-const SHADE_PRESETS = [
-  { name: '01 Ivory Silk (Cool Undertone)', color: '#F3D6BE' },
-  { name: '02 Warm Honey (Neutral)', color: '#E5B88E' },
-  { name: '03 Golden Amber (Warm)', color: '#C88E62' },
-  { name: '04 Rich Espresso (Deep)', color: '#8D5534' },
+interface ProductItem {
+  id: string | number;
+  name: string;
+  finish: string;
+  price: number;
+  badge?: string;
+  image: string;
+  swatches: string[];
+}
+
+const BESTSELLERS: ProductItem[] = [
+  {
+    id: 1,
+    name: 'Rosy Day',
+    finish: 'Soft Matte',
+    price: 16,
+    image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80',
+    swatches: ['#C86D7C', '#E09A9F', '#9E3E52'],
+  },
+  {
+    id: 2,
+    name: 'Berry Crush',
+    finish: 'Soft Matte',
+    price: 16,
+    image: 'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=600&q=80',
+    swatches: ['#9E2A4B', '#C94A6A', '#731C35'],
+  },
+  {
+    id: 3,
+    name: 'Nude Silk',
+    finish: 'Satin',
+    price: 16,
+    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80',
+    swatches: ['#C68B77', '#D9A796', '#9C6250'],
+  },
+  {
+    id: 4,
+    name: 'Coral Pop',
+    finish: 'Gloss',
+    price: 14,
+    badge: 'New',
+    image: 'https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=600&q=80',
+    swatches: ['#E86B63', '#F2948A', '#C4453E'],
+  },
 ];
 
-const TESTIMONIALS = [
+const SKIN_TONES = [
   {
-    id: 't-1',
-    name: 'Nadia L.',
-    skinProfile: 'Combination · Shade 220 Natural Beige',
-    rating: 5,
-    quote:
-      'Being able to see the exact HEX shade swatch, SKU, and non-expired batch availability right on the product page made choosing my foundation effortless.',
+    id: 'fair',
+    label: 'Fair',
+    hex: '#F6DFD2',
+    matches: [
+      { name: 'Petal Pink', shade: '#E58A9B' },
+      { name: 'Soft Peony', shade: '#D46A82' },
+      { name: 'Nude Blush', shade: '#C98276' },
+    ],
   },
   {
-    id: 't-2',
-    name: 'Hannah K.',
-    skinProfile: 'Dry & Sensitive · K-Beauty Routine',
-    rating: 5,
-    quote:
-      'The 30 ml and 50 ml volume selector updates pricing transparently, and every serum arrived sealed with generous shelf-life.',
+    id: 'light',
+    label: 'Light',
+    hex: '#EBC8B2',
+    matches: [
+      { name: 'Rosy Day', shade: '#C85A74' },
+      { name: 'Warm Rose', shade: '#B84B62' },
+      { name: 'Peach Nude', shade: '#C97B68' },
+    ],
   },
   {
-    id: 't-3',
-    name: 'Sora M.',
-    skinProfile: 'Oily · Matte Lip & SPF Collector',
-    rating: 5,
-    quote:
-      'Smooth checkout, instant order tracking updates, and thoughtful packaging across skincare and lip shades.',
+    id: 'medium',
+    label: 'Medium',
+    hex: '#D7A382',
+    matches: [
+      { name: 'Rosy Day', shade: '#BD4265' },
+      { name: 'Brick Rose', shade: '#A44638' },
+      { name: 'Cinnamon', shade: '#9E4D36' },
+    ],
+  },
+  {
+    id: 'tan',
+    label: 'Tan',
+    hex: '#BA815C',
+    matches: [
+      { name: 'Spiced Terracotta', shade: '#9C4234' },
+      { name: 'Berry Crush', shade: '#8E2846' },
+      { name: 'Caramel Kiss', shade: '#8F4D38' },
+    ],
+  },
+  {
+    id: 'deep',
+    label: 'Deep',
+    hex: '#8C583A',
+    matches: [
+      { name: 'Rich Plum', shade: '#6E223B' },
+      { name: 'Mahogany Rose', shade: '#7D3232' },
+      { name: 'Espresso Glaze', shade: '#5E2C24' },
+    ],
+  },
+  {
+    id: 'rich',
+    label: 'Rich',
+    hex: '#5E3824',
+    matches: [
+      { name: 'Velvet Bordeaux', shade: '#59182D' },
+      { name: 'Deep Garnet', shade: '#6B1D29' },
+      { name: 'Cocoa Berry', shade: '#4F2024' },
+    ],
   },
 ];
 
 export const HomePage: React.FC = () => {
-  const [activeShadeIndex, setActiveShadeIndex] = useState(0);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [selectedTone, setSelectedTone] = useState(SKIN_TONES[2]); // Default: Medium
+  const [activeSwatches, setActiveSwatches] = useState<Record<number | string, string>>({});
+  const [wishlist, setWishlist] = useState<Record<number | string, boolean>>({});
+  const [products, setProducts] = useState<ProductItem[]>(BESTSELLERS);
 
-  const activeShade = SHADE_PRESETS[activeShadeIndex] || SHADE_PRESETS[0];
-
-  const { data: newArrivals } = useQuery({
-    queryKey: ['products', 'new_arrival'],
-    queryFn: () => catalogApi.getProducts({ new_arrival: true, page_size: 4 }),
-  });
-  const { data: bestSellers } = useQuery({
-    queryKey: ['products', 'best_seller'],
-    queryFn: () => catalogApi.getProducts({ best_seller: true, page_size: 8 }),
-  });
-  const { data: promotions } = useQuery({
-    queryKey: ['promotions'],
-    queryFn: catalogApi.getPromotions,
-  });
+  // Load products from backend catalog API, falling back to local defaults
+  useEffect(() => {
+    catalogApi
+      .getProducts({ page_size: 4 })
+      .then((data) => {
+        if (data?.items?.length) {
+          const mapped = data.items.slice(0, 4).map((p: any, idx: number) => ({
+            id: p.id,
+            name: p.name,
+            finish: p.category_name || p.category?.name || 'Soft Matte',
+            price: Number(p.min_price || p.price || 16),
+            badge: idx === 3 ? 'New' : undefined,
+            image: p.image_url || p.images?.[0]?.image_url || BESTSELLERS[idx % BESTSELLERS.length].image,
+            swatches: BESTSELLERS[idx % BESTSELLERS.length].swatches,
+          }));
+          setProducts(mapped);
+        }
+      })
+      .catch(() => {
+        fetch('/api/catalog/products?limit=4')
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data?.items?.length) {
+              const mapped = data.items.slice(0, 4).map((p: any, idx: number) => ({
+                id: p.id,
+                name: p.name,
+                finish: p.category?.name || 'Soft Matte',
+                price: Number(p.price || 16),
+                badge: idx === 3 ? 'New' : undefined,
+                image: p.image_url || BESTSELLERS[idx % BESTSELLERS.length].image,
+                swatches: BESTSELLERS[idx % BESTSELLERS.length].swatches,
+              }));
+              setProducts(mapped);
+            }
+          })
+          .catch(() => {});
+      });
+  }, []);
 
   return (
-    <div className="space-y-16">
-      {/* Hero Section — Split & Glassmorphism with Live Serum Orb */}
-      <section className="grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <div>
-          <span className="eyebrow mb-3.5 inline-block text-[11px] font-semibold uppercase tracking-[2px] text-[#B86B43]">
-            International Cosmetic Atelier
-          </span>
-          <h1 className="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl mb-5">
-            Curated Skincare, Shades &amp; <em className="italic text-[#B86B43]">Beauty Essentials</em>
-          </h1>
-          <p className="max-w-xl text-base leading-relaxed text-muted-fg mb-7">
-            Discover foundation shades, barrier-restoring serums, and daily UV shields backed by
-            live variant selection and FEFO batch-verified freshness.
-          </p>
-          <div className="flex flex-wrap gap-3.5">
-            <Link
-              to="/catalog"
-              className="touch-target inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#B86B43] px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#9A5532] hover:-translate-y-0.5"
-            >
-              <span>Shop All Cosmetics →</span>
-            </Link>
-            <a
-              href="#skin-routine-builder"
-              className="touch-target inline-flex cursor-pointer items-center rounded-xl border border-foreground/80 bg-transparent px-6 py-3.5 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-foreground/5"
-            >
-              Build Skin Routine
-            </a>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#FDF7F8] text-stone-900 font-sans">
+      {/* 1. HERO SECTION (Soft Pink Split Layout) */}
+      <section className="bg-gradient-to-br from-[#FBECEF] via-[#F7DFE5] to-[#F3D1DA] border-b border-rose-200/50">
+        <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          {/* Left Content */}
+          <div className="lg:col-span-6 space-y-6">
+            <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
+              NEW • SOFT MATTE RANGE
+            </span>
 
-        {/* Interactive Shade Matcher Card */}
-        <div className="hero-visual">
-          <div className="text-[12px] font-semibold tracking-wider text-[#1C1B1A]">
-            LIVE SHADE PREVIEW
-          </div>
-          <div
-            className="serum-orb"
-            id="shadeOrb"
-            style={{ backgroundColor: activeShade.color }}
-          />
-          <div className="glass-widget">
-            <div className="widget-header">
-              <span className="text-foreground">True-to-Tone Finder</span>
-              <span className="font-semibold text-[#B86B43]">FEFO Verified ✓</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-stone-900 leading-[1.08]">
+              Colour That <br />
+              <span className="text-[#B8295B]">Feels Like You.</span>
+            </h1>
+
+            <p className="text-stone-600 text-base sm:text-lg max-w-md leading-relaxed">
+              Creamy, comfortable lipstick &amp; skincare essentials backed by live shade matching and FEFO freshness.
+            </p>
+
+            {/* Dual Pill Buttons */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Link
+                to="/products"
+                className="bg-[#B8295B] hover:bg-[#991F4A] text-white font-semibold text-sm px-7 py-3.5 rounded-full shadow-md shadow-rose-900/15 transition-all"
+              >
+                Shop Cosmetics
+              </Link>
+              <a
+                href="#shade-finder"
+                className="bg-white/90 hover:bg-white text-stone-900 border border-stone-300 font-semibold text-sm px-7 py-3.5 rounded-full transition-all"
+              >
+                Find My Shade
+              </a>
             </div>
-            <div className="swatches">
-              {SHADE_PRESETS.map((preset, idx) => (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => setActiveShadeIndex(idx)}
-                  className={`swatch ${activeShadeIndex === idx ? 'active' : ''}`}
-                  style={{ backgroundColor: preset.color }}
-                  aria-label={`Select shade ${preset.name}`}
-                  title={preset.name}
+
+            {/* Social Proof Avatars */}
+            <div className="flex items-center gap-3 pt-2">
+              <div className="flex -space-x-2">
+                <img
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80"
+                  alt="Customer"
+                  className="w-7 h-7 rounded-full object-cover ring-2 ring-white"
                 />
-              ))}
+                <img
+                  src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80"
+                  alt="Customer"
+                  className="w-7 h-7 rounded-full object-cover ring-2 ring-white"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=80&q=80"
+                  alt="Customer"
+                  className="w-7 h-7 rounded-full object-cover ring-2 ring-white"
+                />
+              </div>
+              <span className="text-xs font-medium text-stone-600">
+                Loved by <strong className="text-stone-900">200,000+</strong> customers
+              </span>
             </div>
-            <div className="shade-label font-medium text-xs sm:text-sm" id="shadeName">
-              Selected: {activeShade.name}
+          </div>
+
+          {/* Right Model Visual + Floating Rating Card */}
+          <div className="lg:col-span-6 relative">
+            <div className="relative rounded-3xl overflow-hidden shadow-xl bg-rose-200 aspect-[4/3.6]">
+              <img
+                src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1000&q=85"
+                alt="GlowCart Beauty Model"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Floating Rating Badge */}
+            <div className="absolute -bottom-4 right-4 sm:right-6 bg-white rounded-2xl px-4 py-3 shadow-lg border border-rose-100 flex items-center gap-2.5">
+              <span className="text-amber-400 text-lg">★</span>
+              <div>
+                <div className="text-xs font-bold text-stone-900">4.8 rating</div>
+                <div className="text-[11px] text-stone-500">12k reviews</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Infinite Marquee */}
-      <div className="marquee-wrap" aria-hidden="true">
-        <div className="marquee-track">
-          ✦ FEFO BATCH-VERIFIED FRESHNESS &nbsp;&nbsp;&nbsp; ✦ LIVE HEX SHADE MATCHING &nbsp;&nbsp;&nbsp; ✦ DERMATOLOGIST TESTED &nbsp;&nbsp;&nbsp; ✦ VERIFIED CHECKOUT &amp; TRACKING &nbsp;&nbsp;&nbsp;
-          ✦ FEFO BATCH-VERIFIED FRESHNESS &nbsp;&nbsp;&nbsp; ✦ LIVE HEX SHADE MATCHING &nbsp;&nbsp;&nbsp; ✦ DERMATOLOGIST TESTED &nbsp;&nbsp;&nbsp; ✦ VERIFIED CHECKOUT &amp; TRACKING &nbsp;&nbsp;&nbsp;
+      {/* 2. TRUST FEATURE BAR */}
+      <div className="bg-white border-b border-rose-100">
+        <div className="max-w-6xl mx-auto px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-medium text-stone-700">
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[#B8295B]">🌿</span> Vegan &amp; Cruelty-Free
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[#B8295B]">⏱</span> 12-Hour Wear
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[#B8295B]">💧</span> Hydrating Formula
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[#B8295B]">↺</span> Free Returns
+          </div>
         </div>
       </div>
 
-      {/* Bento Grid Categories */}
-      <section className="space-y-6" id="categories" aria-labelledby="featured-categories-heading">
-        <div className="flex items-end justify-between">
-          <div>
-            <span className="bento-tag">Curated Aisles</span>
-            <h2 id="featured-categories-heading" className="font-serif text-3xl font-bold sm:text-4xl">
-              Featured Categories
-            </h2>
-          </div>
+      {/* 3. BESTSELLERS ("Our Most-Loved Shades") */}
+      <section className="max-w-7xl mx-auto px-6 py-14">
+        <div className="relative text-center mb-10">
+          <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
+            BESTSELLERS
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">
+            Our Most-Loved Shades
+          </h2>
           <Link
-            to="/catalog"
-            className="text-sm font-semibold text-[#1C1B1A] transition-colors hover:text-[#B86B43]"
+            to="/products"
+            className="sm:absolute sm:right-0 sm:bottom-1 inline-block mt-2 sm:mt-0 text-xs font-semibold text-stone-700 hover:text-[#B8295B]"
           >
-            Browse all +
+            View All →
           </Link>
         </div>
 
-        <div className="bento-grid">
-          {/* Large Card: Skincare */}
-          <Link to="/category/skincare" className="bento-card bento-large group">
-            <span className="bento-tag">Most Popular</span>
-            <div>
-              <h3 className="font-serif text-3xl font-bold mb-2">Skincare Rituals</h3>
-              <p className="text-sm text-muted-fg leading-relaxed">
-                Barrier-restoring cleansers, active serums, essences, and hydrating moisturizers.
-              </p>
-            </div>
-            <div className="bento-arrow">↗</div>
-          </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((item) => {
+            const activeColor = activeSwatches[item.id] || item.swatches[0];
+            const isLiked = !!wishlist[item.id];
 
-          {/* Standard Card 1: Makeup */}
-          <Link to="/category/makeup" className="bento-card group">
-            <span className="bento-tag">Color Studio</span>
-            <div>
-              <h3 className="font-serif text-2xl font-bold mb-1">Makeup</h3>
-              <p className="text-xs text-muted-fg">Face, eye, and lip color cosmetics.</p>
-            </div>
-            <div className="bento-arrow">↗</div>
-          </Link>
-
-          {/* Standard Card 2: Sun Care */}
-          <Link to="/category/sun-care" className="bento-card group">
-            <span className="bento-tag">SPF 50+</span>
-            <div>
-              <h3 className="font-serif text-2xl font-bold mb-1">Sun Care</h3>
-              <p className="text-xs text-muted-fg">Daily UV protection creams &amp; sticks.</p>
-            </div>
-            <div className="bento-arrow">↗</div>
-          </Link>
-
-          {/* Wide Card: Hair Care */}
-          <Link to="/category/hair-care" className="bento-card bento-wide group">
-            <span className="bento-tag">Botanical Care</span>
-            <div>
-              <h3 className="font-serif text-2xl font-bold mb-1">Hair &amp; Scalp Care</h3>
-              <p className="text-xs text-muted-fg">
-                Nourishing shampoos, conditioners, and reparative hair masks.
-              </p>
-            </div>
-            <div className="bento-arrow">↗</div>
-          </Link>
-        </div>
-      </section>
-
-      {/* Popular Products & Best Sellers Showcase */}
-      {bestSellers && bestSellers.items.length > 0 && (
-        <section aria-labelledby="best-sellers-heading" className="space-y-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <span className="bento-tag">Popular Cult Favorites</span>
-              <h2 id="best-sellers-heading" className="font-serif text-3xl font-bold sm:text-4xl text-foreground">
-                Popular Products &amp; Best Sellers
-              </h2>
-              <p className="mt-1 text-sm text-muted-fg">
-                Hand-picked viral formulas, barrier-restoring serums, and high-pigment shades with authentic studio photography.
-              </p>
-            </div>
-            <Link
-              to="/catalog?sort=rating"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#B86B43] hover:text-[#9A5532] transition-colors"
-            >
-              <span>Shop all popular</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {bestSellers.items.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Interactive Skin-Type Quiz & Routine Builder */}
-      <SkinRoutineBuilder />
-
-      {/* New Arrivals */}
-      {newArrivals && newArrivals.items.length > 0 && (
-        <section aria-labelledby="new-arrivals-heading" className="space-y-5">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-rose">
-                Just Landed
-              </div>
-              <h2 id="new-arrivals-heading" className="font-serif text-3xl font-bold">
-                New Arrivals
-              </h2>
-            </div>
-            <Link
-              to="/catalog?sort=newest"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-accent"
-            >
-              <span>View more</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {newArrivals.items.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Special Offers */}
-      {promotions && promotions.length > 0 && (
-        <section className="rounded-2xl border border-border bg-beige/60 p-6 sm:p-8">
-          <h2 className="font-serif text-3xl font-bold">Special Offers</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {promotions.map(
-              (promo: {
-                id: string;
-                title: string;
-                description?: string;
-                coupons?: Array<{ code: string }>;
-              }) => (
-                <Card key={promo.id}>
-                  <h3 className="text-lg font-semibold text-primary">{promo.title}</h3>
-                  <p className="mt-1 text-sm text-muted-fg">{promo.description}</p>
-                  {promo.coupons && promo.coupons.length > 0 && (
-                    <p className="mt-3 text-xs text-foreground">
-                      Use code:{' '}
-                      <span className="rounded bg-blush px-2 py-1 font-mono font-semibold text-foreground">
-                        {promo.coupons[0].code}
-                      </span>
-                    </p>
+            return (
+              <div
+                key={item.id}
+                className="bg-white rounded-2xl p-3.5 border border-rose-100/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+              >
+                {/* Product Image Box */}
+                <div className="relative rounded-xl overflow-hidden bg-[#F9E8EC] aspect-square mb-3.5">
+                  {item.badge && (
+                    <span className="absolute top-2.5 left-2.5 bg-[#B8295B] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                      {item.badge}
+                    </span>
                   )}
-                </Card>
-              )
-            )}
-          </div>
-        </section>
-      )}
 
-      {/* Customer Testimonials */}
-      <section aria-labelledby="testimonials-heading" className="space-y-5">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-rose">
-              Illustrative Demo Community Feedback
-            </div>
-            <h2 id="testimonials-heading" className="font-serif text-3xl font-bold">
-              Customer Testimonials
-            </h2>
-          </div>
-        </div>
-        <div className="grid gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((item) => (
-            <Card
-              key={item.id}
-              className="flex flex-col justify-between space-y-4 bg-card transition-shadow duration-200 hover:shadow-md"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <StarRating rating={item.rating} />
-                  <Quote className="h-5 w-5 text-rose/60" aria-hidden="true" />
+                  {/* Heart Wishlist Button */}
+                  <button
+                    type="button"
+                    aria-label={`Wishlist ${item.name}`}
+                    onClick={() =>
+                      setWishlist((prev) => ({ ...prev, [item.id]: !prev[item.id] }))
+                    }
+                    className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-xs shadow-sm hover:scale-105 transition"
+                  >
+                    {isLiked ? '❤️' : '🤍'}
+                  </button>
+
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
-                <p className="text-sm leading-relaxed text-foreground">&ldquo;{item.quote}&rdquo;</p>
+
+                {/* Shade Swatch Dots */}
+                <div className="flex items-center gap-1.5 mb-2">
+                  {item.swatches.map((hex) => (
+                    <button
+                      key={hex}
+                      type="button"
+                      aria-label={`Select swatch ${hex}`}
+                      onClick={() =>
+                        setActiveSwatches((prev) => ({ ...prev, [item.id]: hex }))
+                      }
+                      className={`w-3.5 h-3.5 rounded-full border transition-transform ${
+                        activeColor === hex ? 'border-stone-900 scale-125' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: hex }}
+                    />
+                  ))}
+                </div>
+
+                {/* Title & Finish */}
+                <Link
+                  to={`/products/${item.id}`}
+                  className="font-bold text-sm text-stone-900 hover:text-[#B8295B]"
+                >
+                  {item.name}
+                </Link>
+                <p className="text-xs text-stone-500">{item.finish}</p>
+                <p className="text-sm font-bold text-stone-900 mt-1">${item.price}</p>
+
+                {/* Stars + Add to Bag Pill */}
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-stone-100">
+                  <span className="text-amber-400 text-xs tracking-tighter">★★★★★</span>
+                  <button
+                    type="button"
+                    className="bg-stone-900 hover:bg-[#B8295B] text-white text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors"
+                  >
+                    Add to Bag
+                  </button>
+                </div>
               </div>
-              <div className="border-t border-border pt-3">
-                <div className="text-sm font-semibold text-foreground">{item.name}</div>
-                <div className="text-xs text-muted-fg">{item.skinProfile}</div>
-              </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="rounded-2xl border border-border bg-gradient-to-r from-card via-beige/50 to-blush/40 p-6 shadow-sm sm:p-10">
-        <div className="mx-auto max-w-xl text-center">
-          <h2 className="font-serif text-3xl font-bold">Join the GlowCart Atelier List</h2>
-          <p className="mt-1 text-sm text-muted-fg">
-            Receive skincare ritual guides, new shade launches, and seasonal promotional codes.
+      {/* 4. INTERACTIVE SHADE FINDER ("Find Your Perfect Match") */}
+      <section
+        id="shade-finder"
+        className="bg-gradient-to-b from-[#FBECEF] to-[#F6DCE3] py-14 px-6 border-t border-rose-200/50"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
+            SHADE FINDER
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">
+            Find Your Perfect Match
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
+            Pick your skin tone to see your best shades.
           </p>
-          {newsletterSubscribed ? (
-            <div className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent">
-              <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-              <span>Subscribed with {newsletterEmail}</span>
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (newsletterEmail) setNewsletterSubscribed(true);
-              }}
-              className="mt-5 flex flex-col gap-2 sm:flex-row"
+
+          {/* 6 Skin Tone Swatches */}
+          <div className="flex flex-wrap justify-center gap-5 sm:gap-7 my-8">
+            {SKIN_TONES.map((tone) => {
+              const isSelected = selectedTone.id === tone.id;
+              return (
+                <button
+                  key={tone.id}
+                  type="button"
+                  onClick={() => setSelectedTone(tone)}
+                  className="flex flex-col items-center gap-2 group"
+                >
+                  <span
+                    className={`w-11 h-11 rounded-full transition-all ${
+                      isSelected
+                        ? 'ring-2 ring-offset-2 ring-stone-900 scale-110'
+                        : 'hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: tone.hex }}
+                  />
+                  <span
+                    className={`text-xs ${
+                      isSelected ? 'font-bold text-stone-900' : 'text-stone-600'
+                    }`}
+                  >
+                    {tone.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3 Matching Lip/Shade Preview Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+            {selectedTone.matches.map((match) => (
+              <div
+                key={match.name}
+                className="bg-white rounded-2xl p-3 shadow-sm border border-rose-100"
+              >
+                <div
+                  className="h-28 rounded-xl flex items-center justify-center relative overflow-hidden"
+                  style={{ backgroundColor: selectedTone.hex }}
+                >
+                  {/* Lip / Swatch Stroke Visual */}
+                  <div
+                    className="w-24 h-10 rounded-full shadow-inner opacity-95"
+                    style={{ backgroundColor: match.shade }}
+                  />
+                </div>
+                <p className="text-xs font-bold text-stone-900 mt-2.5">{match.name}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Take the Full Quiz Button */}
+          <div className="mt-8">
+            <Link
+              to="/products"
+              className="inline-block bg-[#B8295B] hover:bg-[#991F4A] text-white text-xs font-semibold px-7 py-3 rounded-full shadow-md transition"
             >
-              <label htmlFor="newsletter-email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="newsletter-email"
-                type="email"
-                required
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="flex-1 rounded-lg border border-border bg-card px-4 py-2.5 text-sm"
-              />
-              <Button type="submit">Subscribe</Button>
-            </form>
-          )}
+              Take the Full Quiz
+            </Link>
+          </div>
         </div>
       </section>
     </div>
   );
 };
+
+export default HomePage;

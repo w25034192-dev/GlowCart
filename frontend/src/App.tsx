@@ -77,6 +77,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/catalog" element={<CatalogPage />} />
+        <Route path="/products" element={<CatalogPage />} />
         <Route path="/category/:categorySlug" element={<CatalogPage />} />
         <Route path="/brand/:brandSlug" element={<CatalogPage />} />
         <Route path="/search" element={<CatalogPage />} />
