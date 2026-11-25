@@ -418,9 +418,9 @@ def test_products_data_json_and_loader(db_session):
     from app.models import Product, ProductVariant, ProductImage
     products = load_products_from_json()
     assert isinstance(products, list)
-    assert len(products) >= 5
+    assert len(products) >= 6
 
-    # Check top 5 requested items
+    # Check top 6 requested items
     assert products[0]["name"] == "Dior Addict Lip Glow Oil"
     assert products[0]["brand"] == "DIOR"
     assert products[0]["category"] == "Makeup"
@@ -436,28 +436,43 @@ def test_products_data_json_and_loader(db_session):
     assert products[1]["stock"] == 90
     assert products[1]["shade_name"] == "Joy"
 
-    assert products[2]["name"] == "Estée Lauder Advanced Night Repair Serum"
-    assert products[2]["brand"] == "ESTÉE LAUDER"
-    assert products[2]["category"] == "Skincare"
-    assert products[2]["price"] == 85.0
+    assert products[2]["name"] == "Charlotte Tilbury Pillow Talk Matte Revolution"
+    assert products[2]["brand"] == "CHARLOTTE TILBURY"
+    assert products[2]["category"] == "Makeup"
+    assert products[2]["price"] == 35.0
+    assert products[2]["stock"] == 75
+    assert products[2]["shade_name"] == "Pillow Talk Original"
+    assert products[2]["shade_hex"] == "#C87D76"
 
-    assert products[3]["name"] == "Chanel Coco Mademoiselle Eau De Parfum"
-    assert products[3]["brand"] == "CHANEL"
-    assert products[3]["category"] == "Fragrance"
+    assert products[3]["name"] == "Estée Lauder Advanced Night Repair Serum"
+    assert products[3]["brand"] == "ESTÉE LAUDER"
+    assert products[3]["category"] == "Skincare"
+    assert products[3]["price"] == 85.0
+    assert products[3]["stock"] == 45
 
-    assert products[4]["name"] == "La Roche-Posay Anthelios Invisible Fluid SPF50+"
-    assert products[4]["brand"] == "LA ROCHE-POSAY"
-    assert products[4]["category"] == "Sun Care"
+    assert products[4]["name"] == "Chanel Coco Mademoiselle Eau De Parfum"
+    assert products[4]["brand"] == "CHANEL"
+    assert products[4]["category"] == "Fragrance"
+    assert products[4]["price"] == 135.0
+    assert products[4]["stock"] == 30
 
-    # Seed top 5 into db to verify persistence with image_url and shade_name
-    created = seed_generated_products(db_session, products[:5])
-    assert created == 5
-    dior = db_session.query(Product).filter(Product.name == "Dior Addict Lip Glow Oil").first()
-    assert dior is not None
-    assert dior.brand.name.lower() == "dior"
-    assert dior.images[0].image_url == products[0]["image_url"]
-    assert dior.variants[0].shade_name == "001 Pink"
-    assert dior.variants[0].hex_color == "#F4A6B8"
+    assert products[5]["name"] == "Laneige Lip Sleeping Mask Berry"
+    assert products[5]["brand"] == "LANEIGE"
+    assert products[5]["category"] == "Skincare"
+    assert products[5]["price"] == 24.0
+    assert products[5]["stock"] == 120
+    assert products[5]["shade_name"] == "Sweet Berry"
+    assert products[5]["shade_hex"] == "#F28B9C"
+
+    # Seed top 6 into db to verify persistence with image_url, shade_name, and brands
+    created = seed_generated_products(db_session, products[:6])
+    assert created == 6
+    ct = db_session.query(Product).filter(Product.name == "Charlotte Tilbury Pillow Talk Matte Revolution").first()
+    assert ct is not None
+    assert ct.brand.name.lower() == "charlotte tilbury"
+    assert ct.images[0].image_url == products[2]["image_url"]
+    assert ct.variants[0].shade_name == "Pillow Talk Original"
+    assert ct.variants[0].hex_color == "#C87D76"
 
 
 
