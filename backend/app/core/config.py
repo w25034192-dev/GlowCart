@@ -19,8 +19,8 @@ def _load_dotenv() -> None:
 _load_dotenv()
 
 _DEFAULT_CORS_ORIGINS = ("http://localhost:5173", "http://127.0.0.1:5173")
-_RAILWAY_CORS_ORIGIN_REGEX = (
-    r"^https://[a-zA-Z0-9-]+(\.up\.railway\.app|\.vercel\.app|\.netlify\.app)$"
+_DEFAULT_CORS_ORIGIN_REGEX = (
+    r"^https?://([a-zA-Z0-9-]+\.)*(up\.railway\.app|vercel\.app|netlify\.app|localhost|127\.0\.0\.1)(:\d+)?$"
 )
 
 
@@ -54,22 +54,13 @@ def _default_cors_origin_regex() -> str | None:
     explicit = os.getenv("CORS_ORIGIN_REGEX", "").strip()
     if explicit:
         return explicit
-    # Detect Railway via any of the many env vars it injects
-    is_railway = bool(
-        os.getenv("RAILWAY_ENVIRONMENT")
-        or os.getenv("RAILWAY_PROJECT_ID")
-        or os.getenv("RAILWAY_SERVICE_NAME")
-        or os.getenv("RAILWAY_PUBLIC_DOMAIN")
-        or os.getenv("RAILWAY_STATIC_URL")
-        or os.getenv("RAILWAY_GIT_REPO_NAME")
-        or os.getenv("RAILWAY_DEPLOYMENT_ID")
-    )
-    # Also treat APP_ENV=production as a signal to allow Railway/Vercel origins
-    # unless the user has explicitly listed CORS_ORIGINS (meaning they want tight control)
-    is_production = os.getenv("APP_ENV", "").lower() == "production"
-    if (is_railway or is_production) and not os.getenv("CORS_ORIGINS", "").strip():
-        return _RAILWAY_CORS_ORIGIN_REGEX
-    return None
+    # If the user has explicitly defined CORS_ORIGINS (comma-separated list of exact domains),
+    # respect that and do not enable open regex unless requested.
+    # Otherwise, by default allow any deployment origin on Railway, Vercel, Netlify, or localhost.
+    raw_origins = os.getenv("CORS_ORIGINS", "").strip()
+    if raw_origins and raw_origins != ",".join(_DEFAULT_CORS_ORIGINS):
+        return None
+    return _DEFAULT_CORS_ORIGIN_REGEX
 
 
 class Settings(BaseModel):

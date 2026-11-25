@@ -219,22 +219,22 @@ def test_cors_origins_normalization_and_railway_preflight(monkeypatch):
 
     # --- Regex coverage: all production subdomain forms must match ---
     import re
-    from app.core.config import _RAILWAY_CORS_ORIGIN_REGEX
+    from app.core.config import _DEFAULT_CORS_ORIGIN_REGEX
     should_match = [
         "https://glowcart-production-7b775f24.up.railway.app",
         "https://glowcart-frontend.up.railway.app",
         "https://glowcart.vercel.app",
         "https://my-app.netlify.app",
+        "http://localhost:5173",
     ]
     should_not_match = [
-        "http://glowcart-frontend.up.railway.app",   # http not allowed
         "https://evil.com",
         "https://glowcart-frontend.up.railway.app.evil.com",
     ]
     for origin in should_match:
-        assert re.match(_RAILWAY_CORS_ORIGIN_REGEX, origin), f"Should match: {origin}"
+        assert re.fullmatch(_DEFAULT_CORS_ORIGIN_REGEX, origin), f"Should match: {origin}"
     for origin in should_not_match:
-        assert not re.match(_RAILWAY_CORS_ORIGIN_REGEX, origin), f"Should NOT match: {origin}"
+        assert not re.fullmatch(_DEFAULT_CORS_ORIGIN_REGEX, origin), f"Should NOT match: {origin}"
 
     # --- RAILWAY_PUBLIC_DOMAIN auto-inject into cors_origins ---
     monkeypatch.setenv("RAILWAY_PUBLIC_DOMAIN", "glowcart-production-7b775f24.up.railway.app")
