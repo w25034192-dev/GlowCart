@@ -68,7 +68,12 @@ class Settings(BaseModel):
     free_shipping_threshold: float = float(os.getenv("FREE_SHIPPING_THRESHOLD", "75.00"))
 
     @model_validator(mode="after")
-    def _validate_production_secrets(self) -> "Settings":
+    def _validate_and_normalize(self) -> "Settings":
+        if self.database_url.startswith("postgres://"):
+            self.database_url = "postgresql+psycopg://" + self.database_url[len("postgres://") :]
+        elif self.database_url.startswith("postgresql://"):
+            self.database_url = "postgresql+psycopg://" + self.database_url[len("postgresql://") :]
+
         if self.app_env.lower() == "production":
             dev_jwt = "glowcart-dev-only-secret-key-change-in-production-min-32-chars"
             dev_wh = "glowcart-sandbox-webhook-secret-change-me"

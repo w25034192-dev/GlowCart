@@ -9,7 +9,7 @@
 
 **Command:** `cd backend && python3 -m pytest tests -v`  
 **Exit Code:** `0`  
-**Result:** **17 passed, 0 failed** (`20.45s`, independently verified by Agent B subagent)
+**Result:** **18 passed, 0 failed** (`19.49s`)
 
 | Test Module | Test Case | Status | Verified Behavior |
 |---|---|---|---|
@@ -19,6 +19,7 @@
 | `test_auth_rbac.py` | `test_customer_cannot_access_admin_or_super_admin_endpoints` | PASSED | RBAC enforcement (`403` for customer/admin on super_admin route) |
 | `test_auth_rbac.py` | `test_profile_and_address_crud` | PASSED | Profile update and address create/list/delete |
 | `test_auth_rbac.py` | `test_production_settings_reject_default_secrets` | PASSED | Fail-closed guard rejects dev default JWT/webhook secrets in `production` |
+| `test_auth_rbac.py` | `test_railway_postgres_url_normalization` | PASSED | Normalizes Railway `postgres://` and `postgresql://` URLs to `postgresql+psycopg://` |
 | `test_catalog_inventory.py` | `test_catalog_crud_and_filtering` | PASSED | Admin CRUD, RBAC `403`, search, skin-type & price filtering, variants |
 | `test_catalog_inventory.py` | `test_inventory_batches_expiry_and_fefo_allocation` | PASSED | Expired batch exclusion, negative-stock `409` rejection, FEFO earliest-expiry-first deduction |
 | `test_catalog_inventory.py` | `test_product_image_upload_validation` | PASSED | Rejects `.exe` upload (`400 Bad Request`) |

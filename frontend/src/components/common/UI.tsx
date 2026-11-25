@@ -11,7 +11,7 @@ export const Button: React.FC<
     accent: 'bg-accent text-accent-fg hover:opacity-90',
     secondary: 'bg-blush text-foreground border border-border hover:bg-beige',
     outline: 'border border-border bg-card text-foreground hover:bg-muted/60',
-    danger: 'bg-destructive text-white hover:opacity-90',
+    danger: 'bg-destructive text-destructive-fg hover:opacity-90',
   };
   return (
     <button

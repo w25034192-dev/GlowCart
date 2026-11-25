@@ -18,6 +18,7 @@ export default {
         'accent-fg': 'var(--color-on-accent)',
         border: 'var(--color-border)',
         destructive: 'var(--color-destructive)',
+        'destructive-fg': 'var(--color-on-destructive)',
         ring: 'var(--color-ring)',
         blush: 'var(--color-blush)',
         beige: 'var(--color-beige)',

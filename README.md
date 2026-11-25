@@ -108,7 +108,7 @@ Running `python3 -m app.db.seed` creates clearly labelled illustrative demo acco
 - OpenAPI JSON: `http://localhost:8000/api/v1/openapi.json`
 
 ## 18. Deployment Overview
-Frontend deploys to **Vercel** (`frontend/vercel.json`); Backend + PostgreSQL deploy to **Railway** (`backend/Dockerfile`). See [docs/deployment-guide.md](./docs/deployment-guide.md).
+GlowCart includes multi-stage Dockerfiles and `railway.toml` configurations in both [`backend/`](./backend/) and [`frontend/`](./frontend/) for full-stack Railway deployment (plus [`docker-compose.yml`](./docker-compose.yml) / [`docker-compose.prod.yml`](./docker-compose.prod.yml) for local Docker development and [`frontend/vercel.json`](./frontend/vercel.json) for optional Vercel frontend hosting). See [docs/deployment-guide.md](./docs/deployment-guide.md).
 
 ## 19. Troubleshooting
 - **Database connection refused:** Verify PostgreSQL is running and `DATABASE_URL` matches credentials.

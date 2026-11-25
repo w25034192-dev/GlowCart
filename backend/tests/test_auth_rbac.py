@@ -187,3 +187,16 @@ def test_production_settings_reject_default_secrets():
             payment_webhook_secret="glowcart-sandbox-webhook-secret-change-me",
         )
 
+
+def test_railway_postgres_url_normalization():
+    from app.core.config import Settings
+
+    s1 = Settings(database_url="postgres://user:pass@pg.railway.internal:5432/railway")
+    assert s1.database_url == "postgresql+psycopg://user:pass@pg.railway.internal:5432/railway"
+
+    s2 = Settings(database_url="postgresql://user:pass@pg.railway.internal:5432/railway")
+    assert s2.database_url == "postgresql+psycopg://user:pass@pg.railway.internal:5432/railway"
+
+    s3 = Settings(database_url="sqlite:///./glowcart_dev.db")
+    assert s3.database_url == "sqlite:///./glowcart_dev.db"
+

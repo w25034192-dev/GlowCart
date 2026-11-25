@@ -3,8 +3,8 @@
 This document records the chronological summary of every development phase and the latest verified project context under `/docs/`.
 
 ## Latest Context Snapshot
-- **Last Completed Action:** Applied `ui-ux-pro-max-skill` (`design-system/glowcart/MASTER.md`, `tokens.json`, `tokens.css`, `pages/admin-dashboard.md`) across GlowCart's React + Tailwind UI (`index.html`, `tailwind.config.js`, `index.css`, `UI.tsx`, `ProductCard.tsx`, `CustomerLayout.tsx`, `HomePage.tsx`, `CatalogPage.tsx`, `AdminDashboardPage.tsx`).
-- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **17 passed, 0 failed** (`20.45s`, exit code `0`), independently `VERIFIED` by Agent B/C subagent.
+- **Last Completed Action:** Hardened Docker + Railway deployment configuration (`backend/Dockerfile`, `backend/start.sh`, `backend/.dockerignore`, `backend/railway.toml`, `frontend/Dockerfile`, `frontend/nginx.conf.template`, `frontend/.dockerignore`, `frontend/railway.toml`, `docker-compose.yml`, `docker-compose.prod.yml`), added Railway `postgres://`/`postgresql://` → `postgresql+psycopg://` normalization, and updated `docs/deployment-guide.md`.
+- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **18 passed, 0 failed** (`19.49s`, exit code `0`).
 - **Pending Environment Items (Honest Blockers):**
   - `node` / `npm` is absent in the sandbox (`frontend/` Vitest & Vite production build pending Node.js 20+).
   - `argon2-cffi` and `psycopg` C extensions + live PostgreSQL daemon are absent in the offline sandbox (`requirements.txt` pins both; local backend verified via SQLite transactions + bcrypt fallback).
