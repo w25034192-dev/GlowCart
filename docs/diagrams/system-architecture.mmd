@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph Client["Presentation Tier (Vercel / React + TypeScript + Vite)"]
+        CustUI["Customer Storefront\n(Catalog, Shade Selector, Cart, Checkout, Tracking)"]
+        AdminUI["Admin & Super Admin Dashboard\n(Sidebar, Recharts Analytics, Inventory, Orders)"]
+    end
+
+    subgraph Backend["Application Tier (Railway / FastAPI)"]
+        MW["Middleware\n(CORS, Security Headers, Rate Limiter, Error Handler)"]
+        Routers["API v1 Routers\n(/api/v1/auth, products, cart, orders, payments, admin/*)"]
+        Services["Domain Services\n(Auth, Catalog, FEFO Inventory, Checkout, Payment, Analytics)"]
+        Repos["Repositories & SQLAlchemy 2.0 ORM"]
+    end
+
+    subgraph Data["Data & External Services"]
+        PG[("PostgreSQL\n27 Tables + Alembic")]
+        Storage["Media Storage\n(Cloudinary / Local Fallback)"]
+        PayGW["Payment Provider\n(COD / Sandbox Webhook)"]
+    end
+
+    CustUI --> MW
+    AdminUI --> MW
+    MW --> Routers
+    Routers --> Services
+    Services --> Repos
+    Repos --> PG
+    Services --> Storage
+    Services --> PayGW
+

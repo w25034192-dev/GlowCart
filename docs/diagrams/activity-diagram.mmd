@@ -1,0 +1,16 @@
+flowchart TD
+    Start([Customer Initiates Checkout]) --> ValidateCart[Validate Non-Empty Cart & Address]
+    ValidateCart --> LockStock[Begin DB Transaction & Lock Variant Inventory + Non-Expired Batches]
+    LockStock --> CheckFEFO{Sufficient Non-Expired Stock?}
+    CheckFEFO -- No --> Rollback([Rollback & Return 409 Conflict])
+    CheckFEFO -- Yes --> CalcTotals[Validate Coupon & Compute Subtotal, Discount, Shipping, Total]
+    CalcTotals --> SnapshotOrder[Create Order + Item/Address Snapshots + Payment Record]
+    SnapshotOrder --> PayType{Payment Method?}
+    PayType -- COD --> ReserveCOD[Reserve/Allocate Stock & Set Order CONFIRMED]
+    PayType -- Online Sandbox --> PendingOnline[Reserve Stock & Set Order PAYMENT_PENDING]
+    PendingOnline --> Webhook[Verify Signed Webhook & Idempotency Key]
+    Webhook --> DeductFEFO[Deduct Remaining Quantity FEFO & Log Movement SOLD]
+    ReserveCOD --> ClearCart[Clear Customer Cart & Commit]
+    DeductFEFO --> ClearCart
+    ClearCart --> Done([Order Confirmed & Notification Sent])
+

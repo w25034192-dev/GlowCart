@@ -1,0 +1,24 @@
+sequenceDiagram
+    actor C as Customer
+    participant FE as React Frontend
+    participant API as FastAPI /api/v1
+    participant DB as PostgreSQL
+    participant GW as Sandbox Payment
+
+    C->>FE: Confirm Checkout (Address, Coupon, SANDBOX, Idempotency-Key)
+    FE->>API: POST /api/v1/orders
+    API->>DB: BEGIN TX + Check Idempotency-Key
+    API->>DB: Lock inventory & non-expired batches (ORDER BY expiry_date ASC)
+    API->>DB: Reserve stock, create Order + OrderItems + Payment (PAYMENT_PENDING)
+    DB-->>API: COMMIT
+    API-->>FE: 201 Created (order_id, payment_id)
+
+    C->>FE: Complete Sandbox Payment
+    FE->>API: POST /api/v1/payments
+    API->>GW: Create Sandbox Charge / Redirect Token
+    GW-->>API: POST /api/v1/payments/webhook (HMAC signature + provider_event_id)
+    API->>DB: Verify signature & unique provider_event_id
+    API->>DB: Mark Payment PAID, Order PAID, Deduct FEFO batches, Log SOLD movement
+    DB-->>API: COMMIT
+    API-->>FE: 200 OK (Order PAID)
+

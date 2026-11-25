@@ -1,0 +1,6 @@
+# Abstract — GlowCart
+
+GlowCart is a full-stack international cosmetic e-commerce and inventory management web application with integrated sales analytics. Designed around the specific operational requirements of beauty retail, the system models shade-level and volume-level product variants (including shade codes, HEX color swatches, and milliliter sizes), enforces batch-level expiry tracking with First Expired, First Out (FEFO) stock allocation, and prevents negative inventory or overselling through concurrency-safe database transactions.
+
+The backend is implemented using Python FastAPI, SQLAlchemy 2.0, Alembic, and a 27-table PostgreSQL schema secured by JWT authentication, Argon2id/bcrypt password hashing, and server-side Role-Based Access Control (Customer, Admin, Super Admin). The frontend is built with React, TypeScript, Vite, Tailwind CSS, Zustand, TanStack Query, and Recharts, offering both an accessible customer storefront and an 18-module administrative dashboard. Empirical backend testing via Pytest (15/15 passing tests) verified authentication, RBAC boundaries, FEFO expiry enforcement, concurrent checkout safety, HMAC-signed webhook idempotency, and SQL-backed revenue analytics.
+

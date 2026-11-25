@@ -1,0 +1,39 @@
+erDiagram
+    ROLES ||--o{ USERS : assigns
+    USERS ||--o{ ADDRESSES : owns
+    USERS ||--|| CARTS : has
+    USERS ||--|| WISHLISTS : has
+    USERS ||--o{ ORDERS : places
+    USERS ||--o{ REVIEWS : writes
+    USERS ||--o{ CUSTOMER_MESSAGES : submits
+    USERS ||--o{ MESSAGE_REPLIES : sends
+    USERS ||--o{ NOTIFICATIONS : receives
+    USERS ||--o{ AUDIT_LOGS : triggers
+    USERS ||--o{ COUPON_USAGES : redeems
+
+    CATEGORIES ||--o{ CATEGORIES : parent_of
+    CATEGORIES ||--o{ PRODUCTS : groups
+    BRANDS ||--o{ PRODUCTS : manufactures
+    PRODUCTS ||--o{ PRODUCT_IMAGES : has
+    PRODUCTS ||--o{ PRODUCT_VARIANTS : offers
+    PRODUCTS ||--o{ REVIEWS : receives
+    PRODUCTS ||--o{ WISHLIST_ITEMS : saved_in
+
+    PRODUCT_VARIANTS ||--|| INVENTORY : tracks
+    PRODUCT_VARIANTS ||--o{ INVENTORY_BATCHES : stocked_in
+    PRODUCT_VARIANTS ||--o{ INVENTORY_MOVEMENTS : logs
+    PRODUCT_VARIANTS ||--o{ CART_ITEMS : added_to
+    PRODUCT_VARIANTS ||--o{ ORDER_ITEMS : purchased_as
+
+    INVENTORY_BATCHES ||--o{ INVENTORY_MOVEMENTS : references
+    CARTS ||--o{ CART_ITEMS : contains
+    WISHLISTS ||--o{ WISHLIST_ITEMS : contains
+
+    ORDERS ||--o{ ORDER_ITEMS : includes
+    ORDERS ||--|| PAYMENTS : settled_by
+    ORDERS ||--o{ COUPON_USAGES : applies
+    PAYMENTS ||--o{ PAYMENT_TRANSACTIONS : records
+    COUPONS ||--o{ COUPON_USAGES : tracked_by
+    PROMOTIONS ||--o{ COUPONS : sponsors
+    CUSTOMER_MESSAGES ||--o{ MESSAGE_REPLIES : threaded_with
+

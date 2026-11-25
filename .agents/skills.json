@@ -1,0 +1,12 @@
+{
+  "entries": [
+    {
+      "path": "Universal-Markdown-Skills-Framework/skills",
+      "exclude": [
+        "0[1-9]-.*",
+        "1[0-6]-.*",
+        "README.md"
+      ]
+    }
+  ]
+}

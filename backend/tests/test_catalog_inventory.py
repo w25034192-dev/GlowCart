@@ -1,0 +1,263 @@
+from datetime import date, timedelta
+import io
+
+
+def _login_as(client, make_user, email: str, role_name: str) -> dict[str, str]:
+    make_user(email, role_name=role_name)
+    token = client.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": "GlowCartPass123!"},
+    ).json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+def test_catalog_crud_and_filtering(client, make_user):
+    cust_headers = _login_as(client, make_user, "cust_cat@glowcart.com", "customer")
+    admin_headers = _login_as(client, make_user, "admin_cat@glowcart.com", "admin")
+
+    # Customer cannot create category
+    forbidden = client.post(
+        "/api/v1/admin/categories",
+        json={"name": "Makeup", "slug": "makeup"},
+        headers=cust_headers,
+    )
+    assert forbidden.status_code == 403
+
+    cat_res = client.post(
+        "/api/v1/admin/categories",
+        json={"name": "Makeup", "slug": "makeup", "description": "Face and lip cosmetics"},
+        headers=admin_headers,
+    )
+    assert cat_res.status_code == 201
+    category_id = cat_res.json()["id"]
+
+    brand_res = client.post(
+        "/api/v1/admin/brands",
+        json={"name": "Rare Beauty", "slug": "rare-beauty", "country_of_origin": "USA", "is_featured": True},
+        headers=admin_headers,
+    )
+    assert brand_res.status_code == 201
+    brand_id = brand_res.json()["id"]
+
+    prod_res = client.post(
+        "/api/v1/admin/products",
+        json={
+            "category_id": category_id,
+            "brand_id": brand_id,
+            "name": "Soft Pinch Liquid Blush",
+            "slug": "soft-pinch-liquid-blush",
+            "description": "Weightless liquid blush with buildable pigment.",
+            "skin_types": ["all", "dry", "combination"],
+            "is_featured": True,
+        },
+        headers=admin_headers,
+    )
+    assert prod_res.status_code == 201
+    product_id = prod_res.json()["id"]
+
+    var1 = client.post(
+        "/api/v1/admin/variants",
+        json={
+            "product_id": product_id,
+            "sku": "RB-BLUSH-JOY",
+            "shade_name": "Joy",
+            "shade_code": "RB01",
+            "color_name": "Muted Peach",
+            "hex_color": "#E47A68",
+            "volume_ml": 7,
+            "price": "23.00",
+            "original_price": "26.00",
+        },
+        headers=admin_headers,
+    )
+    assert var1.status_code == 201
+
+    var2 = client.post(
+        "/api/v1/admin/variants",
+        json={
+            "product_id": product_id,
+            "sku": "RB-BLUSH-HOPE",
+            "shade_name": "Hope",
+            "shade_code": "RB02",
+            "color_name": "Nude Mauve",
+            "hex_color": "#C97A7E",
+            "volume_ml": 7,
+            "price": "25.00",
+        },
+        headers=admin_headers,
+    )
+    assert var2.status_code == 201
+
+    # Search and filter
+    search = client.get("/api/v1/products/search?q=Blush")
+    assert search.status_code == 200
+    assert search.json()["total"] == 1
+
+    by_skin = client.get("/api/v1/products?skin_type=dry&min_price=20&max_price=24")
+    assert by_skin.status_code == 200
+    assert len(by_skin.json()["items"]) == 1
+
+    variants = client.get(f"/api/v1/products/{product_id}/variants")
+    assert variants.status_code == 200
+    assert len(variants.json()) == 2
+
+
+def test_inventory_batches_expiry_and_fefo_allocation(client, make_user, db_session):
+    from app.services.inventory_service import InventoryService
+
+    admin_headers = _login_as(client, make_user, "admin_inv@glowcart.com", "admin")
+    cat_id = client.post(
+        "/api/v1/admin/categories",
+        json={"name": "Skincare", "slug": "skincare"},
+        headers=admin_headers,
+    ).json()["id"]
+    brand_id = client.post(
+        "/api/v1/admin/brands",
+        json={"name": "COSRX", "slug": "cosrx"},
+        headers=admin_headers,
+    ).json()["id"]
+    prod_id = client.post(
+        "/api/v1/admin/products",
+        json={
+            "category_id": cat_id,
+            "brand_id": brand_id,
+            "name": "Advanced Snail 96 Mucin Essence",
+            "slug": "cosrx-snail-mucin",
+            "description": "Hydrating essence.",
+            "skin_types": ["dry", "sensitive"],
+        },
+        headers=admin_headers,
+    ).json()["id"]
+    variant_id = client.post(
+        "/api/v1/admin/variants",
+        json={
+            "product_id": prod_id,
+            "sku": "COSRX-SNAIL-100",
+            "volume_ml": 100,
+            "price": "25.00",
+        },
+        headers=admin_headers,
+    ).json()["id"]
+
+    # Receive expired batch -> cannot be sold
+    expired_date = (date.today() - timedelta(days=5)).isoformat()
+    soon_date = (date.today() + timedelta(days=20)).isoformat()
+    later_date = (date.today() + timedelta(days=200)).isoformat()
+    mfg_date = (date.today() - timedelta(days=90)).isoformat()
+
+    r_exp = client.post(
+        "/api/v1/admin/inventory/batches",
+        json={
+            "variant_id": variant_id,
+            "batch_number": "BATCH-EXPIRED",
+            "manufacture_date": mfg_date,
+            "expiry_date": expired_date,
+            "quantity": 5,
+        },
+        headers=admin_headers,
+    )
+    assert r_exp.status_code == 201
+
+    # Negative adjustment should fail
+    neg = client.post(
+        "/api/v1/admin/inventory/adjustments",
+        json={
+            "variant_id": variant_id,
+            "quantity_delta": -99,
+            "reason": "Invalid deduction test",
+        },
+        headers=admin_headers,
+    )
+    assert neg.status_code == 409
+
+    # Receive two sellable batches (FEFO: soon_date before later_date)
+    client.post(
+        "/api/v1/admin/inventory/batches",
+        json={
+            "variant_id": variant_id,
+            "batch_number": "BATCH-LATER",
+            "manufacture_date": mfg_date,
+            "expiry_date": later_date,
+            "quantity": 4,
+        },
+        headers=admin_headers,
+    )
+    client.post(
+        "/api/v1/admin/inventory/batches",
+        json={
+            "variant_id": variant_id,
+            "batch_number": "BATCH-SOON",
+            "manufacture_date": mfg_date,
+            "expiry_date": soon_date,
+            "quantity": 3,
+        },
+        headers=admin_headers,
+    )
+
+    expiring = client.get("/api/v1/admin/inventory/expiring", headers=admin_headers)
+    assert expiring.status_code == 200
+    assert len(expiring.json()["expired"]) == 1
+    assert len(expiring.json()["expiring_soon"]) == 1
+
+    # Sellable stock excludes expired batch (3 + 4 = 7)
+    inv_service = InventoryService(db_session)
+    assert inv_service.get_sellable_quantity(variant_id) == 7
+
+    # Allocate 5 units via FEFO -> consumes all 3 from BATCH-SOON and 2 from BATCH-LATER
+    allocations = inv_service.allocate_and_deduct_fefo(
+        variant_id=variant_id,
+        quantity=5,
+        actor_id=None,
+        reference_type="test",
+        reference_id="fefo-1",
+    )
+    db_session.commit()
+    assert allocations[0][0].batch_number == "BATCH-SOON"
+    assert allocations[0][1] == 3
+    assert allocations[1][0].batch_number == "BATCH-LATER"
+    assert allocations[1][1] == 2
+    assert inv_service.get_sellable_quantity(variant_id) == 2
+
+
+def test_product_image_upload_validation(client, make_user):
+    admin_headers = _login_as(client, make_user, "admin_img@glowcart.com", "admin")
+    cat_id = client.post(
+        "/api/v1/admin/categories",
+        json={"name": "Sun Care", "slug": "sun-care"},
+        headers=admin_headers,
+    ).json()["id"]
+    brand_id = client.post(
+        "/api/v1/admin/brands",
+        json={"name": "Beauty of Joseon", "slug": "boj"},
+        headers=admin_headers,
+    ).json()["id"]
+    prod_id = client.post(
+        "/api/v1/admin/products",
+        json={
+            "category_id": cat_id,
+            "brand_id": brand_id,
+            "name": "Relief Sun",
+            "slug": "relief-sun",
+            "description": "Lightweight SPF.",
+        },
+        headers=admin_headers,
+    ).json()["id"]
+
+    bad_upload = client.post(
+        f"/api/v1/admin/products/{prod_id}/images",
+        files={"file": ("payload.exe", io.BytesIO(b"MZ123"), "application/octet-stream")},
+        headers=admin_headers,
+    )
+    assert bad_upload.status_code == 400
+
+
+def test_demo_seeder_meets_minimum_catalog_counts(db_session):
+    from app.db.seed import seed_demo_data
+    from app.models import Brand, Category, Product, ProductVariant
+
+    seed_demo_data(db_session)
+    assert db_session.query(Category).count() >= 8
+    assert db_session.query(Brand).count() >= 15
+    assert db_session.query(Product).count() >= 50
+    assert db_session.query(ProductVariant).count() >= 100
+

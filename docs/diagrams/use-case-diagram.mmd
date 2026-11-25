@@ -1,0 +1,24 @@
+flowchart LR
+    Customer((Customer))
+    Admin((Admin))
+    SuperAdmin((Super Admin))
+
+    Customer --> UC1[Register / Login / Profile]
+    Customer --> UC2[Browse, Search & Filter Products]
+    Customer --> UC3[Select Shade / Volume Variant]
+    Customer --> UC4[Manage Cart & Wishlist]
+    Customer --> UC5[Apply Coupon & Checkout]
+    Customer --> UC6[Track Orders & Submit Reviews]
+    Customer --> UC7[Send Support Messages]
+
+    Admin --> UC8[Manage Catalog, Brands & Variants]
+    Admin --> UC9[Manage Batches, Expiry & FEFO Stock]
+    Admin --> UC10[Process Orders & Refunds]
+    Admin --> UC11[Manage Promotions, Coupons & Reviews]
+    Admin --> UC12[View Recharts Sales & Variant Analytics]
+    Admin --> UC13[Reply to Customer Messages]
+
+    SuperAdmin --> UC8
+    SuperAdmin --> UC14[Create Admins & Assign Roles]
+    SuperAdmin --> UC15[Inspect Audit Logs & System Settings]
+
