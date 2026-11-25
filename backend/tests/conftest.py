@@ -13,6 +13,7 @@ if str(BACKEND_ROOT) not in sys.path:
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test_glowcart.db")
 os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-at-least-32-chars-long")
 os.environ.setdefault("PAYMENT_WEBHOOK_SECRET", "test-webhook-secret-key")
+os.environ.setdefault("AUTO_SEED_ON_STARTUP", "false")
 
 from app.core.rate_limiter import rate_limiter
 from app.core.security import hash_password, reset_revoked_tokens

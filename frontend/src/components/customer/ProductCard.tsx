@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Badge, StarRating } from '@/components/common/UI';
+import { resolveMediaUrl } from '@/utils/media';
 import type { ProductSummary } from '@/types';
 
 export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) => {
@@ -16,10 +17,7 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
         className="relative block aspect-square cursor-pointer overflow-hidden bg-beige"
       >
         <img
-          src={
-            product.primary_image_url ||
-            `https://placehold.co/500x500/FAF8F6/1C1917?text=${encodeURIComponent(product.name)}`
-          }
+          src={resolveMediaUrl(product.primary_image_url, product.name)}
           alt={product.name}
           loading="lazy"
           className="h-full w-full object-cover"

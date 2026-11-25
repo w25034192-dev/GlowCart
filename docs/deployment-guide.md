@@ -25,10 +25,15 @@
    - `JWT_SECRET_KEY=<64-char-random-secret>`
    - `PAYMENT_WEBHOOK_SECRET=<random-hmac-secret>`
    - `CORS_ORIGINS=https://<your-frontend-service>.up.railway.app` (or Vercel URL)
-   - `SEED_DEMO_DATA=true` *(optional first deploy only; set `false` afterwards)*
+   - `AUTO_SEED_ON_STARTUP=true` *(default: automatically creates default admin/super-admin accounts and seeds 50 demo cosmetic products across all 8 categories if the `products` table is empty on boot; set `false` to disable)*
+   - `SEED_DEMO_DATA=false` *(optional explicit CLI seed before Uvicorn starts)*
    - Optional Cloudinary: `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 4. `backend/start.sh` automatically runs `alembic upgrade head` before starting `uvicorn` on `$PORT` with `--proxy-headers`.
-5. Verify health check: `GET https://<backend-domain>/health` → `{"status": "ok"}`.
+5. Default seeded demo accounts (change passwords after first production login):
+   - Admin: `admin@glowcart.com` / `GlowCartAdmin123!`
+   - Super Admin: `superadmin@glowcart.com` / `GlowCartSuper123!`
+   - Customer: `customer@glowcart.com` / `GlowCartDemo123!`
+6. Verify health check: `GET https://<backend-domain>/health` → `{"status": "ok"}`.
 
 ### C. Frontend Service (`frontend/`)
 1. Create a second Railway service in the same project with **Root Directory** set to `frontend`.

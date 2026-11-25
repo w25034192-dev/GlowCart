@@ -66,6 +66,7 @@ class Settings(BaseModel):
 
     default_shipping_fee: float = float(os.getenv("DEFAULT_SHIPPING_FEE", "5.00"))
     free_shipping_threshold: float = float(os.getenv("FREE_SHIPPING_THRESHOLD", "75.00"))
+    auto_seed_on_startup: bool = os.getenv("AUTO_SEED_ON_STARTUP", "true").lower() == "true"
 
     @model_validator(mode="after")
     def _validate_and_normalize(self) -> "Settings":

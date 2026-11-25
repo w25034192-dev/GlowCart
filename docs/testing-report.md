@@ -9,7 +9,7 @@
 
 **Command:** `cd backend && python3 -m pytest tests -v`  
 **Exit Code:** `0`  
-**Result:** **18 passed, 0 failed** (`19.49s`)
+**Result:** **19 passed, 0 failed** (`18.08s`)
 
 | Test Module | Test Case | Status | Verified Behavior |
 |---|---|---|---|
@@ -24,6 +24,7 @@
 | `test_catalog_inventory.py` | `test_inventory_batches_expiry_and_fefo_allocation` | PASSED | Expired batch exclusion, negative-stock `409` rejection, FEFO earliest-expiry-first deduction |
 | `test_catalog_inventory.py` | `test_product_image_upload_validation` | PASSED | Rejects `.exe` upload (`400 Bad Request`) |
 | `test_catalog_inventory.py` | `test_demo_seeder_meets_minimum_catalog_counts` | PASSED | Verifies `>= 8` categories, `>= 15` brands, `>= 50` products, `>= 100` variants |
+| `test_catalog_inventory.py` | `test_ensure_initial_data_seeds_when_empty_and_creates_default_admin` | PASSED | Seeds 50+ products across Makeup/Skincare/Sun Care/Hair Care/Fragrance + default admin when DB is empty; idempotent on repeat |
 | `test_orders_payments_cart.py` | `test_cart_wishlist_coupon_and_cod_order_snapshot` | PASSED | Wishlist, coupon `LIP10`, COD order, idempotency replay, price snapshot immutability, customer status `403` |
 | `test_orders_payments_cart.py` | `test_sandbox_payment_and_duplicate_webhook_idempotency` | PASSED | Sandbox intent, HMAC-SHA256 webhook verification, duplicate `provider_event_id` deduplication |
 | `test_orders_payments_cart.py` | `test_expired_batch_cannot_be_sold_and_no_overselling_last_unit` | PASSED | Expired batch blocked (`409`), 2 concurrent checkouts for last unit yield `[201, 409]` |

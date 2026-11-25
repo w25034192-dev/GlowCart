@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+import logging
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,6 +9,24 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.exceptions import GlowCartError
+from app.db.seed import ensure_initial_data
+from app.db.session import SessionLocal
+
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    settings = get_settings()
+    if settings.auto_seed_on_startup:
+        try:
+            with SessionLocal() as db:
+                seeded = ensure_initial_data(db)
+                if seeded:
+                    logger.info("GlowCart database was empty; auto-seeded demo catalog and default admin.")
+        except Exception as exc:  # pragma: no cover - surfaced in startup logs if DB unreachable
+            logger.warning("Startup auto-seed skipped or failed: %s", exc)
+    yield
 
 
 def create_app() -> FastAPI:
@@ -17,6 +37,7 @@ def create_app() -> FastAPI:
         openapi_url=f"{settings.api_v1_prefix}/openapi.json",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
     app.add_middleware(

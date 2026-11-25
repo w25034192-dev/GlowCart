@@ -3,8 +3,8 @@
 This document records the chronological summary of every development phase and the latest verified project context under `/docs/`.
 
 ## Latest Context Snapshot
-- **Last Completed Action:** Hardened Docker + Railway deployment configuration (`backend/Dockerfile`, `backend/start.sh`, `backend/.dockerignore`, `backend/railway.toml`, `frontend/Dockerfile`, `frontend/nginx.conf.template`, `frontend/.dockerignore`, `frontend/railway.toml`, `docker-compose.yml`, `docker-compose.prod.yml`), added Railway `postgres://`/`postgresql://` → `postgresql+psycopg://` normalization, and updated `docs/deployment-guide.md`.
-- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **18 passed, 0 failed** (`19.49s`, exit code `0`).
+- **Last Completed Action:** Added automatic FastAPI startup seeding (`ensure_initial_data` via `lifespan` when `AUTO_SEED_ON_STARTUP=true` and `products` is empty), default admin/super_admin creation (`ensure_default_admin_and_roles`), bespoke luxury SVG catalog images (`/images/catalog/*.svg`), and `resolveMediaUrl` frontend media resolution.
+- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **19 passed, 0 failed** (`18.08s`, exit code `0`).
 - **Pending Environment Items (Honest Blockers):**
   - `node` / `npm` is absent in the sandbox (`frontend/` Vitest & Vite production build pending Node.js 20+).
   - `argon2-cffi` and `psycopg` C extensions + live PostgreSQL daemon are absent in the offline sandbox (`requirements.txt` pins both; local backend verified via SQLite transactions + bcrypt fallback).

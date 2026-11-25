@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="GlowCart Hair Care Collection">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FAF8F6"/>
+      <stop offset="100%" stop-color="#E7E5E4"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <circle cx="300" cy="300" r="185" fill="#FFFFFF" opacity="0.72"/>
+  <rect x="220" y="205" width="160" height="235" rx="22" fill="#FFFFFF" stroke="#1C1917" stroke-width="3"/>
+  <rect x="272" y="155" width="56" height="50" rx="8" fill="#1C1917"/>
+  <rect x="245" y="265" width="110" height="110" rx="8" fill="#EFE5DA"/>
+  <text x="300" y="328" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#1C1917">BOND</text>
+  <text x="300" y="515" text-anchor="middle" font-family="Georgia, serif" font-size="22" letter-spacing="4" fill="#1C1917">GLOWCART HAIR CARE</text>
+</svg>

@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { AlertBox, Badge, Button, Card, StarRating } from '@/components/common/UI';
 import { ProductCard } from '@/components/customer/ProductCard';
+import { resolveMediaUrl } from '@/utils/media';
 import type { ProductVariant } from '@/types';
 
 export const ProductDetailsPage: React.FC = () => {
@@ -114,11 +115,10 @@ export const ProductDetailsPage: React.FC = () => {
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="overflow-hidden rounded-2xl border border-border bg-beige">
           <img
-            src={
-              product.images[0]?.image_url ||
-              product.primary_image_url ||
-              `https://placehold.co/600x600/FAF8F6/8F2D46?text=${encodeURIComponent(product.name)}`
-            }
+            src={resolveMediaUrl(
+              product.images[0]?.image_url || product.primary_image_url,
+              product.name
+            )}
             alt={product.name}
             className="h-full w-full object-cover"
           />

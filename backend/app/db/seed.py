@@ -15,6 +15,7 @@ from app.models import (
     ProductImage,
     ProductVariant,
     Promotion,
+    Role,
     User,
     Wishlist,
 )
@@ -143,8 +144,41 @@ VARIANT_TEMPLATES = {
 }
 
 
-def seed_demo_data(db: Session) -> None:
+def ensure_default_admin_and_roles(db: Session) -> dict[str, Role]:
+    """Ensure base RBAC roles and at least one default admin/super_admin exist."""
     roles = UserRepository(db).ensure_default_roles()
+
+    has_admin = (
+        db.query(User)
+        .join(Role, User.role_id == Role.id)
+        .filter(Role.name.in_(["admin", "super_admin"]))
+        .first()
+        is not None
+    )
+    if not has_admin:
+        default_admins = [
+            ("admin@glowcart.com", "Aria Store Admin", "admin", "GlowCartAdmin123!"),
+            ("superadmin@glowcart.com", "Elena Super Admin", "super_admin", "GlowCartSuper123!"),
+        ]
+        for email, name, role_name, pwd in default_admins:
+            if db.query(User).filter(User.email == email).first() is None:
+                u = User(
+                    role_id=roles[role_name].id,
+                    email=email,
+                    full_name=name,
+                    password_hash=hash_password(pwd),
+                    is_active=True,
+                )
+                db.add(u)
+                db.flush()
+                db.add(Cart(user_id=u.id))
+                db.add(Wishlist(user_id=u.id))
+        db.commit()
+    return roles
+
+
+def seed_demo_data(db: Session) -> None:
+    roles = ensure_default_admin_and_roles(db)
 
     # Demo users (Customer, Admin, Super Admin)
     demo_users = [
@@ -222,7 +256,7 @@ def seed_demo_data(db: Session) -> None:
         db.add(
             ProductImage(
                 product_id=product.id,
-                image_url=f"https://placehold.co/600x600/FAF8F6/8F2D46?text={slug.replace('-', '+')}",
+                image_url=f"/images/catalog/{cat_map[cat_name].slug}.svg",
                 alt_text=prod_name,
                 is_primary=True,
                 sort_order=0,
@@ -316,6 +350,15 @@ def seed_demo_data(db: Session) -> None:
         )
 
     db.commit()
+
+
+def ensure_initial_data(db: Session) -> bool:
+    """Ensure default admin exists and auto-seed demo catalog if products table is empty."""
+    ensure_default_admin_and_roles(db)
+    if db.query(Product).count() == 0:
+        seed_demo_data(db)
+        return True
+    return False
 
 
 if __name__ == "__main__":
