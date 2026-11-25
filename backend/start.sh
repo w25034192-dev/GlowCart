@@ -6,7 +6,7 @@ python -m alembic upgrade head
 
 if [ "${SEED_DEMO_DATA:-false}" = "true" ]; then
   echo "Seeding demo catalog data..."
-  python -m app.db.seed --json
+  python -m app.db.seed 
 fi
 
 PORT_VALUE="${PORT:-8000}"
