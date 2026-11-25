@@ -282,11 +282,21 @@ class CatalogService:
         if category_id:
             query = query.filter(Product.category_id == category_id)
         if category_slug:
-            query = query.join(Product.category).filter(Category.slug == category_slug)
+            normalized_category_slug = category_slug.strip().lower()
+            if normalized_category_slug:
+                query = query.join(Product.category).filter(
+                    func.lower(Category.slug) == normalized_category_slug,
+                    Category.is_active.is_(True),
+                )
         if brand_id:
             query = query.filter(Product.brand_id == brand_id)
         if brand_slug:
-            query = query.join(Product.brand).filter(Brand.slug == brand_slug)
+            normalized_brand_slug = brand_slug.strip().lower()
+            if normalized_brand_slug:
+                query = query.join(Product.brand).filter(
+                    func.lower(Brand.slug) == normalized_brand_slug,
+                    Brand.is_active.is_(True),
+                )
         if featured is not None:
             query = query.filter(Product.is_featured.is_(featured))
         if new_arrival is not None:

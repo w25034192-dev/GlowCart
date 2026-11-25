@@ -1,4 +1,4 @@
-import React, { useDeferredValue, useState } from 'react';
+import React, { useDeferredValue, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { catalogApi } from '@/services/api';
@@ -25,6 +25,19 @@ export const CatalogPage: React.FC = () => {
   const [sort, setSort] = useState(initialSort);
   const [page, setPage] = useState(1);
 
+  useEffect(() => {
+    setSelectedCategory(categorySlug || '');
+    setSelectedBrand(brandSlug || '');
+    setQ(initialQuery);
+    setSkinType(initialSkinType);
+    setShade('');
+    setMinPrice('');
+    setMaxPrice('');
+    setInStockOnly(false);
+    setSort(initialSort);
+    setPage(1);
+  }, [categorySlug, brandSlug, initialQuery, initialSkinType, initialSort]);
+
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: catalogApi.getCategories,
@@ -34,10 +47,40 @@ export const CatalogPage: React.FC = () => {
     queryFn: catalogApi.getBrands,
   });
 
-  const activeCategorySlug = categorySlug || selectedCategory || undefined;
-  const activeBrandSlug = brandSlug || selectedBrand || undefined;
+  const activeCategorySlug =
+    (categorySlug || selectedCategory).trim().toLowerCase() || undefined;
+  const activeBrandSlug = (brandSlug || selectedBrand).trim().toLowerCase() || undefined;
 
-  const { data, isLoading } = useQuery({
+  const activeCategory = categories?.find(
+    (c) => c.slug.trim().toLowerCase() === activeCategorySlug
+  );
+  const activeBrand = brands?.find((b) => b.slug.trim().toLowerCase() === activeBrandSlug);
+
+  const resetFilters = () => {
+    setQ('');
+    if (!categorySlug) setSelectedCategory('');
+    if (!brandSlug) setSelectedBrand('');
+    setSkinType('');
+    setShade('');
+    setMinPrice('');
+    setMaxPrice('');
+    setInStockOnly(false);
+    setSort('newest');
+    setPage(1);
+  };
+
+  const hasExtraFilters = Boolean(
+    q.trim() ||
+      (!categorySlug && selectedCategory) ||
+      (!brandSlug && selectedBrand) ||
+      skinType ||
+      shade.trim() ||
+      minPrice ||
+      maxPrice ||
+      inStockOnly
+  );
+
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: [
       'catalog',
       deferredQ,
@@ -53,11 +96,11 @@ export const CatalogPage: React.FC = () => {
     ],
     queryFn: () =>
       catalogApi.getProducts({
-        q: deferredQ || undefined,
+        q: deferredQ.trim() || undefined,
         category_slug: activeCategorySlug,
         brand_slug: activeBrandSlug,
         skin_type: skinType || undefined,
-        shade: deferredShade || undefined,
+        shade: deferredShade.trim() || undefined,
         min_price: minPrice ? Number(minPrice) : undefined,
         max_price: maxPrice ? Number(maxPrice) : undefined,
         in_stock: inStockOnly ? true : undefined,
@@ -181,7 +224,10 @@ export const CatalogPage: React.FC = () => {
                 type="number"
                 min={0}
                 value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
+                onChange={(e) => {
+                  setMinPrice(e.target.value);
+                  setPage(1);
+                }}
                 className="mt-1 w-full rounded-lg border border-border px-2 py-2 text-sm"
               />
             </div>
@@ -194,7 +240,10 @@ export const CatalogPage: React.FC = () => {
                 type="number"
                 min={0}
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                onChange={(e) => {
+                  setMaxPrice(e.target.value);
+                  setPage(1);
+                }}
                 className="mt-1 w-full rounded-lg border border-border px-2 py-2 text-sm"
               />
             </div>
@@ -210,6 +259,16 @@ export const CatalogPage: React.FC = () => {
             />
             <span>In stock only</span>
           </label>
+          {hasExtraFilters && (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={resetFilters}
+            >
+              Reset Filters
+            </Button>
+          )}
         </Card>
       </aside>
 
@@ -217,9 +276,17 @@ export const CatalogPage: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="font-serif text-3xl font-bold capitalize">
-              {categorySlug?.replace('-', ' ') || brandSlug?.replace('-', ' ') || 'Cosmetic Catalog'}
+              {activeCategory?.name ||
+                activeBrand?.name ||
+                categorySlug?.replace(/-/g, ' ') ||
+                brandSlug?.replace(/-/g, ' ') ||
+                'Cosmetic Catalog'}
             </h1>
-            <p className="text-sm text-muted-fg">{data?.total ?? 0} products available</p>
+            {!isError && (
+              <p className="text-sm text-muted-fg">
+                {isLoading ? 'Loading products...' : `${data?.total ?? 0} products available`}
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="sort-select" className="mr-2 text-sm text-muted-fg">
@@ -228,7 +295,10 @@ export const CatalogPage: React.FC = () => {
             <select
               id="sort-select"
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => {
+                setSort(e.target.value);
+                setPage(1);
+              }}
               className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
             >
               <option value="newest">Newest</option>
@@ -239,18 +309,53 @@ export const CatalogPage: React.FC = () => {
           </div>
         </div>
 
-        {isLoading ? (
+        {isError ? (
+          <div role="alert">
+            <Card className="border-destructive bg-card p-6">
+              <h2 className="font-serif text-lg font-semibold text-destructive">
+                Unable to load products right now
+              </h2>
+              <p className="mt-1 text-sm text-muted-fg">
+                {error instanceof Error
+                  ? error.message
+                  : 'The catalog service could not be reached. Please verify the API connection.'}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-4"
+                onClick={() => void refetch()}
+              >
+                Retry
+              </Button>
+            </Card>
+          </div>
+        ) : isLoading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((n) => (
               <div key={n} className="h-80 animate-pulse rounded-xl bg-beige" />
             ))}
           </div>
-        ) : (
+        ) : data && data.items.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {data?.items.map((p) => (
+            {data.items.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
+        ) : (
+          <Card className="p-8 text-center">
+            <h2 className="font-serif text-xl font-semibold text-foreground">
+              No matching products found
+            </h2>
+            <p className="mt-1 text-sm text-muted-fg">
+              Try clearing your active filters or browsing another category.
+            </p>
+            {hasExtraFilters && (
+              <Button type="button" variant="outline" className="mt-4" onClick={resetFilters}>
+                Clear Filters
+              </Button>
+            )}
+          </Card>
         )}
 
         {data && data.total_pages > 1 && (

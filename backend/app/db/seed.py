@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password
@@ -177,60 +178,64 @@ def ensure_default_admin_and_roles(db: Session) -> dict[str, Role]:
     return roles
 
 
-def seed_demo_data(db: Session) -> None:
-    roles = ensure_default_admin_and_roles(db)
-
-    # Demo users (Customer, Admin, Super Admin)
-    demo_users = [
-        ("customer@glowcart.com", "Clara Demo Customer", "customer", "GlowCartDemo123!"),
-        ("admin@glowcart.com", "Aria Store Admin", "admin", "GlowCartAdmin123!"),
-        ("superadmin@glowcart.com", "Elena Super Admin", "super_admin", "GlowCartSuper123!"),
-    ]
-    for email, name, role_name, pwd in demo_users:
-        if db.query(User).filter(User.email == email).first() is None:
-            u = User(
-                role_id=roles[role_name].id,
-                email=email,
-                full_name=name,
-                password_hash=hash_password(pwd),
-                is_active=True,
-            )
-            db.add(u)
-            db.flush()
-            db.add(Cart(user_id=u.id))
-            db.add(Wishlist(user_id=u.id))
-
-    # Categories
+def _ensure_categories_and_brands(db: Session) -> tuple[dict[str, Category], dict[str, Brand]]:
+    """Ensure canonical categories and brands exist and are active without duplicating existing records."""
     cat_map: dict[str, Category] = {}
     for name, slug, desc, order in CATEGORIES_DATA:
-        cat = db.query(Category).filter(Category.slug == slug).first()
+        cat = (
+            db.query(Category)
+            .filter(
+                (func.lower(Category.slug) == slug) | (func.lower(Category.name) == name.lower())
+            )
+            .first()
+        )
         if cat is None:
-            cat = Category(name=name, slug=slug, description=desc, sort_order=order)
+            cat = Category(name=name, slug=slug, description=desc, sort_order=order, is_active=True)
             db.add(cat)
             db.flush()
+        else:
+            if not cat.is_active:
+                cat.is_active = True
+            if cat.slug != slug and db.query(Category).filter(Category.slug == slug).first() is None:
+                cat.slug = slug
         cat_map[name] = cat
 
-    # Brands
     brand_map: dict[str, Brand] = {}
     for name, slug, country, featured in BRANDS_DATA:
-        brand = db.query(Brand).filter(Brand.slug == slug).first()
+        brand = (
+            db.query(Brand)
+            .filter((func.lower(Brand.slug) == slug) | (func.lower(Brand.name) == name.lower()))
+            .first()
+        )
         if brand is None:
             brand = Brand(
                 name=name,
                 slug=slug,
                 country_of_origin=country,
                 is_featured=featured,
+                is_active=True,
                 description=f"Demo brand catalog entry for {name}.",
             )
             db.add(brand)
             db.flush()
+        else:
+            if not brand.is_active:
+                brand.is_active = True
         brand_map[name] = brand
 
-    # Products (>=50) & Variants (>=100) + Batches
+    return cat_map, brand_map
+
+
+def _seed_blueprint_entries(
+    db: Session,
+    indexed_entries: list[tuple[int, tuple]],
+    cat_map: dict[str, Category],
+    brand_map: dict[str, Brand],
+) -> int:
+    """Insert missing products, variants, images, and initial batches without duplicating existing slugs."""
     today = date.today()
-    for idx, (cat_name, brand_name, prod_name, slug, skins, tpl_key, base_price_str) in enumerate(
-        CATALOG_BLUEPRINT, start=1
-    ):
+    created_count = 0
+    for idx, (cat_name, brand_name, prod_name, slug, skins, tpl_key, base_price_str) in indexed_entries:
         product = db.query(Product).filter(Product.slug == slug).first()
         if product is not None:
             continue
@@ -243,7 +248,10 @@ def seed_demo_data(db: Session) -> None:
             short_description=f"Illustrative demo cosmetic entry — {prod_name}.",
             description=f"{prod_name} by {brand_name}. Demo catalog description with illustrative USD pricing for GlowCart.",
             skin_types=skins,
-            specifications={"origin": brand_map[brand_name].country_of_origin or "International", "demo_notice": "Illustrative demo data"},
+            specifications={
+                "origin": brand_map[brand_name].country_of_origin or "International",
+                "demo_notice": "Illustrative demo data",
+            },
             verified_ingredients=None,
             is_featured=(idx <= 10),
             is_new_arrival=(idx % 3 == 0),
@@ -252,6 +260,7 @@ def seed_demo_data(db: Session) -> None:
         )
         db.add(product)
         db.flush()
+        created_count += 1
 
         db.add(
             ProductImage(
@@ -321,6 +330,34 @@ def seed_demo_data(db: Session) -> None:
                     reason="Initial illustrative demo catalog stock",
                 )
             )
+    return created_count
+
+
+def seed_demo_data(db: Session) -> None:
+    roles = ensure_default_admin_and_roles(db)
+
+    # Demo users (Customer, Admin, Super Admin)
+    demo_users = [
+        ("customer@glowcart.com", "Clara Demo Customer", "customer", "GlowCartDemo123!"),
+        ("admin@glowcart.com", "Aria Store Admin", "admin", "GlowCartAdmin123!"),
+        ("superadmin@glowcart.com", "Elena Super Admin", "super_admin", "GlowCartSuper123!"),
+    ]
+    for email, name, role_name, pwd in demo_users:
+        if db.query(User).filter(User.email == email).first() is None:
+            u = User(
+                role_id=roles[role_name].id,
+                email=email,
+                full_name=name,
+                password_hash=hash_password(pwd),
+                is_active=True,
+            )
+            db.add(u)
+            db.flush()
+            db.add(Cart(user_id=u.id))
+            db.add(Wishlist(user_id=u.id))
+
+    cat_map, brand_map = _ensure_categories_and_brands(db)
+    _seed_blueprint_entries(db, list(enumerate(CATALOG_BLUEPRINT, start=1)), cat_map, brand_map)
 
     # Demo Promotion & Coupon
     now = datetime.now(timezone.utc)
@@ -353,11 +390,30 @@ def seed_demo_data(db: Session) -> None:
 
 
 def ensure_initial_data(db: Session) -> bool:
-    """Ensure default admin exists and auto-seed demo catalog if products table is empty."""
+    """Ensure default admin exists and auto-seed demo catalog if products or Skincare catalog are empty."""
     ensure_default_admin_and_roles(db)
     if db.query(Product).count() == 0:
         seed_demo_data(db)
         return True
+
+    has_skincare = (
+        db.query(Product)
+        .join(Product.category)
+        .filter(func.lower(Category.slug) == "skincare")
+        .count()
+        > 0
+    )
+    if not has_skincare:
+        cat_map, brand_map = _ensure_categories_and_brands(db)
+        skincare_entries = [
+            (idx, entry)
+            for idx, entry in enumerate(CATALOG_BLUEPRINT, start=1)
+            if entry[0] == "Skincare"
+        ]
+        created = _seed_blueprint_entries(db, skincare_entries, cat_map, brand_map)
+        if created > 0:
+            db.commit()
+            return True
     return False
 
 

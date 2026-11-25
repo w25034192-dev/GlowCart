@@ -197,23 +197,32 @@ export const CustomerLayout: React.FC = () => {
                 Go
               </button>
             </form>
-            <div className="flex flex-col gap-2 text-sm">
-              <Link to="/catalog" onClick={() => setMobileMenuOpen(false)} className="py-1.5">
+            <div className="flex flex-col gap-1 text-sm">
+              <Link to="/catalog" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
                 All Products
               </Link>
-              <Link to="/category/makeup" onClick={() => setMobileMenuOpen(false)} className="py-1.5">
+              <Link to="/category/makeup" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
                 Makeup
               </Link>
-              <Link to="/category/skincare" onClick={() => setMobileMenuOpen(false)} className="py-1.5">
+              <Link to="/category/skincare" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
                 Skincare
               </Link>
-              <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="py-1.5">
+              <Link to="/category/sun-care" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
+                Sun Care
+              </Link>
+              <Link to="/category/hair-care" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
+                Hair Care
+              </Link>
+              <Link to="/category/fragrance" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
+                Fragrance
+              </Link>
+              <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
                 Order History
               </Link>
-              <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="py-1.5">
+              <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
                 Profile & Addresses
               </Link>
-              <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="py-1.5">
+              <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center">
                 Customer Service
               </Link>
             </div>

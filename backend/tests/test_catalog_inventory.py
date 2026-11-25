@@ -286,3 +286,83 @@ def test_ensure_initial_data_seeds_when_empty_and_creates_default_admin(db_sessi
     ensure_initial_data(db_session)
     assert db_session.query(Product).count() == before_count
 
+
+def test_all_seeded_categories_and_skincare_endpoint_consistency(client, db_session):
+    from app.db.seed import CATEGORIES_DATA, seed_demo_data
+
+    seed_demo_data(db_session)
+
+    cat_res = client.get("/api/v1/categories")
+    assert cat_res.status_code == 200
+    categories = cat_res.json()
+    slugs = {c["slug"]: c for c in categories}
+    for _name, slug, _desc, _order in CATEGORIES_DATA:
+        assert slug in slugs
+        assert slugs[slug]["is_active"] is True
+
+    assert "skincare" in slugs
+    assert slugs["skincare"]["name"] == "Skincare"
+
+    seen_product_ids: set[str] = set()
+    for cat in categories:
+        prod_res = client.get(
+            "/api/v1/products",
+            params={"category_slug": cat["slug"], "page": 1, "page_size": 50},
+        )
+        assert prod_res.status_code == 200
+        body = prod_res.json()
+        assert body["total"] > 0, f"Expected > 0 products for category {cat['slug']}"
+        assert len(body["items"]) == body["total"]
+        for item in body["items"]:
+            assert item["category_id"] == cat["id"]
+            assert item["category_name"] == cat["name"]
+            assert item["in_stock"] is True
+            assert item["primary_image_url"]
+            assert item["id"] not in seen_product_ids
+            seen_product_ids.add(item["id"])
+
+    skincare_res = client.get("/api/v1/products", params={"category_slug": "skincare"})
+    assert skincare_res.status_code == 200
+    assert skincare_res.json()["total"] == 12
+
+    # Case-insensitive and whitespace-trimmed slug lookup
+    mixed_res = client.get("/api/v1/products", params={"category_slug": " Skincare "})
+    assert mixed_res.status_code == 200
+    assert mixed_res.json()["total"] == 12
+
+
+def test_ensure_initial_data_recovers_missing_skincare_when_other_products_exist(db_session):
+    from app.db.seed import ensure_initial_data
+    from app.models import Brand, Category, Product
+
+    makeup = Category(name="Makeup", slug="makeup", sort_order=1, is_active=True)
+    brand = Brand(name="Custom Brand", slug="custom-brand", is_active=True)
+    db_session.add_all([makeup, brand])
+    db_session.flush()
+    existing_prod = Product(
+        category_id=makeup.id,
+        brand_id=brand.id,
+        name="Custom Lip Oil",
+        slug="custom-lip-oil",
+        description="Pre-existing non-skincare product.",
+        skin_types=["all"],
+        specifications={},
+        is_active=True,
+        is_archived=False,
+        is_demo=False,
+    )
+    db_session.add(existing_prod)
+    db_session.commit()
+
+    seeded = ensure_initial_data(db_session)
+    assert seeded is True
+    skincare_cat = db_session.query(Category).filter(Category.slug == "skincare").first()
+    assert skincare_cat is not None
+    skincare_products = (
+        db_session.query(Product).filter(Product.category_id == skincare_cat.id).all()
+    )
+    assert len(skincare_products) == 12
+    # Existing product preserved with zero duplicates
+    assert db_session.query(Product).filter(Product.slug == "custom-lip-oil").count() == 1
+
+

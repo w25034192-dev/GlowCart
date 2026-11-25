@@ -3,11 +3,13 @@
 This document records the chronological summary of every development phase and the latest verified project context under `/docs/`.
 
 ## Latest Context Snapshot
-- **Last Completed Action:** Added automatic FastAPI startup seeding (`ensure_initial_data` via `lifespan` when `AUTO_SEED_ON_STARTUP=true` and `products` is empty), default admin/super_admin creation (`ensure_default_admin_and_roles`), bespoke luxury SVG catalog images (`/images/catalog/*.svg`), and `resolveMediaUrl` frontend media resolution.
-- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **19 passed, 0 failed** (`18.08s`, exit code `0`).
+- **Last Completed Action:** Investigated and fixed Skincare category `"0 products available"` across backend catalog filtering (`CatalogService.list_products`), startup seeding (`ensure_initial_data` / `_ensure_categories_and_brands` / `_seed_blueprint_entries`), `CatalogPage.tsx` (URL param state sync/reset + accessible `role="alert"` error UI + category display title), mobile navigation links (`CustomerLayout.tsx`), and Vitest configuration (`vitest.config.ts` + `setup.ts`). Full details recorded in [skincare-category-fix.md](./skincare-category-fix.md).
+- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **21 passed, 0 failed** (`19.45s`, exit code `0`).
+- **Verified Frontend Build & Test Status:** `cd frontend && npm run build` (`tsc && vite build`, `2.02s`, exit code `0`) and `cd frontend && npm test -- --run` — **6 passed, 0 failed** (`1.41s`, exit code `0`).
+- **Verified Live Local HTTP Endpoints (Scratch SQLite + Alembic + `uvicorn` + `vite preview`):** All 8 categories return `200 OK` (`makeup`: 12, `skincare`: 12, `sun-care`: 5, `hair-care`: 5, `body-care`: 4, `fragrance`: 4, `beauty-tools`: 4, `makeup-sets`: 4) with zero backend errors.
 - **Pending Environment Items (Honest Blockers):**
-  - `node` / `npm` is absent in the sandbox (`frontend/` Vitest & Vite production build pending Node.js 20+).
-  - `argon2-cffi` and `psycopg` C extensions + live PostgreSQL daemon are absent in the offline sandbox (`requirements.txt` pins both; local backend verified via SQLite transactions + bcrypt fallback).
+  - Chrome DevTools remote debugging (`DevToolsActivePort`) was unavailable for headless/live Chrome console inspection, and remote Railway PostgreSQL was not directly queried from this host.
+  - Local `Postgres.app` has no `glowcart` database; live Railway PostgreSQL & `argon2-cffi` run in Railway deployment.
 
 ---
 
