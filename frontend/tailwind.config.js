@@ -25,8 +25,8 @@ export default {
         rose: 'var(--color-rose)',
       },
       fontFamily: {
-        sans: ['Montserrat', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['Cormorant', 'Georgia', 'serif'],
+        sans: ['"Plus Jakarta Sans"', 'Montserrat', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['"Cormorant Garamond"', 'Cormorant', 'Georgia', 'serif'],
         mono: ['"Fira Code"', 'ui-monospace', 'monospace'],
       },
     },

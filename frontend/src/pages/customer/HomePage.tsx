@@ -1,36 +1,18 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import {
-  ArrowRight,
-  Award,
-  CheckCircle2,
-  Droplets,
-  Gift,
-  HeartHandshake,
-  Palette,
-  Quote,
-  ShieldCheck,
-  Sparkles,
-  Sun,
-  Truck,
-  Wind,
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2, Quote } from 'lucide-react';
 import { catalogApi } from '@/services/api';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { SkinRoutineBuilder } from '@/components/customer/SkinRoutineBuilder';
-import { Badge, Button, Card, StarRating } from '@/components/common/UI';
+import { Button, Card, StarRating } from '@/components/common/UI';
 
-const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  makeup: Palette,
-  skincare: Droplets,
-  'sun-care': Sun,
-  'hair-care': Wind,
-  'body-care': HeartHandshake,
-  fragrance: Sparkles,
-  'beauty-tools': Award,
-  'makeup-sets': Gift,
-};
+const SHADE_PRESETS = [
+  { name: '01 Ivory Silk (Cool Undertone)', color: '#F3D6BE' },
+  { name: '02 Warm Honey (Neutral)', color: '#E5B88E' },
+  { name: '03 Golden Amber (Warm)', color: '#C88E62' },
+  { name: '04 Rich Espresso (Deep)', color: '#8D5534' },
+];
 
 const TESTIMONIALS = [
   {
@@ -60,8 +42,11 @@ const TESTIMONIALS = [
 ];
 
 export const HomePage: React.FC = () => {
+  const [activeShadeIndex, setActiveShadeIndex] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+
+  const activeShade = SHADE_PRESETS[activeShadeIndex] || SHADE_PRESETS[0];
 
   const { data: newArrivals } = useQuery({
     queryKey: ['products', 'new_arrival'],
@@ -71,10 +56,6 @@ export const HomePage: React.FC = () => {
     queryKey: ['products', 'best_seller'],
     queryFn: () => catalogApi.getProducts({ best_seller: true, page_size: 4 }),
   });
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: catalogApi.getCategories,
-  });
   const { data: promotions } = useQuery({
     queryKey: ['promotions'],
     queryFn: catalogApi.getPromotions,
@@ -82,156 +63,141 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="space-y-16">
-      {/* Luxury Hero Banner with Gradient & Glassmorphism */}
-      <section className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-br from-blush/80 via-beige/70 to-card p-6 shadow-luxury sm:p-12 lg:p-14">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-blush/80 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-20 left-1/3 h-72 w-72 rounded-full bg-beige blur-3xl"
-        />
-
-        <div className="relative z-10 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
-          <div className="space-y-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge tone="blush">International Cosmetic Atelier · Demo Storefront</Badge>
-              <span className="inline-flex items-center gap-1 rounded-full bg-card/80 px-2.5 py-0.5 text-[11px] font-semibold text-rose shadow-sm backdrop-blur-sm">
-                <Sparkles className="h-3 w-3 text-amber-500" />
-                <span>Award-Winning Design</span>
-              </span>
-            </div>
-
-            <h1 className="font-serif text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-[1.1]">
-              Curated Skincare, Shades &amp; Beauty Essentials
-            </h1>
-
-            <p className="max-w-xl text-base leading-relaxed text-muted-fg sm:text-lg">
-              Discover foundation shades, barrier-restoring serums, daily UV shields, and hair
-              rituals backed by live variant selection and FEFO batch-verified freshness.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                to="/catalog"
-                className="touch-target inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-fg shadow-md transition-all duration-200 hover:opacity-90 hover:shadow-lg"
-              >
-                <span>Shop All Cosmetics</span>
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <a
-                href="#skin-routine-builder"
-                className="touch-target inline-flex cursor-pointer items-center rounded-xl border border-border bg-card/90 px-5 py-3.5 text-sm font-semibold text-primary backdrop-blur-sm transition-all duration-200 hover:border-primary hover:bg-card shadow-sm"
-              >
-                Build Skin Routine
-              </a>
-            </div>
+      {/* Hero Section — Split & Glassmorphism with Live Serum Orb */}
+      <section className="grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <div>
+          <span className="eyebrow mb-3.5 inline-block text-[11px] font-semibold uppercase tracking-[2px] text-[#B86B43]">
+            International Cosmetic Atelier
+          </span>
+          <h1 className="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl mb-5">
+            Curated Skincare, Shades &amp; <em className="italic text-[#B86B43]">Beauty Essentials</em>
+          </h1>
+          <p className="max-w-xl text-base leading-relaxed text-muted-fg mb-7">
+            Discover foundation shades, barrier-restoring serums, and daily UV shields backed by
+            live variant selection and FEFO batch-verified freshness.
+          </p>
+          <div className="flex flex-wrap gap-3.5">
+            <Link
+              to="/catalog"
+              className="touch-target inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#B86B43] px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#9A5532] hover:-translate-y-0.5"
+            >
+              <span>Shop All Cosmetics →</span>
+            </Link>
+            <a
+              href="#skin-routine-builder"
+              className="touch-target inline-flex cursor-pointer items-center rounded-xl border border-foreground/80 bg-transparent px-6 py-3.5 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-foreground/5"
+            >
+              Build Skin Routine
+            </a>
           </div>
+        </div>
 
-          <div className="rounded-2xl border border-card/90 bg-card/85 p-6 shadow-xl backdrop-blur-md space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-rose">
-                GlowCart Beauty Standard
-              </span>
-              <span className="flex items-center gap-1 font-mono text-[11px] font-bold text-accent">
-                <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
-                <span>VERIFIED</span>
-              </span>
+        {/* Interactive Shade Matcher Card */}
+        <div className="hero-visual">
+          <div className="text-[12px] font-semibold tracking-wider text-[#1C1B1A]">
+            LIVE SHADE PREVIEW
+          </div>
+          <div
+            className="serum-orb"
+            id="shadeOrb"
+            style={{ backgroundColor: activeShade.color }}
+          />
+          <div className="glass-widget">
+            <div className="widget-header">
+              <span className="text-foreground">True-to-Tone Finder</span>
+              <span className="font-semibold text-[#B86B43]">FEFO Verified ✓</span>
             </div>
-            <ul className="space-y-3.5 text-sm">
-              <li className="flex items-start gap-3">
-                <Palette className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                <div>
-                  <div className="font-semibold text-foreground">True-to-Tone Shades</div>
-                  <p className="text-xs text-muted-fg">Interactive HEX swatches, codes &amp; ml volumes</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                <div>
-                  <div className="font-semibold text-foreground">FEFO Freshness Guarantee</div>
-                  <p className="text-xs text-muted-fg">Expired cosmetic batches are blocked automatically</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                <div>
-                  <div className="font-semibold text-foreground">Verified Checkout &amp; Tracking</div>
-                  <p className="text-xs text-muted-fg">COD &amp; server-verified sandbox payments</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <Award className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
-                <div>
-                  <div className="font-semibold text-foreground">Clean &amp; Cruelty-Free Active Curation</div>
-                  <p className="text-xs text-muted-fg">Korean Glass Skin, French Luxury &amp; Myanmar Thanakha</p>
-                </div>
-              </li>
-            </ul>
-            <div className="border-t border-border/60 pt-2">
-              <Link
-                to="/category/skincare"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-accent"
-              >
-                <span>Explore Skincare Collection</span>
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
+            <div className="swatches">
+              {SHADE_PRESETS.map((preset, idx) => (
+                <button
+                  key={preset.name}
+                  type="button"
+                  onClick={() => setActiveShadeIndex(idx)}
+                  className={`swatch ${activeShadeIndex === idx ? 'active' : ''}`}
+                  style={{ backgroundColor: preset.color }}
+                  aria-label={`Select shade ${preset.name}`}
+                  title={preset.name}
+                />
+              ))}
+            </div>
+            <div className="shade-label font-medium text-xs sm:text-sm" id="shadeName">
+              Selected: {activeShade.name}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Categories Cards with Smooth Hover Transitions */}
-      {categories && categories.length > 0 && (
-        <section aria-labelledby="featured-categories-heading" className="space-y-5">
-          <div className="flex flex-wrap items-end justify-between gap-2">
+      {/* Infinite Marquee */}
+      <div className="marquee-wrap" aria-hidden="true">
+        <div className="marquee-track">
+          ✦ FEFO BATCH-VERIFIED FRESHNESS &nbsp;&nbsp;&nbsp; ✦ LIVE HEX SHADE MATCHING &nbsp;&nbsp;&nbsp; ✦ DERMATOLOGIST TESTED &nbsp;&nbsp;&nbsp; ✦ VERIFIED CHECKOUT &amp; TRACKING &nbsp;&nbsp;&nbsp;
+          ✦ FEFO BATCH-VERIFIED FRESHNESS &nbsp;&nbsp;&nbsp; ✦ LIVE HEX SHADE MATCHING &nbsp;&nbsp;&nbsp; ✦ DERMATOLOGIST TESTED &nbsp;&nbsp;&nbsp; ✦ VERIFIED CHECKOUT &amp; TRACKING &nbsp;&nbsp;&nbsp;
+        </div>
+      </div>
+
+      {/* Bento Grid Categories */}
+      <section className="space-y-6" id="categories" aria-labelledby="featured-categories-heading">
+        <div className="flex items-end justify-between">
+          <div>
+            <span className="bento-tag">Curated Aisles</span>
+            <h2 id="featured-categories-heading" className="font-serif text-3xl font-bold sm:text-4xl">
+              Featured Categories
+            </h2>
+          </div>
+          <Link
+            to="/catalog"
+            className="text-sm font-semibold text-[#1C1B1A] transition-colors hover:text-[#B86B43]"
+          >
+            Browse all +
+          </Link>
+        </div>
+
+        <div className="bento-grid">
+          {/* Large Card: Skincare */}
+          <Link to="/category/skincare" className="bento-card bento-large group">
+            <span className="bento-tag">Most Popular</span>
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-rose">
-                Curated Aisles
-              </div>
-              <h2 id="featured-categories-heading" className="font-serif text-3xl font-bold">
-                Featured Categories
-              </h2>
+              <h3 className="font-serif text-3xl font-bold mb-2">Skincare Rituals</h3>
+              <p className="text-sm text-muted-fg leading-relaxed">
+                Barrier-restoring cleansers, active serums, essences, and hydrating moisturizers.
+              </p>
             </div>
-            <Link
-              to="/catalog"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-accent"
-            >
-              <span>Browse all</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {categories.slice(0, 8).map((cat) => {
-              const Icon = CATEGORY_ICONS[cat.slug] || Sparkles;
-              return (
-                <Link
-                  key={cat.id}
-                  to={`/category/${cat.slug}`}
-                  className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-sm transition-transform transition-shadow duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blush/70 text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-primary-fg">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <ArrowRight
-                      className="h-4 w-4 text-muted-fg transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <div className="text-base font-semibold text-foreground">{cat.name}</div>
-                    <p className="mt-1 line-clamp-2 text-xs text-muted-fg">
-                      {cat.description || 'Explore curated formulas'}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
+            <div className="bento-arrow">↗</div>
+          </Link>
+
+          {/* Standard Card 1: Makeup */}
+          <Link to="/category/makeup" className="bento-card group">
+            <span className="bento-tag">Color Studio</span>
+            <div>
+              <h3 className="font-serif text-2xl font-bold mb-1">Makeup</h3>
+              <p className="text-xs text-muted-fg">Face, eye, and lip color cosmetics.</p>
+            </div>
+            <div className="bento-arrow">↗</div>
+          </Link>
+
+          {/* Standard Card 2: Sun Care */}
+          <Link to="/category/sun-care" className="bento-card group">
+            <span className="bento-tag">SPF 50+</span>
+            <div>
+              <h3 className="font-serif text-2xl font-bold mb-1">Sun Care</h3>
+              <p className="text-xs text-muted-fg">Daily UV protection creams &amp; sticks.</p>
+            </div>
+            <div className="bento-arrow">↗</div>
+          </Link>
+
+          {/* Wide Card: Hair Care */}
+          <Link to="/category/hair-care" className="bento-card bento-wide group">
+            <span className="bento-tag">Botanical Care</span>
+            <div>
+              <h3 className="font-serif text-2xl font-bold mb-1">Hair &amp; Scalp Care</h3>
+              <p className="text-xs text-muted-fg">
+                Nourishing shampoos, conditioners, and reparative hair masks.
+              </p>
+            </div>
+            <div className="bento-arrow">↗</div>
+          </Link>
+        </div>
+      </section>
 
       {/* Best Sellers Product Showcase */}
       {bestSellers && bestSellers.items.length > 0 && (
