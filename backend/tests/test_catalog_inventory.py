@@ -261,3 +261,28 @@ def test_demo_seeder_meets_minimum_catalog_counts(db_session):
     assert db_session.query(Product).count() >= 50
     assert db_session.query(ProductVariant).count() >= 100
 
+
+def test_ensure_initial_data_seeds_when_empty_and_creates_default_admin(db_session):
+    from app.db.seed import ensure_initial_data
+    from app.models import Category, Product, ProductImage, Role, User
+
+    assert db_session.query(Product).count() == 0
+    ensure_initial_data(db_session)
+
+    admin_role = db_session.query(Role).filter(Role.name == "admin").one()
+    assert db_session.query(User).filter(User.role_id == admin_role.id).count() >= 1
+    assert db_session.query(Product).count() >= 50
+
+    cat_names = {c.name for c in db_session.query(Category).all()}
+    for required in ("Makeup", "Skincare", "Sun Care", "Hair Care", "Fragrance"):
+        assert required in cat_names
+
+    images = db_session.query(ProductImage).all()
+    assert len(images) >= 50
+    assert all(img.image_url.startswith("/images/catalog/") for img in images)
+
+    # Calling a second time is idempotent
+    before_count = db_session.query(Product).count()
+    ensure_initial_data(db_session)
+    assert db_session.query(Product).count() == before_count
+

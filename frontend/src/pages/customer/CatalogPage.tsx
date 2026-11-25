@@ -9,18 +9,20 @@ export const CatalogPage: React.FC = () => {
   const { categorySlug, brandSlug } = useParams();
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
+  const initialSkinType = searchParams.get('skin_type') || '';
+  const initialSort = searchParams.get('sort') || 'newest';
 
   const [q, setQ] = useState(initialQuery);
   const deferredQ = useDeferredValue(q);
   const [selectedCategory, setSelectedCategory] = useState(categorySlug || '');
   const [selectedBrand, setSelectedBrand] = useState(brandSlug || '');
-  const [skinType, setSkinType] = useState('');
+  const [skinType, setSkinType] = useState(initialSkinType);
   const [shade, setShade] = useState('');
   const deferredShade = useDeferredValue(shade);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [sort, setSort] = useState('newest');
+  const [sort, setSort] = useState(initialSort);
   const [page, setPage] = useState(1);
 
   const { data: categories } = useQuery({

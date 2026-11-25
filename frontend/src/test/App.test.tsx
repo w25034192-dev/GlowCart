@@ -113,10 +113,21 @@ function renderAt(path: string) {
 }
 
 describe('GlowCart Frontend', () => {
-  it('renders storefront hero and navigation', async () => {
+  it('renders storefront hero, featured categories, best sellers, routine builder, and testimonials', async () => {
     useAuthStore.setState({ user: null, isLoading: false });
+    const user = userEvent.setup();
     renderAt('/');
     expect(await screen.findByText(/Curated Skincare, Shades/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Featured Categories/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Best Sellers/i)).toBeInTheDocument();
+    expect(screen.getByText(/Build Your Skin-Type Routine/i)).toBeInTheDocument();
+    expect(screen.getByText(/Customer Testimonials/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Sensitive' }));
+    expect(screen.getByRole('link', { name: /Shop Sensitive Skin Formulas/i })).toHaveAttribute(
+      'href',
+      '/catalog?skin_type=sensitive'
+    );
   });
 
   it('redirects unauthenticated visitors away from protected admin routes', async () => {
