@@ -39,3 +39,10 @@ if (typeof globalThis.localStorage?.getItem !== 'function') {
     });
   }
 }
+
+// Mock HTMLMediaElement methods for jsdom
+if (typeof window !== 'undefined' && window.HTMLMediaElement) {
+  window.HTMLMediaElement.prototype.play = () => Promise.resolve();
+  window.HTMLMediaElement.prototype.pause = () => {};
+  window.HTMLMediaElement.prototype.load = () => {};
+}

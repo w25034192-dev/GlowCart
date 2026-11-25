@@ -19,6 +19,7 @@ import {
 import { catalogApi } from '@/services/api';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { SkinRoutineBuilder } from '@/components/customer/SkinRoutineBuilder';
+import { RotatingVideoStudio } from '@/components/customer/RotatingVideoStudio';
 import { Badge, Button, Card, StarRating } from '@/components/common/UI';
 
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -296,6 +297,9 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* Interactive 360° Rotating Beauty & Short Video Studio */}
+      <RotatingVideoStudio />
 
       {/* Featured & Popular Brands with Local Favorites */}
       {brands && brands.length > 0 && (
