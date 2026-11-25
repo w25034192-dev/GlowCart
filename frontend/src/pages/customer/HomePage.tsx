@@ -152,7 +152,7 @@ export const HomePage: React.FC = () => {
               setProducts(mapped);
             }
           })
-          .catch(() => {});
+          .catch(() => { });
       });
   }, []);
 
@@ -321,9 +321,8 @@ export const HomePage: React.FC = () => {
                       onClick={() =>
                         setActiveSwatches((prev) => ({ ...prev, [item.id]: hex }))
                       }
-                      className={`w-3.5 h-3.5 rounded-full border transition-transform ${
-                        activeColor === hex ? 'border-stone-900 scale-125' : 'border-transparent'
-                      }`}
+                      className={`w-3.5 h-3.5 rounded-full border transition-transform ${activeColor === hex ? 'border-stone-900 scale-125' : 'border-transparent'
+                        }`}
                       style={{ backgroundColor: hex }}
                     />
                   ))}
@@ -383,17 +382,15 @@ export const HomePage: React.FC = () => {
                   className="flex flex-col items-center gap-2 group"
                 >
                   <span
-                    className={`w-11 h-11 rounded-full transition-all ${
-                      isSelected
+                    className={`w-11 h-11 rounded-full transition-all ${isSelected
                         ? 'ring-2 ring-offset-2 ring-stone-900 scale-110'
                         : 'hover:scale-105'
-                    }`}
+                      }`}
                     style={{ backgroundColor: tone.hex }}
                   />
                   <span
-                    className={`text-xs ${
-                      isSelected ? 'font-bold text-stone-900' : 'text-stone-600'
-                    }`}
+                    className={`text-xs ${isSelected ? 'font-bold text-stone-900' : 'text-stone-600'
+                      }`}
                   >
                     {tone.label}
                   </span>
