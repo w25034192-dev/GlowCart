@@ -394,8 +394,27 @@ def test_all_50_seeded_products_accessible_via_pagination(client, db_session):
 
 
 def test_generate_100_products_and_seeder(db_session):
-    from app.db.seed import BRANDS, CATEGORIES, generate_100_products, seed_generated_products
+    from app.db.seed import (
+        BRANDS,
+        CATEGORIES,
+        CATEGORY_CATALOG,
+        generate_100_products,
+        generate_single_product,
+        seed_generated_products,
+    )
     from app.models import Product, ProductVariant, InventoryBatch
+
+    # Test single product generator
+    single = generate_single_product()
+    assert single["category"] in CATEGORY_CATALOG
+    assert single["brand"] in BRANDS
+    assert single["image_url"] in CATEGORY_CATALOG[single["category"]]["images"]
+
+    # Test single product with explicit category
+    single_makeup = generate_single_product(index=42, category="Makeup")
+    assert single_makeup["category"] == "Makeup"
+    assert single_makeup["name"].endswith("#42")
+    assert single_makeup["image_url"] in CATEGORY_CATALOG["Makeup"]["images"]
 
     products = generate_100_products()
     assert len(products) == 100
@@ -404,6 +423,7 @@ def test_generate_100_products_and_seeder(db_session):
     assert all(18.0 <= p["price"] <= 68.0 for p in products)
     assert all(20 <= p["stock"] <= 120 for p in products)
     assert sum(1 for p in products if p["is_popular"]) == 20
+    assert all("image_url" in p for p in products)
 
     # Seed subset into db to verify model persistence
     created = seed_generated_products(db_session, products[:10])

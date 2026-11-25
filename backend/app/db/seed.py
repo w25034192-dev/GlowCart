@@ -554,31 +554,117 @@ def ensure_initial_data(db: Session) -> bool:
 # ---------------------------------------------------------------------------
 # Generated 100 Products Catalog Engine
 # ---------------------------------------------------------------------------
+CATEGORY_CATALOG = {
+    "Makeup": {
+        "items": [
+            "Velvet Matte Lipstick",
+            "Liquid Silk Foundation",
+            "Soft Pinch Liquid Blush",
+            "Luminous Concealer",
+            "Waterproof Volume Mascara",
+            "Precision Liquid Eyeliner",
+            "Dewy Setting Spray",
+            "Shimmer Eyeshadow Palette",
+        ],
+        "images": [
+            "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=600&q=80",
+        ],
+    },
+    "Skincare": {
+        "items": [
+            "Barrier Restore Hydrating Serum",
+            "Radiance Cleansing Balm",
+            "Hyaluronic Acid Moisture Cream",
+            "Niacinamide Pore Refining Toner",
+            "Vitamin C Brightening Essence",
+            "Overnight Peptide Repair Mask",
+            "Gentle Foaming Facial Cleanser",
+            "Ceramide Eye Contour Gel",
+        ],
+        "images": [
+            "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=600&q=80",
+        ],
+    },
+    "Sun Care": {
+        "items": [
+            "Invisible Fluid Sunscreen SPF50+",
+            "Tone-Up UV Defense Sun Milk",
+            "Hydrating Aloe Sun Gel SPF50",
+            "Matte Mineral Sun Stick",
+            "Soothing After-Sun Cooling Mist",
+        ],
+        "images": [
+            "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=600&q=80",
+        ],
+    },
+    "Hair Care": {
+        "items": [
+            "Honey Infused Repair Hair Oil",
+            "Keratin Smooth Nourishing Shampoo",
+            "Argan Deep Moisture Hair Mask",
+            "Heat Protectant Styling Mist",
+            "Scalp Revitalizing Tonic",
+        ],
+        "images": [
+            "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=600&q=80",
+        ],
+    },
+    "Fragrance": {
+        "items": [
+            "Libre Intense Eau De Parfum",
+            "Rose Velvet Eau De Toilette",
+            "Vanilla Amber Hair & Body Mist",
+            "White Peony Botanical Perfume",
+        ],
+        "images": [
+            "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=600&q=80",
+        ],
+    },
+}
+
+CATEGORIES = ["Makeup", "Skincare", "Sun Care", "Hair Care", "Fragrance"]
 BRANDS = ["Atelier Lab", "GlowCart Studio", "Solis Botanica", "KeraFlora", "Velvet Veil", "Lumière Skin"]
-CATEGORIES = ["Skincare", "Makeup", "Sun Care", "Hair Care", "Fragrance"]
-ADJECTIVES = ["Barrier Restore", "Hydra-Glow", "Velvet Matte", "Peptide Repair", "Botanical Dew", "Silk Touch", "Daily Shield", "Radiance"]
-ITEM_TYPES = ["Serum", "Cream", "Lip Tint", "Cushion Foundation", "UV Gel SPF50", "Hair Elixir", "Toner Essence", "Cleansing Balm"]
 SHADE_HEXES = ["#F3D6BE", "#E5B88E", "#C88E62", "#D98A7C", "#B85D4F", "#8E3B33", "#EADBC8"]
 
 
+def generate_single_product(index: int | None = None, category: str | None = None) -> dict:
+    """Generate a single cosmetic product using the category catalog items and real images."""
+    category_name = (
+        category
+        if (category and category in CATEGORY_CATALOG)
+        else random.choice(list(CATEGORY_CATALOG.keys()))
+    )
+    product_base_name = random.choice(CATEGORY_CATALOG[category_name]["items"])
+    image_url = random.choice(CATEGORY_CATALOG[category_name]["images"])
+    brand = random.choice(BRANDS)
+    name = f"{product_base_name} #{index}" if index is not None else product_base_name
+    price = round(random.uniform(18.0, 68.0), 2)
+    stock = random.randint(20, 120)
+    shade_hex = random.choice(SHADE_HEXES)
+    is_popular = True if (index is not None and index <= 20) else False
+
+    return {
+        "name": name,
+        "brand": brand,
+        "category": category_name,
+        "price": price,
+        "stock": stock,
+        "shade_hex": shade_hex,
+        "is_popular": is_popular,
+        "image_url": image_url,
+    }
+
+
 def generate_100_products():
-    products = []
-    for i in range(1, 101):
-        brand = random.choice(BRANDS)
-        category = random.choice(CATEGORIES)
-        name = f"{random.choice(ADJECTIVES)} {random.choice(ITEM_TYPES)} #{i}"
-        price = round(random.uniform(18.0, 68.0), 2)
-        
-        products.append({
-            "name": name,
-            "brand": brand,
-            "category": category,
-            "price": price,
-            "stock": random.randint(20, 120),
-            "shade_hex": random.choice(SHADE_HEXES),
-            "is_popular": True if i <= 20 else False, 
-        })
-    return products
+    return [generate_single_product(index=i) for i in range(1, 101)]
 
 
 def load_products_from_json(file_path: str | Path | None = None) -> list[dict]:
