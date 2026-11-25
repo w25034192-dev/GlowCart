@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { StarRating } from '@/components/common/UI';
-import { resolveMediaUrl } from '@/utils/media';
+import { getRealFallbackImage, resolveMediaUrl } from '@/utils/media';
 import type { ProductSummary } from '@/types';
 
 export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) => {
@@ -25,7 +25,7 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
         className="relative block aspect-square cursor-pointer overflow-hidden bg-gradient-to-br from-beige/60 via-card to-blush/40"
       >
         <img
-          src={resolveMediaUrl(product.primary_image_url, product.name)}
+          src={resolveMediaUrl(product.primary_image_url, product.name, product.category_name)}
           alt={product.name}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
@@ -33,8 +33,7 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
             const target = e.currentTarget;
             if (!target.dataset.fallback) {
               target.dataset.fallback = 'true';
-              const catSlug = product.category_name?.toLowerCase().replace(/\s+/g, '-') || 'makeup';
-              target.src = `/images/catalog/${catSlug}.svg`;
+              target.src = getRealFallbackImage(product.name, product.category_name);
             }
           }}
         />

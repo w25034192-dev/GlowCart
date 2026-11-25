@@ -54,7 +54,7 @@ export const HomePage: React.FC = () => {
   });
   const { data: bestSellers } = useQuery({
     queryKey: ['products', 'best_seller'],
-    queryFn: () => catalogApi.getProducts({ best_seller: true, page_size: 4 }),
+    queryFn: () => catalogApi.getProducts({ best_seller: true, page_size: 8 }),
   });
   const { data: promotions } = useQuery({
     queryKey: ['promotions'],
@@ -199,27 +199,28 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Best Sellers Product Showcase */}
+      {/* Popular Products & Best Sellers Showcase */}
       {bestSellers && bestSellers.items.length > 0 && (
-        <section aria-labelledby="best-sellers-heading" className="space-y-5">
-          <div className="flex flex-wrap items-end justify-between gap-2">
+        <section aria-labelledby="best-sellers-heading" className="space-y-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-rose">
-                Community Favorites
-              </div>
-              <h2 id="best-sellers-heading" className="font-serif text-3xl font-bold">
-                Best Sellers
+              <span className="bento-tag">Popular Cult Favorites</span>
+              <h2 id="best-sellers-heading" className="font-serif text-3xl font-bold sm:text-4xl text-foreground">
+                Popular Products &amp; Best Sellers
               </h2>
+              <p className="mt-1 text-sm text-muted-fg">
+                Hand-picked viral formulas, barrier-restoring serums, and high-pigment shades with authentic studio photography.
+              </p>
             </div>
             <Link
               to="/catalog?sort=rating"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-accent"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#B86B43] hover:text-[#9A5532] transition-colors"
             >
-              <span>Shop top rated</span>
+              <span>Shop all popular</span>
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {bestSellers.items.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

@@ -1,40 +1,37 @@
 # Latest Session Context — GlowCart
 
-> **Updated:** 2026-11-25 (Session 9 — Homepage Atelier Design & Interactive Shade Matcher)  
-> **Current Focus:** Implemented the exact user-specified editorial design in `HomePage.tsx` with live floating serum orb, shade selector, infinite marquee ticker, and bento grid categories.
+> **Updated:** 2026-11-25 (Session 10 — Popular Products & Real Image Design)  
+> **Current Focus:** Prepared and enhanced Popular Products with authentic studio cosmetic photography across all items and fallbacks.
 
-## What Was Developed
+## What Was Added & Updated
 
-1. **Interactive Shade Matcher & Floating Serum Orb ([HomePage.tsx](../frontend/src/pages/customer/HomePage.tsx)):**
-   - **Hero Split Layout:** Eyebrow `International Cosmetic Atelier`, headline `Curated Skincare, Shades & Beauty Essentials`, and dual CTAs (`Shop All Cosmetics →` and `Build Skin Routine`).
-   - **Live Shade Preview Card:** Right-side luxury card with a floating, glowing animated serum drop orb (`.serum-orb`).
-   - **Glass Widget & 4 Swatches:**
-     - `01 Ivory Silk (Cool Undertone)` (`#F3D6BE`)
-     - `02 Warm Honey (Neutral)` (`#E5B88E`)
-     - `03 Golden Amber (Warm)` (`#C88E62`)
-     - `04 Rich Espresso (Deep)` (`#8D5534`)
-   - Interactive React state dynamically shifts the serum orb's ambient color and updates the selected shade title with smooth CSS transitions.
+1. **Popular Products & Best Sellers Showcase ([HomePage.tsx](../frontend/src/pages/customer/HomePage.tsx)):**
+   - Elevated the section to **"Popular Products & Best Sellers"** with eyebrow `Popular Cult Favorites`.
+   - Expanded query to 8 popular items across skincare, foundations, lipsticks, and sun care.
+   - Descriptive editorial subheader highlighting authentic studio photography.
 
-2. **Infinite Marquee Ticker ([HomePage.tsx](../frontend/src/pages/customer/HomePage.tsx) & [index.css](../frontend/src/index.css)):**
-   - Continuous horizontal scrolling ticker with core beauty pillars:
-     `✦ FEFO BATCH-VERIFIED FRESHNESS ✦ LIVE HEX SHADE MATCHING ✦ DERMATOLOGIST TESTED ✦ VERIFIED CHECKOUT & TRACKING`
+2. **Full Real Photographic Image Resolver ([media.ts](../frontend/src/utils/media.ts)):**
+   - Built a comprehensive keyword-to-real-cosmetic photography dictionary covering:
+     - *Foundations, Cushions, Concealers, Powders*
+     - *Lipsticks, Velvet Crayons, Glosses, Blushes, Mascaras*
+     - *Serums, Ampoules, Snail Mucin, Creams, Toners, Cleansers, Natural Thanakha*
+     - *Sun Protection, UV Fluids, Sun Sticks*
+     - *Hair Care, Bonding Oils, Botanical Shampoos*
+     - *Body Butters, Nourishing Lotions*
+     - *Luxury Perfumes, Floral Sillage Mists*
+     - *Velvet Sponges, Precision Blending Brushes, Discovery Bundles*
+   - Replaced all fallback behaviors: if any image is missing, fails to load, or points to an SVG, it automatically resolves to its true, high-definition real beauty photo.
 
-3. **Bento Grid Categories ([HomePage.tsx](../frontend/src/pages/customer/HomePage.tsx)):**
-   - Asymmetrical Bento grid matching the editorial specification:
-     - **Large Card:** Skincare Rituals (barrier-restoring cleansers, active serums, essences, moisturizers)
-     - **Standard Card 1:** Makeup (Color Studio)
-     - **Standard Card 2:** Sun Care (SPF 50+)
-     - **Wide Card:** Hair & Scalp Care (Botanical Care)
-   - Interactive hover lift with arrow icons (`↗`) routing directly to category catalogs.
+3. **ProductCard & Details Fallbacks ([ProductCard.tsx](../frontend/src/components/customer/ProductCard.tsx) & [ProductDetailsPage.tsx](../frontend/src/pages/customer/ProductDetailsPage.tsx)):**
+   - Updated image `onError` handlers to use `getRealFallbackImage(product.name, product.category_name)` instead of SVG placeholders.
 
-4. **Typography & Styling:**
-   - Imported `Cormorant Garamond` and `Plus Jakarta Sans` in [frontend/index.html](../frontend/index.html).
-   - Updated Tailwind font family stacks in [frontend/tailwind.config.js](../frontend/tailwind.config.js).
-   - Added standalone reference file in [frontend/public/preview-homepage.html](../frontend/public/preview-homepage.html).
+4. **Zero-Downtime Database Upgrade ([seed.py](../backend/app/db/seed.py)):**
+   - `ensure_initial_data()` automatically upgrades any existing `ProductImage` database rows pointing to SVGs or placeholders to real high-resolution photographs, and ensures every single product has a primary image.
 
 ## Verified Checks
-- `cd frontend && npm test -- --run`: **8 passed, 0 failed** in `1.61s` (exit code `0`).
-- `cd frontend && npm run build`: **Clean production build** via `tsc && vite build` in `2.11s` (exit code `0`).
+- `cd frontend && npm test -- --run`: **8 passed, 0 failed** in `1.87s` (exit code `0`).
+- `cd frontend && npm run build`: **Clean production build** via `tsc && vite build` in `2.15s` (exit code `0`).
+- `cd backend && python3 -m pytest tests -v`: **23 passed, 0 failed** in `20.30s` (exit code `0`).
 
 ## Deployment
 - Pushed to `origin/main` for automatic deployment to Railway.

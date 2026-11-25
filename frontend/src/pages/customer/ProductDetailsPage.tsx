@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { AlertBox, Badge, Button, Card, StarRating } from '@/components/common/UI';
 import { ProductCard } from '@/components/customer/ProductCard';
-import { resolveMediaUrl } from '@/utils/media';
+import { getRealFallbackImage, resolveMediaUrl } from '@/utils/media';
 import type { ProductVariant } from '@/types';
 
 export const ProductDetailsPage: React.FC = () => {
@@ -117,7 +117,8 @@ export const ProductDetailsPage: React.FC = () => {
           <img
             src={resolveMediaUrl(
               product.images[0]?.image_url || product.primary_image_url,
-              product.name
+              product.name,
+              product.category_name
             )}
             alt={product.name}
             className="h-full w-full object-cover"
@@ -125,8 +126,7 @@ export const ProductDetailsPage: React.FC = () => {
               const target = e.currentTarget;
               if (!target.dataset.fallback) {
                 target.dataset.fallback = 'true';
-                const catSlug = product.category_name?.toLowerCase().replace(/\s+/g, '-') || 'makeup';
-                target.src = `/images/catalog/${catSlug}.svg`;
+                target.src = getRealFallbackImage(product.name, product.category_name);
               }
             }}
           />

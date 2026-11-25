@@ -517,14 +517,22 @@ def ensure_initial_data(db: Session) -> bool:
     all_blueprint_entries = list(enumerate(CATALOG_BLUEPRINT, start=1))
     created = _seed_blueprint_entries(db, all_blueprint_entries, cat_map, brand_map)
 
-    # Upgrade any existing product images pointing to generic SVG placeholders to real photographs
+    # Upgrade any existing product images pointing to generic SVG or placeholders to real photographs
     updated_images = 0
     for img in db.query(ProductImage).all():
-        if img.image_url and img.image_url.endswith(".svg"):
+        if not img.image_url or img.image_url.endswith(".svg") or "placeholder" in img.image_url.lower() or "placehold.co" in img.image_url.lower():
             prod = db.query(Product).filter(Product.id == img.product_id).first()
             if prod and prod.category:
                 img.image_url = resolve_seed_image_url(prod.category.name, prod.name, prod.slug)
                 updated_images += 1
+
+    # Ensure all products have at least one primary ProductImage
+    for prod in db.query(Product).all():
+        has_img = db.query(ProductImage).filter(ProductImage.product_id == prod.id).first()
+        if not has_img and prod.category:
+            real_url = resolve_seed_image_url(prod.category.name, prod.name, prod.slug)
+            db.add(ProductImage(product_id=prod.id, image_url=real_url, is_primary=True, sort_order=0))
+            updated_images += 1
 
     if created > 0 or updated_images > 0:
         db.commit()
