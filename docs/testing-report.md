@@ -9,7 +9,7 @@
 
 **Command:** `cd backend && python3 -m pytest tests -v`  
 **Exit Code:** `0`  
-**Result:** **21 passed, 0 failed** (`19.45s`)
+**Result:** **23 passed, 0 failed** (`20.39s`)
 
 | Test Module | Test Case | Status | Verified Behavior |
 |---|---|---|---|
@@ -20,6 +20,7 @@
 | `test_auth_rbac.py` | `test_profile_and_address_crud` | PASSED | Profile update and address create/list/delete |
 | `test_auth_rbac.py` | `test_production_settings_reject_default_secrets` | PASSED | Fail-closed guard rejects dev default JWT/webhook secrets in `production` |
 | `test_auth_rbac.py` | `test_railway_postgres_url_normalization` | PASSED | Normalizes Railway `postgres://` and `postgresql://` URLs to `postgresql+psycopg://` |
+| `test_auth_rbac.py` | `test_cors_origins_normalization_and_railway_preflight` | PASSED | Strips quotes/trailing slashes from `CORS_ORIGINS` and verifies `OPTIONS /api/v1/products` preflight headers for Railway HTTPS frontend origins |
 | `test_catalog_inventory.py` | `test_catalog_crud_and_filtering` | PASSED | Admin CRUD, RBAC `403`, search, skin-type & price filtering, variants |
 | `test_catalog_inventory.py` | `test_inventory_batches_expiry_and_fefo_allocation` | PASSED | Expired batch exclusion, negative-stock `409` rejection, FEFO earliest-expiry-first deduction |
 | `test_catalog_inventory.py` | `test_product_image_upload_validation` | PASSED | Rejects `.exe` upload (`400 Bad Request`) |
@@ -27,6 +28,7 @@
 | `test_catalog_inventory.py` | `test_ensure_initial_data_seeds_when_empty_and_creates_default_admin` | PASSED | Seeds 50+ products across Makeup/Skincare/Sun Care/Hair Care/Fragrance + default admin when DB is empty; idempotent on repeat |
 | `test_catalog_inventory.py` | `test_all_seeded_categories_and_skincare_endpoint_consistency` | PASSED | Verifies all 8 categories active, every category returns `> 0` matching products (`skincare`: 12), no duplicates, and trimmed/case-insensitive slug lookup |
 | `test_catalog_inventory.py` | `test_ensure_initial_data_recovers_missing_skincare_when_other_products_exist` | PASSED | Seeds Skincare demo products idempotently when pre-existing non-skincare products exist without duplicating existing items |
+| `test_catalog_inventory.py` | `test_all_50_seeded_products_accessible_via_pagination` | PASSED | Verifies all 50 seeded products across pages 1–5 (`page_size=12`, `total_pages=5`, `total=50`) with zero duplicates |
 | `test_orders_payments_cart.py` | `test_cart_wishlist_coupon_and_cod_order_snapshot` | PASSED | Wishlist, coupon `LIP10`, COD order, idempotency replay, price snapshot immutability, customer status `403` |
 | `test_orders_payments_cart.py` | `test_sandbox_payment_and_duplicate_webhook_idempotency` | PASSED | Sandbox intent, HMAC-SHA256 webhook verification, duplicate `provider_event_id` deduplication |
 | `test_orders_payments_cart.py` | `test_expired_batch_cannot_be_sold_and_no_overselling_last_unit` | PASSED | Expired batch blocked (`409`), 2 concurrent checkouts for last unit yield `[201, 409]` |
@@ -38,14 +40,16 @@
 ---
 
 ## 2. Frontend Build & Test Status (`TypeScript`, `Vite`, `Vitest` + `React Testing Library`)
-- **Build Command:** `cd frontend && npm run build` (`tsc && vite build`) — **PASSED** (`2.02s`, exit code `0`).
-- **Test Command:** `cd frontend && npm test -- --run` (`vitest run`) — **6 passed, 0 failed** (`1.41s`, exit code `0`):
+- **Build Command:** `cd frontend && npm run build` (`tsc && vite build`) — **PASSED** (`2.15s`, exit code `0`).
+- **Test Command:** `cd frontend && npm test -- --run` (`vitest run`) — **8 passed, 0 failed** (`1.55s`, exit code `0`):
   - Homepage hero, featured categories, best sellers, skin-routine builder, and testimonials render (`/`).
   - Unauthenticated redirect away from protected `/admin` routes.
   - Product shade variant selection updates SKU and price (`/products/prod-1`).
   - Skincare category loads products and resets stale keyword filters when navigating from `/category/makeup` -> `/category/skincare`.
   - All 8 seeded category routes (`/category/makeup`, `/category/skincare`, `/category/sun-care`, `/category/hair-care`, `/category/body-care`, `/category/fragrance`, `/category/beauty-tools`, `/category/makeup-sets`) request their exact `category_slug` and display products.
-  - API failure shows `role="alert"` error message with `Retry` button instead of `"0 products available"`.
+  - API failure shows `role="alert"` error message with `Retry` button and resolved `API endpoint` instead of `"0 products available"`.
+  - `resolveApiBaseUrl` normalizes runtime config (`window.__GLOWCART_CONFIG__`), bare domains, trailing slashes, duplicate `/api/v1`, and `http://` -> `https://` mixed-content upgrades.
+  - `CatalogPage` paginates `total: 50`, `total_pages: 5` responses cleanly across pages (`Page 1 / 5` -> `Page 2 / 5`).
 
 ---
 

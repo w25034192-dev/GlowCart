@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { catalogApi } from '@/services/api';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { Button, Card } from '@/components/common/UI';
+import { API_BASE_URL } from '@/utils/apiConfig';
 
 export const CatalogPage: React.FC = () => {
   const { categorySlug, brandSlug } = useParams();
@@ -319,6 +320,9 @@ export const CatalogPage: React.FC = () => {
                 {error instanceof Error
                   ? error.message
                   : 'The catalog service could not be reached. Please verify the API connection.'}
+              </p>
+              <p className="mt-1 font-mono text-xs text-muted-fg">
+                API endpoint: {API_BASE_URL}/products
               </p>
               <Button
                 type="button"

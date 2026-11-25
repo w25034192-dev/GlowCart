@@ -39,7 +39,7 @@
 1. Create a second Railway service in the same project with **Root Directory** set to `frontend`.
 2. Railway automatically reads `frontend/railway.toml` (`builder = "DOCKERFILE"`, `healthcheckPath = "/healthz"`).
 3. Configure Railway build/runtime variable:
-   - `VITE_API_BASE_URL=https://<backend-domain>/api/v1` *(Vite reads this at Docker build time via `ARG VITE_API_BASE_URL`)*.
+   - `VITE_API_BASE_URL=https://<backend-domain>/api/v1` *(honored both at Docker build time via `ARG VITE_API_BASE_URL` and at Nginx container startup via `/env-config.js`, with automatic scheme/path normalization)*.
 4. Nginx serves the React SPA (`try_files $uri $uri/ /index.html;`) on Railway's dynamic `$PORT`.
 5. Verify health check: `GET https://<frontend-domain>/healthz` → `ok`.
 

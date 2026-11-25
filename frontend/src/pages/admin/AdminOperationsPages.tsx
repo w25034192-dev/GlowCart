@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { adminApi, engagementApi } from '@/services/api';
 import { Badge, Button, Card } from '@/components/common/UI';
 import { useAuthStore } from '@/store/authStore';
+import { API_BASE_URL } from '@/utils/apiConfig';
 
 export const AdminOrdersPage: React.FC = () => {
   const { data: orders, refetch } = useQuery({ queryKey: ['admin-orders'], queryFn: adminApi.getOrders });
@@ -254,7 +255,7 @@ export const AdminNotificationsReportsSettingsPages = {
   })(),
   Reports: (() => {
     const Comp: React.FC = () => {
-      const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+      const base = API_BASE_URL;
       return (
         <Card className="space-y-4">
           <h1 className="font-serif text-3xl font-bold">Export Reports</h1>

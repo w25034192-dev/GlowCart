@@ -366,3 +366,26 @@ def test_ensure_initial_data_recovers_missing_skincare_when_other_products_exist
     assert db_session.query(Product).filter(Product.slug == "custom-lip-oil").count() == 1
 
 
+def test_all_50_seeded_products_accessible_via_pagination(client, db_session):
+    from app.db.seed import seed_demo_data
+
+    seed_demo_data(db_session)
+
+    collected_ids: set[str] = set()
+    for page in range(1, 6):
+        res = client.get("/api/v1/products", params={"page": page, "page_size": 12})
+        assert res.status_code == 200
+        payload = res.json()
+        assert payload["total"] == 50
+        assert payload["page"] == page
+        assert payload["page_size"] == 12
+        assert payload["total_pages"] == 5
+        expected_len = 12 if page < 5 else 2
+        assert len(payload["items"]) == expected_len
+        for item in payload["items"]:
+            collected_ids.add(item["id"])
+
+    assert len(collected_ids) == 50
+
+
+

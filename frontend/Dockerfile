@@ -29,6 +29,8 @@ FROM nginxinc/nginx-unprivileged:1.27-alpine AS production
 ENV PORT=8080
 
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY docker-entrypoint-env.sh /docker-entrypoint.d/99-glowcart-env.sh
+RUN chmod +x /docker-entrypoint.d/99-glowcart-env.sh
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 8080

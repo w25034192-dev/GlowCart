@@ -3,13 +3,11 @@
 This document records the chronological summary of every development phase and the latest verified project context under `/docs/`.
 
 ## Latest Context Snapshot
-- **Last Completed Action:** Investigated and fixed Skincare category `"0 products available"` across backend catalog filtering (`CatalogService.list_products`), startup seeding (`ensure_initial_data` / `_ensure_categories_and_brands` / `_seed_blueprint_entries`), `CatalogPage.tsx` (URL param state sync/reset + accessible `role="alert"` error UI + category display title), mobile navigation links (`CustomerLayout.tsx`), and Vitest configuration (`vitest.config.ts` + `setup.ts`). Full details recorded in [skincare-category-fix.md](./skincare-category-fix.md).
-- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **21 passed, 0 failed** (`19.45s`, exit code `0`).
-- **Verified Frontend Build & Test Status:** `cd frontend && npm run build` (`tsc && vite build`, `2.02s`, exit code `0`) and `cd frontend && npm test -- --run` — **6 passed, 0 failed** (`1.41s`, exit code `0`).
-- **Verified Live Local HTTP Endpoints (Scratch SQLite + Alembic + `uvicorn` + `vite preview`):** All 8 categories return `200 OK` (`makeup`: 12, `skincare`: 12, `sun-care`: 5, `hair-care`: 5, `body-care`: 4, `fragrance`: 4, `beauty-tools`: 4, `makeup-sets`: 4) with zero backend errors.
-- **Pending Environment Items (Honest Blockers):**
-  - Chrome DevTools remote debugging (`DevToolsActivePort`) was unavailable for headless/live Chrome console inspection, and remote Railway PostgreSQL was not directly queried from this host.
-  - Local `Postgres.app` has no `glowcart` database; live Railway PostgreSQL & `argon2-cffi` run in Railway deployment.
+- **Last Completed Action:** Implemented runtime `/env-config.js` API injection (`frontend/Dockerfile`, `docker-entrypoint-env.sh`, `nginx.conf.template`), centralized `resolveApiBaseUrl()` normalization (`frontend/src/utils/apiConfig.ts`), and backend CORS origin normalization + Railway regex fallback (`backend/app/core/config.py`, `main.py`). Details in [production-network-error-fix.md](./production-network-error-fix.md) and [latest-session-context.md](./latest-session-context.md).
+- **Verified Backend Test Status:** `cd backend && python3 -m pytest tests -v` — **23 passed, 0 failed** (`20.39s`, exit code `0`).
+- **Verified Frontend Build & Test Status:** `cd frontend && npm run build` (`tsc && vite build`, `2.15s`, exit code `0`) and `cd frontend && npm test -- --run` — **8 passed, 0 failed** (`1.55s`, exit code `0`).
+- **Pending Verification (Requires Deployed URLs & Redeploy):**
+  - Deployed Railway frontend/backend URLs and Railway CLI access are not available in this workspace; push + redeploy on Railway and provide the live URLs to test All Products (pages 1–5), categories, and browser Network tab end to end.
 
 ---
 

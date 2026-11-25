@@ -241,6 +241,73 @@ describe('GlowCart Frontend', () => {
     expect(screen.queryByText('0 products available')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Retry/i })).toBeInTheDocument();
   });
+
+  it('normalizes production API URLs across runtime config, bare domains, trailing slashes, and duplicate /api/v1', async () => {
+    const { resolveApiBaseUrl } = await import('@/utils/apiConfig');
+
+    expect(resolveApiBaseUrl('https://glowcart-api.up.railway.app')).toBe(
+      'https://glowcart-api.up.railway.app/api/v1'
+    );
+    expect(resolveApiBaseUrl('https://glowcart-api.up.railway.app/api/v1/')).toBe(
+      'https://glowcart-api.up.railway.app/api/v1'
+    );
+    expect(resolveApiBaseUrl('https://glowcart-api.up.railway.app/api/v1/api/v1/')).toBe(
+      'https://glowcart-api.up.railway.app/api/v1'
+    );
+    expect(resolveApiBaseUrl('glowcart-api.up.railway.app')).toBe(
+      'https://glowcart-api.up.railway.app/api/v1'
+    );
+    expect(resolveApiBaseUrl('http://glowcart-api.up.railway.app/api/v1', 'https:')).toBe(
+      'https://glowcart-api.up.railway.app/api/v1'
+    );
+    expect(resolveApiBaseUrl(undefined, 'http:', 'https://runtime-api.up.railway.app')).toBe(
+      'https://runtime-api.up.railway.app/api/v1'
+    );
+  });
+
+  it('supports navigating paginated 50-product catalog responses across pages', async () => {
+    useAuthStore.setState({ user: null, isLoading: false });
+    const user = userEvent.setup();
+    vi.mocked(catalogApi.getProducts).mockImplementation(async (params) => {
+      const page = Number(params?.page || 1);
+      return {
+        items: [
+          {
+            id: `prod-page-${page}`,
+            name: `GlowCart Catalog Item Page ${page}`,
+            slug: `glowcart-item-page-${page}`,
+            category_id: 'cat-1',
+            category_name: 'Makeup',
+            brand_id: 'br-1',
+            brand_name: 'Rare Beauty',
+            min_price: '24.00',
+            max_price: '24.00',
+            average_rating: 4.9,
+            review_count: 5,
+            in_stock: true,
+            is_featured: true,
+            is_new_arrival: false,
+            is_best_seller: true,
+            is_demo: true,
+            skin_types: ['all'],
+          },
+        ],
+        total: 50,
+        page,
+        page_size: 12,
+        total_pages: 5,
+      };
+    });
+
+    renderAt('/catalog');
+    expect(await screen.findByText('50 products available')).toBeInTheDocument();
+    expect(screen.getByText('GlowCart Catalog Item Page 1')).toBeInTheDocument();
+    expect(screen.getByText('Page 1 / 5')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    expect(await screen.findByText('GlowCart Catalog Item Page 2')).toBeInTheDocument();
+    expect(screen.getByText('Page 2 / 5')).toBeInTheDocument();
+  });
 });
 
 

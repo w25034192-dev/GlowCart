@@ -200,3 +200,46 @@ def test_railway_postgres_url_normalization():
     s3 = Settings(database_url="sqlite:///./glowcart_dev.db")
     assert s3.database_url == "sqlite:///./glowcart_dev.db"
 
+
+def test_cors_origins_normalization_and_railway_preflight(monkeypatch):
+    from fastapi.testclient import TestClient
+    from app.core.config import Settings, get_settings
+    from app.main import create_app
+
+    s = Settings(
+        cors_origins=[
+            ' "https://glowcart-frontend.up.railway.app/" ',
+            "https://glowcart.vercel.app/",
+        ]
+    )
+    assert s.cors_origins == [
+        "https://glowcart-frontend.up.railway.app",
+        "https://glowcart.vercel.app",
+    ]
+
+    # When running on Railway without explicit CORS_ORIGINS override, HTTPS *.up.railway.app origins work
+    get_settings.cache_clear()
+    monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("JWT_SECRET_KEY", "x" * 64)
+    monkeypatch.setenv("PAYMENT_WEBHOOK_SECRET", "y" * 32)
+    try:
+        app = create_app()
+        with TestClient(app) as tc:
+            origin = "https://glowcart-frontend.up.railway.app"
+            preflight = tc.options(
+                "/api/v1/products",
+                headers={
+                    "Origin": origin,
+                    "Access-Control-Request-Method": "GET",
+                    "Access-Control-Request-Headers": "Authorization,Content-Type",
+                },
+            )
+            assert preflight.status_code == 200
+            assert preflight.headers.get("access-control-allow-origin") == origin
+            assert preflight.headers.get("access-control-allow-credentials") == "true"
+    finally:
+        get_settings.cache_clear()
+
+

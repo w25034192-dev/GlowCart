@@ -1,7 +1,7 @@
 from functools import lru_cache
 import os
 from pathlib import Path
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 def _load_dotenv() -> None:
@@ -18,40 +18,71 @@ def _load_dotenv() -> None:
 
 _load_dotenv()
 
+_DEFAULT_CORS_ORIGINS = ("http://localhost:5173", "http://127.0.0.1:5173")
+_RAILWAY_CORS_ORIGIN_REGEX = (
+    r"^https://([a-zA-Z0-9-]+\.)?(up\.railway\.app|vercel\.app)$"
+)
+
+
+def _normalize_origin(origin: str) -> str:
+    return origin.strip().strip('"').strip("'").rstrip("/")
+
+
+def _default_cors_origins() -> list[str]:
+    raw = os.getenv("CORS_ORIGINS", ",".join(_DEFAULT_CORS_ORIGINS))
+    origins = [_normalize_origin(o) for o in raw.split(",") if _normalize_origin(o)]
+    for extra_key in ("FRONTEND_URL", "PUBLIC_FRONTEND_URL"):
+        extra = _normalize_origin(os.getenv(extra_key, ""))
+        if extra and extra not in origins:
+            origins.append(extra)
+    return origins
+
+
+def _default_cors_origin_regex() -> str | None:
+    explicit = os.getenv("CORS_ORIGIN_REGEX", "").strip()
+    if explicit:
+        return explicit
+    is_railway = bool(
+        os.getenv("RAILWAY_ENVIRONMENT")
+        or os.getenv("RAILWAY_PROJECT_ID")
+        or os.getenv("RAILWAY_SERVICE_NAME")
+    )
+    if is_railway and not os.getenv("CORS_ORIGINS", "").strip():
+        return _RAILWAY_CORS_ORIGIN_REGEX
+    return None
+
 
 class Settings(BaseModel):
-    app_name: str = os.getenv("APP_NAME", "GlowCart API")
-    app_env: str = os.getenv("APP_ENV", "development")
-    debug: bool = os.getenv("DEBUG", "false").lower() == "true"
-    api_v1_prefix: str = os.getenv("API_V1_PREFIX", "/api/v1")
+    app_name: str = Field(default_factory=lambda: os.getenv("APP_NAME", "GlowCart API"))
+    app_env: str = Field(default_factory=lambda: os.getenv("APP_ENV", "development"))
+    debug: bool = Field(default_factory=lambda: os.getenv("DEBUG", "false").lower() == "true")
+    api_v1_prefix: str = Field(default_factory=lambda: os.getenv("API_V1_PREFIX", "/api/v1"))
 
-    database_url: str = os.getenv(
-        "DATABASE_URL",
-        "sqlite:///./glowcart_dev.db",
+    database_url: str = Field(
+        default_factory=lambda: os.getenv("DATABASE_URL", "sqlite:///./glowcart_dev.db")
     )
 
-    jwt_secret_key: str = os.getenv(
-        "JWT_SECRET_KEY",
-        "glowcart-dev-only-secret-key-change-in-production-min-32-chars",
+    jwt_secret_key: str = Field(
+        default_factory=lambda: os.getenv(
+            "JWT_SECRET_KEY",
+            "glowcart-dev-only-secret-key-change-in-production-min-32-chars",
+        )
     )
-    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
+    jwt_algorithm: str = Field(default_factory=lambda: os.getenv("JWT_ALGORITHM", "HS256"))
     access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
     refresh_token_expire_days: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
     password_reset_token_expire_minutes: int = int(
         os.getenv("PASSWORD_RESET_TOKEN_EXPIRE_MINUTES", "30")
     )
 
-    cors_origins: list[str] = [
-        origin.strip()
-        for origin in os.getenv(
-            "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
-        ).split(",")
-        if origin.strip()
-    ]
+    cors_origins: list[str] = Field(default_factory=_default_cors_origins)
+    cors_origin_regex: str | None = Field(default_factory=_default_cors_origin_regex)
 
-    payment_webhook_secret: str = os.getenv(
-        "PAYMENT_WEBHOOK_SECRET",
-        "glowcart-sandbox-webhook-secret-change-me",
+    payment_webhook_secret: str = Field(
+        default_factory=lambda: os.getenv(
+            "PAYMENT_WEBHOOK_SECRET",
+            "glowcart-sandbox-webhook-secret-change-me",
+        )
     )
 
     cloudinary_cloud_name: str = os.getenv("CLOUDINARY_CLOUD_NAME", "")
@@ -70,6 +101,9 @@ class Settings(BaseModel):
 
     @model_validator(mode="after")
     def _validate_and_normalize(self) -> "Settings":
+        self.cors_origins = [
+            _normalize_origin(o) for o in self.cors_origins if _normalize_origin(o)
+        ]
         if self.database_url.startswith("postgres://"):
             self.database_url = "postgresql+psycopg://" + self.database_url[len("postgres://") :]
         elif self.database_url.startswith("postgresql://"):
