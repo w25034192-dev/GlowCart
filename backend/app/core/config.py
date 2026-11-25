@@ -20,7 +20,7 @@ _load_dotenv()
 
 _DEFAULT_CORS_ORIGINS = ("http://localhost:5173", "http://127.0.0.1:5173")
 _RAILWAY_CORS_ORIGIN_REGEX = (
-    r"^https://([a-zA-Z0-9-]+\.)?(up\.railway\.app|vercel\.app)$"
+    r"^https://[a-zA-Z0-9-]+(\.up\.railway\.app|\.vercel\.app|\.netlify\.app)$"
 )
 
 
@@ -35,6 +35,18 @@ def _default_cors_origins() -> list[str]:
         extra = _normalize_origin(os.getenv(extra_key, ""))
         if extra and extra not in origins:
             origins.append(extra)
+    # On Railway, RAILWAY_PUBLIC_DOMAIN is the backend's own public domain.
+    # Also auto-add any explicit CORS_FRONTEND_URL the user sets in Railway vars.
+    for extra_key in ("RAILWAY_PUBLIC_DOMAIN", "CORS_FRONTEND_URL"):
+        raw_domain = os.getenv(extra_key, "").strip()
+        if not raw_domain:
+            continue
+        # RAILWAY_PUBLIC_DOMAIN is just the hostname (no scheme)
+        if not raw_domain.startswith("http"):
+            raw_domain = f"https://{raw_domain}"
+        extra = _normalize_origin(raw_domain)
+        if extra and extra not in origins:
+            origins.append(extra)
     return origins
 
 
@@ -42,12 +54,20 @@ def _default_cors_origin_regex() -> str | None:
     explicit = os.getenv("CORS_ORIGIN_REGEX", "").strip()
     if explicit:
         return explicit
+    # Detect Railway via any of the many env vars it injects
     is_railway = bool(
         os.getenv("RAILWAY_ENVIRONMENT")
         or os.getenv("RAILWAY_PROJECT_ID")
         or os.getenv("RAILWAY_SERVICE_NAME")
+        or os.getenv("RAILWAY_PUBLIC_DOMAIN")
+        or os.getenv("RAILWAY_STATIC_URL")
+        or os.getenv("RAILWAY_GIT_REPO_NAME")
+        or os.getenv("RAILWAY_DEPLOYMENT_ID")
     )
-    if is_railway and not os.getenv("CORS_ORIGINS", "").strip():
+    # Also treat APP_ENV=production as a signal to allow Railway/Vercel origins
+    # unless the user has explicitly listed CORS_ORIGINS (meaning they want tight control)
+    is_production = os.getenv("APP_ENV", "").lower() == "production"
+    if (is_railway or is_production) and not os.getenv("CORS_ORIGINS", "").strip():
         return _RAILWAY_CORS_ORIGIN_REGEX
     return None
 

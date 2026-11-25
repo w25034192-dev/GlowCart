@@ -18,6 +18,12 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     settings = get_settings()
+    # Log active CORS config so Railway deployment logs make it easy to debug
+    logger.info(
+        "CORS config: allow_origins=%s, allow_origin_regex=%s",
+        settings.cors_origins,
+        settings.cors_origin_regex,
+    )
     if settings.auto_seed_on_startup:
         try:
             with SessionLocal() as db:
@@ -67,6 +73,31 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["Health"])
     def health_check():
         return {"status": "ok", "service": "glowcart-backend", "version": "1.0.0"}
+
+    @app.get("/health/cors", tags=["Health"])
+    def cors_debug():
+        """Read-only CORS configuration dump for deployment debugging."""
+        import os
+        return {
+            "cors_origins": settings.cors_origins,
+            "cors_origin_regex": settings.cors_origin_regex,
+            "app_env": settings.app_env,
+            "railway_env_vars_detected": {
+                k: bool(os.getenv(k))
+                for k in (
+                    "RAILWAY_ENVIRONMENT",
+                    "RAILWAY_PROJECT_ID",
+                    "RAILWAY_SERVICE_NAME",
+                    "RAILWAY_PUBLIC_DOMAIN",
+                    "RAILWAY_STATIC_URL",
+                    "RAILWAY_GIT_REPO_NAME",
+                    "RAILWAY_DEPLOYMENT_ID",
+                    "CORS_ORIGINS",
+                    "CORS_FRONTEND_URL",
+                    "FRONTEND_URL",
+                )
+            },
+        }
 
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 

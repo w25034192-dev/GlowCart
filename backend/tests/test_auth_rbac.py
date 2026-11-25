@@ -203,7 +203,7 @@ def test_railway_postgres_url_normalization():
 
 def test_cors_origins_normalization_and_railway_preflight(monkeypatch):
     from fastapi.testclient import TestClient
-    from app.core.config import Settings, get_settings
+    from app.core.config import Settings, get_settings, _default_cors_origin_regex
     from app.main import create_app
 
     s = Settings(
@@ -217,7 +217,59 @@ def test_cors_origins_normalization_and_railway_preflight(monkeypatch):
         "https://glowcart.vercel.app",
     ]
 
-    # When running on Railway without explicit CORS_ORIGINS override, HTTPS *.up.railway.app origins work
+    # --- Regex coverage: all production subdomain forms must match ---
+    import re
+    from app.core.config import _RAILWAY_CORS_ORIGIN_REGEX
+    should_match = [
+        "https://glowcart-production-7b775f24.up.railway.app",
+        "https://glowcart-frontend.up.railway.app",
+        "https://glowcart.vercel.app",
+        "https://my-app.netlify.app",
+    ]
+    should_not_match = [
+        "http://glowcart-frontend.up.railway.app",   # http not allowed
+        "https://evil.com",
+        "https://glowcart-frontend.up.railway.app.evil.com",
+    ]
+    for origin in should_match:
+        assert re.match(_RAILWAY_CORS_ORIGIN_REGEX, origin), f"Should match: {origin}"
+    for origin in should_not_match:
+        assert not re.match(_RAILWAY_CORS_ORIGIN_REGEX, origin), f"Should NOT match: {origin}"
+
+    # --- RAILWAY_PUBLIC_DOMAIN auto-inject into cors_origins ---
+    monkeypatch.setenv("RAILWAY_PUBLIC_DOMAIN", "glowcart-production-7b775f24.up.railway.app")
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    monkeypatch.delenv("FRONTEND_URL", raising=False)
+    monkeypatch.delenv("PUBLIC_FRONTEND_URL", raising=False)
+    monkeypatch.delenv("CORS_FRONTEND_URL", raising=False)
+    get_settings.cache_clear()
+    s2 = Settings()
+    assert "https://glowcart-production-7b775f24.up.railway.app" in s2.cors_origins
+    monkeypatch.delenv("RAILWAY_PUBLIC_DOMAIN", raising=False)
+
+    # --- CORS_FRONTEND_URL env var ---
+    monkeypatch.setenv("CORS_FRONTEND_URL", "https://my-custom-frontend.up.railway.app")
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    get_settings.cache_clear()
+    s3 = Settings()
+    assert "https://my-custom-frontend.up.railway.app" in s3.cors_origins
+    monkeypatch.delenv("CORS_FRONTEND_URL", raising=False)
+
+    # --- is_production fallback: APP_ENV=production enables regex even without Railway vars ---
+    monkeypatch.delenv("RAILWAY_ENVIRONMENT", raising=False)
+    monkeypatch.delenv("RAILWAY_PROJECT_ID", raising=False)
+    monkeypatch.delenv("RAILWAY_SERVICE_NAME", raising=False)
+    monkeypatch.delenv("RAILWAY_PUBLIC_DOMAIN", raising=False)
+    monkeypatch.delenv("RAILWAY_STATIC_URL", raising=False)
+    monkeypatch.delenv("RAILWAY_GIT_REPO_NAME", raising=False)
+    monkeypatch.delenv("RAILWAY_DEPLOYMENT_ID", raising=False)
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    monkeypatch.setenv("APP_ENV", "production")
+    regex = _default_cors_origin_regex()
+    assert regex is not None, "APP_ENV=production should activate CORS regex"
+    assert re.match(regex, "https://glowcart-production-7b775f24.up.railway.app")
+
+    # When running on Railway, HTTPS *.up.railway.app origins work via regex
     get_settings.cache_clear()
     monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
     monkeypatch.delenv("CORS_ORIGINS", raising=False)
@@ -227,7 +279,7 @@ def test_cors_origins_normalization_and_railway_preflight(monkeypatch):
     try:
         app = create_app()
         with TestClient(app) as tc:
-            origin = "https://glowcart-frontend.up.railway.app"
+            origin = "https://glowcart-production-7b775f24.up.railway.app"
             preflight = tc.options(
                 "/api/v1/products",
                 headers={
@@ -239,6 +291,13 @@ def test_cors_origins_normalization_and_railway_preflight(monkeypatch):
             assert preflight.status_code == 200
             assert preflight.headers.get("access-control-allow-origin") == origin
             assert preflight.headers.get("access-control-allow-credentials") == "true"
+
+            # Also verify the /health/cors debug endpoint works
+            cors_debug = tc.get("/health/cors")
+            assert cors_debug.status_code == 200
+            data = cors_debug.json()
+            assert "cors_origin_regex" in data
+            assert data["cors_origin_regex"] is not None
     finally:
         get_settings.cache_clear()
 
