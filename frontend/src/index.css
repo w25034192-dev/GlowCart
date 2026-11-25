@@ -21,10 +21,13 @@
   --color-on-destructive: #ffffff;
   --color-ring: #1c1917;
 
-  /* GlowCart Cosmetic Editorial Accents (Warm White, Soft Blush Pink, Beige) */
+  /* GlowCart Cosmetic Editorial Accents (Warm White, Soft Blush Pink, Cashmere Beige, Velvet Rose, Royal Gold) */
   --color-blush: #f7e1e6;
   --color-beige: #f3ece4;
   --color-rose: #8f2d46;
+  --color-gold: #c59b27;
+  --color-gold-light: #fef3c7;
+  --color-emerald-clean: #2c5e4f;
 
   /* Spacing & Shadow Tokens */
   --space-xs: 0.25rem;
@@ -35,6 +38,7 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-luxury: 0 20px 25px -5px rgba(143, 45, 70, 0.06), 0 8px 10px -6px rgba(197, 155, 39, 0.04);
 
   /* Chart Semantic Tokens */
   --color-chart-1: #1c1917;
@@ -57,18 +61,72 @@
     color: var(--color-foreground);
     font-family: Montserrat, system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(247, 225, 230, 0.4) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(243, 236, 228, 0.5) 0px, transparent 50%);
+    background-attachment: fixed;
   }
 
   h1,
   h2,
   h3 {
     font-family: Cormorant, Georgia, serif;
+    letter-spacing: -0.02em;
   }
 
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
   }
+}
+
+/* Luxury Cosmetic Glassmorphism & UI Accents */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-panel-dark {
+  background: rgba(28, 25, 23, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #1c1917 0%, #8f2d46 50%, #c59b27 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.rose-gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(247, 225, 230, 0.3) 0%,
+    rgba(254, 243, 199, 0.6) 50%,
+    rgba(247, 225, 230, 0.3) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 4s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.product-card-sheen {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-card-sheen:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(28, 25, 23, 0.12), 0 4px 8px -2px rgba(143, 45, 70, 0.08);
 }
 
 .touch-target {

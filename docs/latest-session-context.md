@@ -1,38 +1,36 @@
 # Latest Session Context — GlowCart
 
-> **Updated:** 2026-11-25 (Session 6 — 360° Rotating Cosmetic Video Studio)  
-> **Current Focus:** Added interactive 360-degree rotating short video studio to GlowCart homepage for final project presentation
+> **Updated:** 2026-11-25 (Session 7 — Modern Cosmetic Web App Final Design Upgrade)  
+> **Current Focus:** Prepared and refined the final luxury cosmetic design for the GlowCart modern beauty atelier storefront.
 
 ## What Was Added & Updated
 
-1. **Interactive 360° Rotating Video Studio Component ([frontend/src/components/customer/RotatingVideoStudio.tsx](../frontend/src/components/customer/RotatingVideoStudio.tsx)):**
-   - **3D Perspective Stage & Turntable:** Full 3D perspective (`preserve-3d`, `rotateY`, `perspective: 1200px`) simulation enabling 360-degree horizontal rotation and responsive tilt angle.
-   - **Multiple Rotation Modes:**
-     - **Auto-Spin Engine:** Automatic continuous rotation with variable speed controls (0.5x gentle, 1.0x normal, 2.0x showcase).
-     - **Precision Scrub Slider:** Interactive 0°–360° range slider with instantaneous angle readouts and preset snap buttons (0° Front, 90° Profile, 180° Ingredients, 270° Formula, 360° Full Cycle).
-     - **Direct Touch/Pointer Drag:** Natural drag-to-rotate interaction across desktop mouse and mobile touch screens with momentum preservation.
-   - **4 Curated Trending Beauty Video Reels:**
-     - *Beauty of Joseon (Glass Skin Glow)*: Radiant Ginseng Sunscreen showcase.
-     - *Bella Cosmetics (Velvet Matte Kiss)*: Ultra-pigmented soft matte lip swatch.
-     - *Shwe Pyi Nann (Golden Thanakha Heritage)*: Traditional bark grinding to golden sun-defense paste.
-     - *Yves Saint Laurent (Libre Sillage Mist)*: Luxury fragrance bottle reflection and atomization.
-   - **Dual-Sided 3D Formulation Card:**
-     - Front face (0°–90° & 270°–360°): High-definition video reel player with sound toggle, play/pause, and reel selector.
-     - Back face (90°–270°): 360° Formulation Specs, key active ingredients, laboratory batch verification, and a "Shop Look / Add to Cart" action link.
-   - **Accessibility & Resilience:**
-     - Safe `video.play()` handling with automated fallback to muted autoplay on browser media policy restrictions.
-     - Fully WCAG AA compliant with keyboard controls, ARIA labels, and touch targets ≥44px.
+1. **Editorial Cosmetic Atelier Design System ([frontend/src/index.css](../frontend/src/index.css)):**
+   - **Modern Palette & Glow Tokens:** Soft silk blush (`#f7e1e6`), cashmere beige (`#f3ece4`), velvet cranberry rose (`#8f2d46`), champagne royal gold (`#c59b27`), and clean botanical emerald (`#2c5e4f`).
+   - **Glassmorphic Surface Utility:** Added `.glass-panel` and `.glass-panel-dark` backdrop blur classes.
+   - **Subtle Sheen & Animations:** Custom `@keyframes shimmer` for glowing promo chips, `.product-card-sheen` for smooth GPU elevation.
+   - **Luxury Radial Ambient Gradients:** Background depth simulating high-end beauty editorial layouts.
 
-2. **Homepage Integration ([frontend/src/pages/customer/HomePage.tsx](../frontend/src/pages/customer/HomePage.tsx)):**
-   - Seamlessly integrated `<RotatingVideoStudio />` between the New Arrivals and Featured Brands sections, providing an immersive hero experience for the final project.
+2. **Luxury Header, Announcement Ticker & Navigation ([frontend/src/layouts/CustomerLayout.tsx](../frontend/src/layouts/CustomerLayout.tsx)):**
+   - **Announcement Bar:** Copyable `GLOW15` coupon chip with click-to-copy interaction and visual feedback, free international shipping badge, and FEFO batch verification indicator.
+   - **Sticky Luxe Header:** Brand identity with glowing sparkle emblem, "Atelier de Beauté" sub-mark, pill-shaped search with focus rings, and pulsating shopping bag badge indicator.
+   - **Sub-Navigation Strip:** Categorized cosmetic aisles (Makeup, Skincare, Sun Care, Hair Care, Fragrance) with active route indicator lines, direct Routine Quiz badge, and Customer Care links.
+   - **Trust Strip & Modern Footer:** 4 trust pillars (100% Authentic, FEFO Freshness, Fast Tracked Dispatch, Seamless Returns) and comprehensive sitemap.
+   - **Floating Return-to-Top:** Smooth-scroll floating button.
 
-3. **Test Infrastructure ([frontend/src/test/setup.ts](../frontend/src/test/setup.ts)):**
-   - Added polyfills for `HTMLMediaElement.prototype.play`, `pause`, and `load` in jsdom environment to ensure clean automated testing across all media components.
+3. **Elevated Cosmetic Product Cards ([frontend/src/components/customer/ProductCard.tsx](../frontend/src/components/customer/ProductCard.tsx)):**
+   - Smooth zoom hover transition (`scale-108`).
+   - Badges for `New Arrival`, `Best Seller` (gold/onyx), `-XX% OFF` discount pill, and `Sold Out` status.
+   - Clean price display with crossed-out original price in font-mono and star rating.
+
+4. **Modern Homepage Layout ([frontend/src/pages/customer/HomePage.tsx](../frontend/src/pages/customer/HomePage.tsx)):**
+   - Refined hero banner with "Award-Winning Design" pill, direct action links to *Shop All Cosmetics*, *Build Skin Routine*, and the *360° Rotating Studio*.
+   - GlowCart Beauty Standard card with clean ingredient verification and FEFO freshness highlights.
 
 ## Verified Checks
-- `cd frontend && npm test -- --run`: **8 passed, 0 failed** in `1.57s` (exit code `0`).
-- `cd frontend && npm run build`: **Clean production build** via `tsc && vite build` (exit code `0`).
-- `cd backend && python3 -m pytest tests -v`: **23 passed, 0 failed** in `16.62s` (exit code `0`).
+- `cd frontend && npm test -- --run`: **8 passed, 0 failed** in `1.88s` (exit code `0`).
+- `cd frontend && npm run build`: **Clean production build** via `tsc && vite build` in `2.10s` (exit code `0`).
+- `cd backend && python3 -m pytest tests -v`: **23 passed, 0 failed** in `20.29s` (exit code `0`).
 
-## Railway Deployment
-- Changes are pushed to `origin/main` for automatic deployment to Railway.
+## Deployment
+- Pushed to `origin/main` for automatic deployment to Railway.

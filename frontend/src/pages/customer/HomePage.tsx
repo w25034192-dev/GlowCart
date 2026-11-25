@@ -108,51 +108,70 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-16">
       {/* Luxury Hero Banner with Gradient & Glassmorphism */}
-      <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-blush/80 via-beige/70 to-card p-6 shadow-md sm:p-12 lg:p-14">
+      <section className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-br from-blush/80 via-beige/70 to-card p-6 shadow-luxury sm:p-12 lg:p-14">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-blush/80 blur-3xl"
+          className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-blush/80 blur-3xl"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-20 left-1/3 h-64 w-64 rounded-full bg-beige blur-3xl"
+          className="pointer-events-none absolute -bottom-20 left-1/3 h-72 w-72 rounded-full bg-beige blur-3xl"
         />
 
         <div className="relative z-10 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
           <div className="space-y-6">
-            <Badge tone="blush">International Cosmetic Atelier · Demo Storefront</Badge>
-            <h1 className="font-serif text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="blush">International Cosmetic Atelier · Demo Storefront</Badge>
+              <span className="inline-flex items-center gap-1 rounded-full bg-card/80 px-2.5 py-0.5 text-[11px] font-semibold text-rose shadow-sm backdrop-blur-sm">
+                <Sparkles className="h-3 w-3 text-amber-500" />
+                <span>Award-Winning Design</span>
+              </span>
+            </div>
+
+            <h1 className="font-serif text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-[1.1]">
               Curated Skincare, Shades &amp; Beauty Essentials
             </h1>
+
             <p className="max-w-xl text-base leading-relaxed text-muted-fg sm:text-lg">
               Discover foundation shades, barrier-restoring serums, daily UV shields, and hair
               rituals backed by live variant selection and FEFO batch-verified freshness.
             </p>
-            <div className="flex flex-wrap gap-3">
+
+            <div className="flex flex-wrap items-center gap-3">
               <Link
                 to="/catalog"
-                className="touch-target inline-flex cursor-pointer items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-accent-fg shadow-sm transition-opacity duration-200 hover:opacity-90"
+                className="touch-target inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-fg shadow-md transition-all duration-200 hover:opacity-90 hover:shadow-lg"
               >
                 <span>Shop All Cosmetics</span>
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <a
                 href="#skin-routine-builder"
-                className="touch-target inline-flex cursor-pointer items-center rounded-lg border-2 border-primary bg-card/85 px-6 py-3 text-sm font-semibold text-primary backdrop-blur-sm transition-colors duration-200 hover:bg-card"
+                className="touch-target inline-flex cursor-pointer items-center rounded-xl border border-border bg-card/90 px-5 py-3.5 text-sm font-semibold text-primary backdrop-blur-sm transition-all duration-200 hover:border-primary hover:bg-card shadow-sm"
               >
                 Build Skin Routine
+              </a>
+              <a
+                href="#rotating-video-studio"
+                className="touch-target inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-rose/30 bg-blush/40 px-4 py-3.5 text-sm font-semibold text-rose backdrop-blur-sm transition-all duration-200 hover:bg-blush shadow-sm"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span>360° Studio</span>
               </a>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-card/90 bg-card/75 p-6 shadow-lg backdrop-blur-md space-y-4">
+          <div className="rounded-2xl border border-card/90 bg-card/85 p-6 shadow-xl backdrop-blur-md space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-rose">
+              <span className="text-xs font-bold uppercase tracking-wider text-rose">
                 GlowCart Beauty Standard
               </span>
-              <Sparkles className="h-5 w-5 text-accent" aria-hidden="true" />
+              <span className="flex items-center gap-1 font-mono text-[11px] font-bold text-accent">
+                <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
+                <span>VERIFIED</span>
+              </span>
             </div>
-            <ul className="space-y-3 text-sm">
+            <ul className="space-y-3.5 text-sm">
               <li className="flex items-start gap-3">
                 <Palette className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                 <div>
@@ -174,8 +193,15 @@ export const HomePage: React.FC = () => {
                   <p className="text-xs text-muted-fg">COD &amp; server-verified sandbox payments</p>
                 </div>
               </li>
+              <li className="flex items-start gap-3">
+                <Award className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+                <div>
+                  <div className="font-semibold text-foreground">Clean &amp; Cruelty-Free Active Curation</div>
+                  <p className="text-xs text-muted-fg">Korean Glass Skin, French Luxury &amp; Myanmar Thanakha</p>
+                </div>
+              </li>
             </ul>
-            <div className="pt-1">
+            <div className="border-t border-border/60 pt-2">
               <Link
                 to="/category/skincare"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-accent"
