@@ -258,6 +258,95 @@ def _ensure_categories_and_brands(db: Session) -> tuple[dict[str, Category], dic
     return cat_map, brand_map
 
 
+REAL_COSMETIC_IMAGES = {
+    "shwe-pyi-nann-thanakha-pudding": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
+    "shwe-pyi-nann-lime-thanakha": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
+    "shwe-pyi-nann-sun-shield": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
+    "shwe-pyi-nann-body-lotion": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
+    "bella-matte-velvet-lip-crayon": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+    "bella-glow-cushion-foundation": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+    "bella-ultra-fine-hd-powder": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+    "bell-silk-matte-compact-powder": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+    "tayaw-kinpun-herbal-shampoo": "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
+    "royal-inle-jasmine-mist": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
+    "bell-flawless-beauty-sponge": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+    "bella-yangon-glam-set": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+    "laneige-lip-sleeping-mask": "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
+    "laneige-water-bank-cream": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+    "innisfree-green-tea-serum": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+    "innisfree-daily-uv-defense": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
+    "nars-radiant-creamy-concealer": "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+    "nars-orgasm-powder-blush": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+    "ysl-rouge-pur-couture-slim": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+    "ysl-libre-eau-de-parfum": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
+}
+
+CATEGORY_REAL_IMAGES = {
+    "Makeup": {
+        "foundation": "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        "concealer": "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        "lip": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+        "gloss": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+        "blush": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+        "powder": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+        "mascara": "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+    },
+    "Skincare": {
+        "serum": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+        "ampoule": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+        "cream": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+        "baume": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+        "toner": "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
+        "essence": "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
+        "cleanser": "https://images.unsplash.com/photo-1556228722-d0b5eb1c11d5?auto=format&fit=crop&w=800&q=80",
+        "thanakha": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+    },
+    "Sun Care": {
+        "stick": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1567928815116-3e33b006c6e7?auto=format&fit=crop&w=800&q=80",
+    },
+    "Hair Care": {
+        "oil": "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80",
+        "shampoo": "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
+        "conditioner": "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80",
+    },
+    "Body Care": {
+        "lotion": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
+        "butter": "https://images.unsplash.com/photo-1556228722-d0b5eb1c11d5?auto=format&fit=crop&w=800&q=80",
+        "wash": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
+    },
+    "Fragrance": {
+        "mist": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
+    },
+    "Beauty Tools": {
+        "brush": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+        "sponge": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+    },
+    "Makeup Sets": {
+        "kit": "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
+        "default": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+    },
+}
+
+
+def resolve_seed_image_url(cat_name: str, prod_name: str, slug: str) -> str:
+    """Return high-resolution realistic cosmetic photograph URL matching the product item."""
+    if slug in REAL_COSMETIC_IMAGES:
+        return REAL_COSMETIC_IMAGES[slug]
+    cat_rules = CATEGORY_REAL_IMAGES.get(cat_name, {})
+    lower_name = prod_name.lower()
+    for keyword, url in cat_rules.items():
+        if keyword != "default" and keyword in lower_name:
+            return url
+    return cat_rules.get("default", "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80")
+
+
 def _seed_blueprint_entries(
     db: Session,
     indexed_entries: list[tuple[int, tuple]],
@@ -297,7 +386,7 @@ def _seed_blueprint_entries(
         db.add(
             ProductImage(
                 product_id=product.id,
-                image_url=f"/images/catalog/{cat_map[cat_name].slug}.svg",
+                image_url=resolve_seed_image_url(cat_name, prod_name, slug),
                 alt_text=prod_name,
                 is_primary=True,
                 sort_order=0,
@@ -422,12 +511,22 @@ def seed_demo_data(db: Session) -> None:
 
 
 def ensure_initial_data(db: Session) -> bool:
-    """Ensure default admin exists and ensure all canonical categories, brands, and catalog items exist without duplicating."""
+    """Ensure default admin exists and ensure all canonical categories, brands, and catalog items exist with real images."""
     ensure_default_admin_and_roles(db)
     cat_map, brand_map = _ensure_categories_and_brands(db)
     all_blueprint_entries = list(enumerate(CATALOG_BLUEPRINT, start=1))
     created = _seed_blueprint_entries(db, all_blueprint_entries, cat_map, brand_map)
-    if created > 0:
+
+    # Upgrade any existing product images pointing to generic SVG placeholders to real photographs
+    updated_images = 0
+    for img in db.query(ProductImage).all():
+        if img.image_url and img.image_url.endswith(".svg"):
+            prod = db.query(Product).filter(Product.id == img.product_id).first()
+            if prod and prod.category:
+                img.image_url = resolve_seed_image_url(prod.category.name, prod.name, prod.slug)
+                updated_images += 1
+
+    if created > 0 or updated_images > 0:
         db.commit()
         return True
     return False

@@ -279,7 +279,7 @@ def test_ensure_initial_data_seeds_when_empty_and_creates_default_admin(db_sessi
 
     images = db_session.query(ProductImage).all()
     assert len(images) >= 50
-    assert all(img.image_url.startswith("/images/catalog/") for img in images)
+    assert all(img.image_url and (img.image_url.startswith("https://") or img.image_url.startswith("/images/")) for img in images)
 
     # Calling a second time is idempotent
     before_count = db_session.query(Product).count()

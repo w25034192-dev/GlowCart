@@ -20,7 +20,15 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
           src={resolveMediaUrl(product.primary_image_url, product.name)}
           alt={product.name}
           loading="lazy"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (!target.dataset.fallback) {
+              target.dataset.fallback = 'true';
+              const catSlug = product.category_name?.toLowerCase().replace(/\s+/g, '-') || 'makeup';
+              target.src = `/images/catalog/${catSlug}.svg`;
+            }
+          }}
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           {product.is_new_arrival && <Badge tone="blush">New</Badge>}

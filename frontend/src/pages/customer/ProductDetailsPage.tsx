@@ -121,6 +121,14 @@ export const ProductDetailsPage: React.FC = () => {
             )}
             alt={product.name}
             className="h-full w-full object-cover"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.dataset.fallback) {
+                target.dataset.fallback = 'true';
+                const catSlug = product.category_name?.toLowerCase().replace(/\s+/g, '-') || 'makeup';
+                target.src = `/images/catalog/${catSlug}.svg`;
+              }
+            }}
           />
         </div>
 
