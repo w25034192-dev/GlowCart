@@ -69,6 +69,9 @@ BRANDS_DATA = [
     ("Innisfree", "innisfree", "South Korea", True),
     ("NARS", "nars", "France", True),
     ("Yves Saint Laurent", "ysl", "France", True),
+    ("Estée Lauder", "estee-lauder", "USA", True),
+    ("Rom&nd", "romand", "South Korea", True),
+    ("Medicube", "medicube", "South Korea", True),
     # Studio Atelier Brands
     ("Atelier Lab", "atelier-lab", "France", True),
     ("GlowCart Studio", "glowcart-studio", "International", True),
@@ -79,30 +82,39 @@ BRANDS_DATA = [
 ]
 
 CATALOG_BLUEPRINT = [
-    ("Makeup", "Maybelline", "Maybelline Fit Me Foundation", "maybelline-fit-me-foundation", ["normal", "oily", "combination"], "shades_foundation", "9.99"),
-    ("Makeup", "Maybelline", "Maybelline SuperStay Matte Ink", "maybelline-superstay-matte-ink", ["all"], "shades_lip", "11.49"),
-    ("Makeup", "NYX", "NYX Butter Gloss", "nyx-butter-gloss", ["all"], "shades_lip", "6.50"),
-    ("Makeup", "Fenty Beauty", "Fenty Beauty Gloss Bomb", "fenty-gloss-bomb", ["all"], "shades_lip", "21.00"),
-    ("Makeup", "Rare Beauty", "Rare Beauty Soft Pinch Blush", "rare-beauty-soft-pinch-blush", ["all", "dry"], "shades_blush", "23.00"),
-    ("Makeup", "MAC", "MAC Studio Fix Fluid Foundation", "mac-studio-fix-fluid", ["oily", "combination"], "shades_foundation", "42.00"),
-    ("Makeup", "MAC", "MAC Matte Lipstick", "mac-matte-lipstick", ["all"], "shades_lip", "23.00"),
-    ("Makeup", "Huda Beauty", "Huda Beauty Easy Bake Powder", "huda-easy-bake-powder", ["oily", "combination"], "shades_powder", "38.00"),
-    ("Makeup", "Charlotte Tilbury", "Charlotte Tilbury Pillow Talk Lipstick", "ct-pillow-talk-lipstick", ["all"], "shades_lip", "35.00"),
-    ("Makeup", "Dior", "Dior Backstage Rosy Glow Blush", "dior-rosy-glow-blush", ["all"], "shades_blush", "40.00"),
-    ("Makeup", "L'Oréal Paris", "L'Oréal True Match Concealer", "loreal-true-match-concealer", ["all"], "shades_foundation", "13.99"),
-    ("Makeup", "L'Oréal Paris", "L'Oréal Lash Paradise Mascara", "loreal-lash-paradise", ["all"], "shades_eye", "12.99"),
-    ("Skincare", "The Ordinary", "The Ordinary Niacinamide 10% + Zinc 1%", "ordinary-niacinamide-10", ["oily", "combination", "acne-prone"], "volumes", "6.50"),
-    ("Skincare", "COSRX", "COSRX Advanced Snail 96 Mucin Essence", "cosrx-snail-96-essence", ["dry", "sensitive", "all"], "volumes", "25.00"),
-    ("Skincare", "CeraVe", "CeraVe Moisturizing Cream", "cerave-moisturizing-cream", ["dry", "sensitive"], "volumes", "18.99"),
-    ("Skincare", "CeraVe", "CeraVe Foaming Facial Cleanser", "cerave-foaming-cleanser", ["oily", "normal"], "volumes", "16.99"),
-    ("Skincare", "Anua", "Anua Heartleaf 77% Soothing Toner", "anua-heartleaf-77-toner", ["sensitive", "acne-prone"], "volumes", "22.00"),
-    ("Skincare", "SKIN1004", "SKIN1004 Madagascar Centella Ampoule", "skin1004-centella-ampoule", ["sensitive", "all"], "volumes", "19.50"),
-    ("Skincare", "Round Lab", "Round Lab 1025 Dokdo Toner", "round-lab-dokdo-toner", ["sensitive", "dry", "normal"], "volumes", "18.00"),
-    ("Skincare", "Torriden", "Torriden Dive-In Hyaluronic Serum", "torriden-dive-in-serum", ["dry", "dehydrated", "all"], "volumes", "24.00"),
-    ("Skincare", "La Roche-Posay", "La Roche-Posay Cicaplast Baume B5", "lrp-cicaplast-b5", ["sensitive", "dry"], "volumes", "16.99"),
-    ("Skincare", "The Ordinary", "The Ordinary Hyaluronic Acid 2% + B5", "ordinary-hyaluronic-b5", ["all", "dry"], "volumes", "9.90"),
-    ("Skincare", "COSRX", "COSRX Low pH Good Morning Gel Cleanser", "cosrx-low-ph-cleanser", ["oily", "combination"], "volumes", "14.00"),
-    ("Skincare", "Beauty of Joseon", "Beauty of Joseon Glow Serum", "boj-glow-serum", ["all", "dull"], "volumes", "17.00"),
+    # --- Makeup Popular Products (Fit Me, Centella, Dior, Rare Beauty, etc.) ---
+    ("Makeup", "Maybelline", "Maybelline Fit Me Matte + Poreless Liquid Foundation", "maybelline-fit-me-foundation", ["oily", "combination"], "volumes", "30ml", "10.99"),
+    ("Makeup", "Maybelline", "Maybelline Fit Me Concealer", "maybelline-fit-me-concealer", ["all"], "volumes", "6.8ml", "8.99"),
+    ("Makeup", "Maybelline", "Maybelline Fit Me Loose Finishing Powder", "maybelline-fit-me-loose-powder", ["oily", "combination"], "sizes", "20g", "9.99"),
+    ("Makeup", "Maybelline", "Maybelline Lash Sensational Sky High Mascara", "maybelline-sky-high-mascara", ["all"], "volumes", "7.2ml", "12.99"),
+    ("Makeup", "SKIN1004", "SKIN1004 Madagascar Centella Tone-Up Cushion SPF50+", "skin1004-centella-toneup-cushion", ["sensitive", "all"], "sizes", "15g", "22.00"),
+    ("Makeup", "Dior", "Dior Forever Skin Glow Foundation", "dior-forever-skin-glow-foundation", ["dry", "normal"], "volumes", "30ml", "57.00"),
+    ("Makeup", "Dior", "Dior Addict Lip Glow Oil", "dior-addict-lip-glow-oil", ["all"], "shades_lip", "6ml", "40.00"),
+    ("Makeup", "Rare Beauty", "Rare Beauty Soft Pinch Liquid Blush", "rare-beauty-soft-pinch-blush", ["all"], "volumes", "7.5ml", "23.00"),
+    ("Makeup", "Charlotte Tilbury", "Charlotte Tilbury Pillow Talk Matte Revolution Lipstick", "ct-pillow-talk-lipstick", ["all"], "shades_lip", "3.5g", "35.00"),
+    ("Makeup", "NARS", "NARS Radiant Creamy Concealer", "nars-radiant-creamy-concealer", ["all"], "volumes", "6ml", "32.00"),
+    ("Makeup", "Estée Lauder", "Estée Lauder Double Wear Stay-in-Place Foundation", "estee-lauder-double-wear", ["oily", "combination"], "volumes", "30ml", "52.00"),
+    ("Makeup", "Rom&nd", "Rom&nd Juicy Lasting Tint", "romand-juicy-lasting-tint", ["all"], "shades_lip", "5.5g", "11.50"),
+    ("Makeup", "MAC", "MAC Retro Matte Lipstick Ruby Woo", "mac-retro-matte-ruby-woo", ["all"], "shades_lip", "3g", "23.00"),
+    ("Makeup", "Fenty Beauty", "Fenty Beauty Gloss Bomb Universal Lip Luminizer", "fenty-gloss-bomb-luminizer", ["all"], "shades_lip", "9ml", "21.00"),
+    ("Makeup", "Laneige", "Laneige Neo Cushion Matte SPF42", "laneige-neo-cushion-matte", ["oily", "combination"], "sizes", "15g", "34.00"),
+
+    # --- Skincare Popular Products (The Ordinary, CeraVe, Medicube, Centella, etc.) ---
+    ("Skincare", "The Ordinary", "The Ordinary Niacinamide 10% + Zinc 1% Serum", "the-ordinary-niacinamide-10-zinc-1", ["oily", "combination"], "volumes", "30ml", "6.50"),
+    ("Skincare", "The Ordinary", "The Ordinary Hyaluronic Acid 2% + B5 Hydrating Serum", "the-ordinary-hyaluronic-acid-2-b5", ["dry", "all"], "volumes", "30ml", "9.90"),
+    ("Skincare", "The Ordinary", "The Ordinary Glycolic Acid 7% Exfoliating Toning Solution", "the-ordinary-glycolic-acid-7-toner", ["oily", "combination"], "volumes", "240ml", "13.00"),
+    ("Skincare", "The Ordinary", "The Ordinary AHA 30% + BHA 2% Peeling Solution", "the-ordinary-aha-30-bha-2-peeling", ["oily", "combination"], "volumes", "30ml", "9.50"),
+    ("Skincare", "CeraVe", "CeraVe Hydrating Facial Cleanser", "cerave-hydrating-facial-cleanser", ["dry", "sensitive"], "volumes", "236ml", "15.99"),
+    ("Skincare", "CeraVe", "CeraVe Foaming Facial Cleanser", "cerave-foaming-facial-cleanser", ["oily", "combination"], "volumes", "236ml", "15.99"),
+    ("Skincare", "CeraVe", "CeraVe Daily Moisturizing Lotion", "cerave-daily-moisturizing-lotion", ["dry", "all"], "volumes", "355ml", "16.49"),
+    ("Skincare", "CeraVe", "CeraVe PM Facial Moisturizing Lotion", "cerave-pm-facial-lotion", ["all", "sensitive"], "volumes", "89ml", "17.99"),
+    ("Skincare", "Medicube", "Medicube Zero Pore Pad 2.0", "medicube-zero-pore-pad-2", ["oily", "combination"], "sizes", "70 pads", "24.00"),
+    ("Skincare", "Medicube", "Medicube Collagen Night Wrapping Mask", "medicube-collagen-night-mask", ["dry", "all"], "volumes", "75ml", "28.00"),
+    ("Skincare", "Medicube", "Medicube PDRN Pink Peptide Serum", "medicube-pdrn-pink-peptide-serum", ["all", "dry"], "volumes", "30ml", "25.00"),
+    ("Skincare", "SKIN1004", "SKIN1004 Madagascar Centella Ampoule", "skin1004-madagascar-centella-ampoule", ["sensitive", "all"], "volumes", "55ml", "18.50"),
+    ("Skincare", "SKIN1004", "SKIN1004 Madagascar Centella Toning Toner", "skin1004-centella-toning-toner", ["sensitive", "combination"], "volumes", "210ml", "19.00"),
+    ("Skincare", "Anua", "Anua Heartleaf 77% Soothing Toner", "anua-heartleaf-77-soothing-toner", ["sensitive", "oily"], "volumes", "250ml", "23.00"),
+    ("Skincare", "COSRX", "COSRX Advanced Snail 96 Mucin Power Essence", "cosrx-advanced-snail-96-essence", ["dry", "sensitive"], "volumes", "100ml", "21.00"),
     ("Sun Care", "Beauty of Joseon", "Beauty of Joseon Relief Sun SPF50+", "boj-relief-sun", ["all", "sensitive"], "volumes", "18.00"),
     ("Sun Care", "Beauty of Joseon", "Beauty of Joseon Matte Sun Stick", "boj-matte-sun-stick", ["oily", "combination"], "sizes", "18.00"),
     ("Sun Care", "La Roche-Posay", "La Roche-Posay Anthelios Invisible Fluid", "lrp-anthelios-fluid", ["sensitive", "all"], "volumes", "33.50"),
@@ -147,7 +159,6 @@ CATALOG_BLUEPRINT = [
     ("Skincare", "Laneige", "Laneige Water Bank Blue Hyaluronic Moisture Cream", "laneige-water-bank-cream", ["dry", "dehydrated", "sensitive"], "volumes", "40.00"),
     ("Skincare", "Innisfree", "Innisfree Green Tea Seed Hyaluronic Serum", "innisfree-green-tea-serum", ["all", "combination"], "volumes", "30.00"),
     ("Sun Care", "Innisfree", "Innisfree Daily UV Defense Sunscreen Broad Spectrum SPF36", "innisfree-daily-uv-defense", ["all"], "volumes", "18.00"),
-    ("Makeup", "NARS", "NARS Radiant Creamy Concealer", "nars-radiant-creamy-concealer", ["all"], "shades_foundation", "32.00"),
     ("Makeup", "NARS", "NARS Orgasm Powder Blush", "nars-orgasm-powder-blush", ["all"], "shades_blush", "34.00"),
     ("Makeup", "Yves Saint Laurent", "YSL Rouge Pur Couture The Slim Velvet Radical Lipstick", "ysl-rouge-pur-couture-slim", ["all"], "shades_lip", "45.00"),
     ("Fragrance", "Yves Saint Laurent", "YSL Libre Eau De Parfum", "ysl-libre-eau-de-parfum", ["all"], "volumes", "98.00"),
@@ -367,25 +378,56 @@ def _seed_blueprint_entries(
     """Insert missing products, variants, images, and initial batches without duplicating existing slugs."""
     today = date.today()
     created_count = 0
-    for idx, (cat_name, brand_name, prod_name, slug, skins, tpl_key, base_price_str) in indexed_entries:
+    for idx, entry in indexed_entries:
+        if len(entry) == 8:
+            cat_name, brand_name, prod_name, slug, skins, tpl_key, size_desc, base_price_str = entry
+        else:
+            cat_name, brand_name, prod_name, slug, skins, tpl_key, base_price_str = entry
+            size_desc = None
+
         product = db.query(Product).filter(Product.slug == slug).first()
         if product is not None:
             continue
         base_price = Decimal(base_price_str)
+        brand = brand_map.get(brand_name)
+        if brand is None:
+            brand_slug = re.sub(r"[^a-z0-9]+", "-", brand_name.lower()).strip("-")
+            brand = (
+                db.query(Brand)
+                .filter((func.lower(Brand.slug) == brand_slug) | (func.lower(Brand.name) == brand_name.lower()))
+                .first()
+            )
+            if brand is None:
+                brand = Brand(
+                    name=brand_name,
+                    slug=brand_slug,
+                    country_of_origin="International",
+                    is_featured=True,
+                    is_active=True,
+                    description=f"Curated brand catalog entry for {brand_name}.",
+                )
+                db.add(brand)
+                db.flush()
+            brand_map[brand_name] = brand
+
+        specs = {
+            "origin": brand.country_of_origin or "International",
+            "demo_notice": "Illustrative demo data",
+        }
+        if size_desc:
+            specs["standard_size"] = size_desc
+
         product = Product(
             category_id=cat_map[cat_name].id,
-            brand_id=brand_map[brand_name].id,
+            brand_id=brand.id,
             name=prod_name,
             slug=slug,
             short_description=f"Illustrative demo cosmetic entry — {prod_name}.",
             description=f"{prod_name} by {brand_name}. Demo catalog description with illustrative USD pricing for GlowCart.",
             skin_types=skins,
-            specifications={
-                "origin": brand_map[brand_name].country_of_origin or "International",
-                "demo_notice": "Illustrative demo data",
-            },
+            specifications=specs,
             verified_ingredients=None,
-            is_featured=(idx <= 10),
+            is_featured=(idx <= 15),
             is_new_arrival=(idx % 3 == 0),
             is_best_seller=(idx % 2 == 0),
             is_demo=True,
