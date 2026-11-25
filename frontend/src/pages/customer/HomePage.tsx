@@ -383,8 +383,8 @@ export const HomePage: React.FC = () => {
                 >
                   <span
                     className={`w-11 h-11 rounded-full transition-all ${isSelected
-                        ? 'ring-2 ring-offset-2 ring-stone-900 scale-110'
-                        : 'hover:scale-105'
+                      ? 'ring-2 ring-offset-2 ring-stone-900 scale-110'
+                      : 'hover:scale-105'
                       }`}
                     style={{ backgroundColor: tone.hex }}
                   />
