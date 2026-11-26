@@ -138,7 +138,7 @@ def _p(
 ) -> dict:
     digest = zlib.crc32(slug.encode("utf-8"))
     rating = round(4.7 + (digest % 3) * 0.1, 1)  # 4.7, 4.8, or 4.9
-    review_count = 85 + (digest % 336)  # 85 .. 420
+    review_count = 95 + (digest % 356)  # 95 .. 450
     return {
         "category": category,
         "brand": brand,

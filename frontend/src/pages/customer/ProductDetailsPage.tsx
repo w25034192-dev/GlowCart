@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, Heart, ShoppingBag } from 'lucide-react';
+import { Check, Heart, ShieldCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
 import { cartApi, catalogApi, engagementApi } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useToastStore } from '@/store/toastStore';
 import { AlertBox, Badge, Button, Card, StarRating } from '@/components/common/UI';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { getRealFallbackImage, resolveMediaUrl } from '@/utils/media';
@@ -15,6 +16,7 @@ export const ProductDetailsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { setCart } = useCartStore();
+  const showBagToast = useToastStore((s) => s.showBagToast);
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -39,7 +41,7 @@ export const ProductDetailsPage: React.FC = () => {
 
   const { data: related } = useQuery({
     queryKey: ['related', product?.category_id],
-    queryFn: () => catalogApi.getProducts({ category_id: product?.category_id, page_size: 4 }),
+    queryFn: () => catalogApi.getProducts({ category_id: product?.category_id, page_size: 5 }),
     enabled: Boolean(product?.category_id),
   });
 
@@ -75,6 +77,12 @@ export const ProductDetailsPage: React.FC = () => {
       const updated = await cartApi.addItem(activeVariant.id, quantity);
       setCart(updated);
       setFeedback(`Added ${product.name} (${activeVariant.shade_name || activeVariant.sku}) to cart.`);
+      showBagToast({
+        name: product.name,
+        brand: product.brand_name,
+        imageUrl: product.images[0]?.image_url || product.primary_image_url,
+        price: activeVariant.price,
+      });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(msg || 'Could not add item to cart.');
@@ -134,12 +142,11 @@ export const ProductDetailsPage: React.FC = () => {
 
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-fg">
-            <span className="font-semibold uppercase tracking-wider text-primary">
+            <span className="font-semibold uppercase tracking-widest text-primary">
               {product.brand_name}
             </span>
             <span>·</span>
             <span>{product.category_name}</span>
-            {product.is_demo && <Badge tone="neutral">Demo Catalog Item</Badge>}
           </div>
 
           <h1 className="font-serif text-3xl font-bold sm:text-4xl">{product.name}</h1>
@@ -244,23 +251,59 @@ export const ProductDetailsPage: React.FC = () => {
             </Button>
           </div>
 
-          <Card className="space-y-2 text-xs">
-            <h2 className="text-sm font-semibold">Specifications &amp; Notes</h2>
-            {product.skin_types.length > 0 && (
+          {/* Luxury Authenticity & Shipping Badges */}
+          <div className="grid gap-2.5 rounded-2xl border border-border/80 bg-gradient-to-br from-beige/50 via-card to-blush/20 p-4 sm:grid-cols-3">
+            <div className="flex items-center gap-2.5 text-xs">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              </span>
               <div>
-                <strong>Suitable Skin Types:</strong> {product.skin_types.join(', ')}
+                <p className="font-semibold text-foreground">100% Authentic</p>
+                <p className="text-[11px] text-muted-fg">Authorized Atelier</p>
               </div>
-            )}
-            {product.verified_ingredients ? (
+            </div>
+            <div className="flex items-center gap-2.5 text-xs">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Truck className="h-4 w-4" aria-hidden="true" />
+              </span>
               <div>
-                <strong>Verified Ingredients:</strong> {product.verified_ingredients}
+                <p className="font-semibold text-foreground">Free Shipping $75+</p>
+                <p className="text-[11px] text-muted-fg">Express Dispatch</p>
               </div>
-            ) : (
-              <div className="text-muted-fg">
-                Ingredient list omitted unless verified by manufacturer documentation.
+            </div>
+            <div className="flex items-center gap-2.5 text-xs">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="font-semibold text-foreground">Fresh Batch</p>
+                <p className="text-[11px] text-muted-fg">FEFO Verified</p>
               </div>
-            )}
-          </Card>
+            </div>
+          </div>
+
+          {product.skin_types.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-fg">
+                Suitable For:
+              </span>
+              {product.skin_types.map((st) => (
+                <span
+                  key={st}
+                  className="rounded-full border border-border bg-beige/40 px-3 py-1 text-xs font-medium capitalize text-foreground"
+                >
+                  {st === 'all' ? 'All Skin Types' : st}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {product.verified_ingredients && (
+            <Card className="space-y-1.5 text-xs">
+              <h2 className="text-sm font-semibold">Key Verified Ingredients</h2>
+              <p className="leading-relaxed text-muted-fg">{product.verified_ingredients}</p>
+            </Card>
+          )}
         </div>
       </div>
 
@@ -336,9 +379,16 @@ export const ProductDetailsPage: React.FC = () => {
         </Card>
       </section>
 
-      {related && related.items.length > 0 && (
-        <section className="space-y-4">
-          <h2 className="font-serif text-2xl font-bold">Related Products</h2>
+      {related && related.items.filter((p) => p.id !== product.id).length > 0 && (
+        <section className="space-y-5 border-t border-border/60 pt-10">
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-primary">
+              Atelier Pairing
+            </p>
+            <h2 className="font-serif text-2xl font-bold sm:text-3xl">
+              Complete Your Routine · You May Also Like
+            </h2>
+          </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {related.items
               .filter((p) => p.id !== product.id)

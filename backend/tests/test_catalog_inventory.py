@@ -844,13 +844,13 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
     expected_brush_url = next(p["image_url"] for p in PRODUCTS_100 if p["slug"] == "hourglass-vanish-foundation-brush")
     assert refreshed_img.image_url == expected_brush_url
 
-    # Verify realistic seeded ratings (4.7-4.9) and review counts (85-420) via CatalogService
+    # Verify realistic seeded ratings (4.7-4.9) and review counts (95-450) via CatalogService
     from app.services.catalog_service import CatalogService
     listed = CatalogService(db_session).list_products(page=1, page_size=20)
     assert len(listed["items"]) == 20
     for item in listed["items"]:
         assert 4.7 <= item.average_rating <= 4.9
-        assert 85 <= item.review_count <= 420
+        assert 95 <= item.review_count <= 450
 
 
 
