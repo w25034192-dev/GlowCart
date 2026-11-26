@@ -413,6 +413,24 @@ def resolve_seed_image_url(cat_name: str, prod_name: str, slug: str) -> str:
     return cat_rules.get("default", "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80")
 
 
+def _resolve_unique_sku(existing_skus: set[str], preferred_sku: str, slug: str, suffix: str = "") -> str:
+    """Return preferred_sku if unused, otherwise a deterministic collision-free SKU."""
+    if preferred_sku not in existing_skus:
+        existing_skus.add(preferred_sku)
+        return preferred_sku
+
+    clean_slug = re.sub(r"[^a-z0-9]+", "-", slug.lower()).strip("-")
+    base = f"GC-{clean_slug[:65]}{'-' + suffix if suffix else ''}".upper()[:100]
+    candidate = base
+    counter = 1
+    while candidate in existing_skus:
+        tail = f"-{counter}"
+        candidate = f"{base[: 100 - len(tail)]}{tail}"
+        counter += 1
+    existing_skus.add(candidate)
+    return candidate
+
+
 def _seed_blueprint_entries(
     db: Session,
     indexed_entries: list[tuple[int, tuple]],
@@ -422,6 +440,7 @@ def _seed_blueprint_entries(
     """Insert missing products, variants, images, and initial batches without duplicating existing slugs."""
     today = date.today()
     created_count = 0
+    existing_skus: set[str] = {s for (s,) in db.query(ProductVariant.sku).all()}
     for idx, entry in indexed_entries:
         if len(entry) == 8:
             cat_name, brand_name, prod_name, slug, skins, tpl_key, size_desc, base_price_str = entry
@@ -494,7 +513,12 @@ def _seed_blueprint_entries(
         for v_idx, (shade_name, shade_code, color_name, hex_color, vol_ml) in enumerate(
             variants_spec, start=1
         ):
-            sku = f"GC-{idx:03d}-{v_idx:02d}"
+            sku = _resolve_unique_sku(
+                existing_skus,
+                f"GC-{idx:03d}-{v_idx:02d}",
+                slug,
+                suffix=f"V{v_idx:02d}",
+            )
             price = base_price + Decimal(str((v_idx - 1) * 4)) if vol_ml else base_price
             orig = (price + Decimal("4.00")) if idx % 4 == 0 else None
             size_label = (
@@ -779,6 +803,7 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
     cat_map, brand_map = _ensure_categories_and_brands(db)
     today = date.today()
     created_count = 0
+    existing_skus: set[str] = {s for (s,) in db.query(ProductVariant.sku).all()}
 
     for idx, item in enumerate(products, start=1):
         raw_slug = f"{item['brand']}-{item['name']}".lower()
@@ -831,7 +856,12 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
             created_count += 1
 
             # Variant with exact price, shade_name, and shade_hex
-            sku = f"GC-GEN-{idx:03d}"
+            sku = _resolve_unique_sku(
+                existing_skus,
+                f"GC-GEN-{idx:03d}",
+                slug,
+                suffix=f"G{idx:03d}",
+            )
             variant = ProductVariant(
                 product_id=product.id,
                 sku=sku,

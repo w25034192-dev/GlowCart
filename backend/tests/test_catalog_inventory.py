@@ -468,4 +468,62 @@ def test_products_data_json_and_loader(db_session):
     assert db_session.query(Product).count() >= 1
 
 
+def test_ensure_initial_data_and_generated_seed_survive_sku_collisions(db_session):
+    """Simulate an existing Railway DB where old products already own GC-001-01 and GC-GEN-001."""
+    from decimal import Decimal
+    from app.db.seed import (
+        CATALOG_BLUEPRINT,
+        _ensure_categories_and_brands,
+        ensure_initial_data,
+        generate_single_product,
+        seed_generated_products,
+    )
+    from app.models import Product, ProductVariant
+
+    cat_map, brand_map = _ensure_categories_and_brands(db_session)
+    legacy_prod = Product(
+        category_id=cat_map["Skincare"].id,
+        brand_id=next(iter(brand_map.values())).id,
+        name="Legacy Pre-Existing Product",
+        slug="legacy-pre-existing-product",
+        short_description="Legacy item",
+        description="Already in DB before new blueprint items",
+        skin_types=["all"],
+        specifications={},
+        is_demo=True,
+    )
+    db_session.add(legacy_prod)
+    db_session.flush()
+
+    db_session.add(
+        ProductVariant(
+            product_id=legacy_prod.id,
+            sku="GC-001-01",
+            price=Decimal("10.00"),
+            is_available=True,
+            status="ACTIVE",
+        )
+    )
+    db_session.add(
+        ProductVariant(
+            product_id=legacy_prod.id,
+            sku="GC-GEN-001",
+            price=Decimal("12.00"),
+            is_available=True,
+            status="ACTIVE",
+        )
+    )
+    db_session.commit()
+
+    seeded = ensure_initial_data(db_session)
+    assert seeded is True
+    assert db_session.query(Product).count() == len(CATALOG_BLUEPRINT) + 1
+
+    extra = [generate_single_product(index=1, category="Skincare")]
+    created_gen = seed_generated_products(db_session, extra)
+    assert created_gen == 1
+    assert db_session.query(Product).count() == len(CATALOG_BLUEPRINT) + 2
+
+
+
 
