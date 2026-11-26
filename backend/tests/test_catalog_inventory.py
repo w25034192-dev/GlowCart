@@ -672,10 +672,10 @@ def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
     assert len(set(slugs)) == len(CATALOG_BLUEPRINT)
     lower_names = {n.lower() for n in names}
     for required in (
-        "charlotte tilbury airbrush flawless setting spray",
-        "mac matte lipstick velvet teddy",
-        "estée lauder advanced night repair serum",
-        "medicube collagen night wrapping mask",
+        "airbrush flawless setting spray",
+        "matte lipstick velvet teddy",
+        "advanced night repair serum",
+        "collagen night wrapping mask",
     ):
         assert required in lower_names
 
@@ -763,14 +763,14 @@ def test_zero_duplicate_image_urls_across_full_catalog_and_lip_matching(db_sessi
     ensure_initial_data(db_session)
     all_images = db_session.query(ProductImage).all()
     all_urls = [img.image_url for img in all_images]
-    assert len(all_urls) == 120
-    assert len(set(all_urls)) == 120
+    assert len(all_urls) == 100
+    assert len(set(all_urls)) == 100
 
-    # Verify Beauty Tools has 20 distinct items with 20 unique images
+    # Verify Beauty Tools has 15 distinct items with 15 unique images
     beauty_tools = [p for p in db_session.query(Product).all() if p.category.slug == "beauty-tools"]
-    assert len(beauty_tools) == 20
+    assert len(beauty_tools) == 15
     tool_urls = [db_session.query(ProductImage).filter(ProductImage.product_id == p.id).one().image_url for p in beauty_tools]
-    assert len(set(tool_urls)) == 20
+    assert len(set(tool_urls)) == 15
 
 
 def test_all_seeded_products_have_unique_image_urls_and_type_groups(db_session):
@@ -798,23 +798,25 @@ def test_all_seeded_products_have_unique_image_urls_and_type_groups(db_session):
     products = db_session.query(Product).all()
     images = db_session.query(ProductImage).filter(ProductImage.is_primary.is_(True)).all()
     unique_urls = {img.image_url for img in images}
-    assert len(products) == 120
+    assert len(products) == 100
     assert len(unique_urls) == len(products)
 
 
 def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session):
-    """Verify PRODUCTS_120 has 120 unique products & verified URLs, and sync_catalog_120 force-refreshes stale DB rows."""
-    from app.db.seed import PRODUCTS_120, PRODUCTS_100, _ensure_categories_and_brands, ensure_initial_data
+    """Verify CURATED_CATALOG has 100 unique products & verified URLs, and sync_curated_catalog force-refreshes stale DB rows."""
+    from app.db.seed import CURATED_CATALOG, PRODUCTS_120, PRODUCTS_100, _ensure_categories_and_brands, ensure_initial_data
     from app.models import Product, ProductImage
 
-    assert len(PRODUCTS_120) == 120
-    assert len({p["image_url"] for p in PRODUCTS_120}) == 120
-    assert len({p["name"] for p in PRODUCTS_120}) == 120
-    assert len({p["slug"] for p in PRODUCTS_120}) == 120
-    for p in PRODUCTS_120:
+    assert len(CURATED_CATALOG) == 100
+    assert len({p["image_url"] for p in CURATED_CATALOG}) == 100
+    assert len({p["name"] for p in CURATED_CATALOG}) == 100
+    assert len({p["slug"] for p in CURATED_CATALOG}) == 100
+    assert len({(p["brand"], p["name"]) for p in CURATED_CATALOG}) == 100
+    for p in CURATED_CATALOG:
         assert p["image_url"].startswith(("https://", "/images/products/"))
+        assert not p["name"].lower().startswith(p["brand"].lower() + " ")
 
-    # Seed initial 120 products, then corrupt one image and insert a stale duplicate product
+    # Seed initial 100 products, then corrupt one image and insert a stale duplicate product
     ensure_initial_data(db_session)
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
     brand = next(iter(brand_map.values()))
@@ -841,7 +843,7 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
     assert changed is True
     assert db_session.query(Product).filter(Product.slug == "nyx-blending-sponge").first() is None
     refreshed_img = db_session.query(ProductImage).filter(ProductImage.product_id == brush.id).one()
-    expected_brush_url = next(p["image_url"] for p in PRODUCTS_120 if p["slug"] == "hourglass-vanish-foundation-brush")
+    expected_brush_url = next(p["image_url"] for p in CURATED_CATALOG if p["slug"] == "hourglass-vanish-foundation-brush")
     assert refreshed_img.image_url == expected_brush_url
 
     # Verify realistic seeded ratings (4.7-4.9) and review counts (95-450) via CatalogService
@@ -854,9 +856,9 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
 
 
 def test_purge_deprecated_ugly_products_and_verify_clean_replacements(db_session):
-    """Ensure the 8 deprecated products are absent from PRODUCTS_120 and purged from PostgreSQL on startup."""
+    """Ensure the 8 deprecated products are absent from CURATED_CATALOG and purged from PostgreSQL on startup."""
     from app.db.seed import (
-        PRODUCTS_120,
+        CURATED_CATALOG,
         _ensure_categories_and_brands,
         ensure_initial_data,
         purge_deprecated_products,
@@ -873,13 +875,13 @@ def test_purge_deprecated_ugly_products_and_verify_clean_replacements(db_session
         "eltamd-uv-clear-spf46",
         "anessa-perfect-uv-milk",
     }
-    slugs_120 = {p["slug"] for p in PRODUCTS_120}
-    names_120 = {p["name"].lower() for p in PRODUCTS_120}
-    urls_120 = [p["image_url"] for p in PRODUCTS_120]
+    slugs_120 = {p["slug"] for p in CURATED_CATALOG}
+    names_120 = {p["name"].lower() for p in CURATED_CATALOG}
+    urls_120 = [p["image_url"] for p in CURATED_CATALOG]
 
-    # None of the 8 deleted products exist in PRODUCTS_120
+    # None of the 8 deleted products exist in CURATED_CATALOG
     for dslug in deprecated_slugs:
-        assert dslug not in slugs_120, f"{dslug} should not be in PRODUCTS_120"
+        assert dslug not in slugs_120, f"{dslug} should not be in CURATED_CATALOG"
 
     assert "carolina herrera good girl" not in names_120
     assert "garnier fructis hair food banana mask" not in names_120
@@ -890,13 +892,13 @@ def test_purge_deprecated_ugly_products_and_verify_clean_replacements(db_session
     assert "eltamd uv clear broad-spectrum spf 46" not in names_120
     assert "anessa perfect uv sunscreen skincare milk" not in names_120
 
-    # 120 total distinct products with 120 unique images
-    assert len(PRODUCTS_120) == 120
-    assert len(set(urls_120)) == 120
-    assert len(set(slugs_120)) == 120
-    assert len(names_120) == 120
+    # 100 total distinct products with 100 unique images
+    assert len(CURATED_CATALOG) == 100
+    assert len(set(urls_120)) == 100
+    assert len(set(slugs_120)) == 100
+    assert len(names_120) == 100
 
-    # The 8 clean replacements are in PRODUCTS_120
+    # The 8 clean replacements are in CURATED_CATALOG
     for req_slug in (
         "tom-ford-soleil-blanc",
         "moroccanoil-intense-hydrating-mask",
@@ -907,7 +909,7 @@ def test_purge_deprecated_ugly_products_and_verify_clean_replacements(db_session
         "kiehls-super-fluid-daily-uv-defense",
         "torriden-dive-in-watery-sun-cream",
     ):
-        assert req_slug in slugs_120, f"Expected clean replacement {req_slug} in PRODUCTS_120"
+        assert req_slug in slugs_120, f"Expected clean replacement {req_slug} in CURATED_CATALOG"
 
     # Simulate dirty live database containing deprecated products and SKUs
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
@@ -948,10 +950,44 @@ def test_purge_deprecated_ugly_products_and_verify_clean_replacements(db_session
     for dslug in deprecated_slugs:
         assert db_session.query(Product).filter(Product.slug == dslug).first() is None
 
-    # ensure_initial_data leaves exactly 120 products in the DB
+    # ensure_initial_data leaves exactly 100 products in the DB
     ensure_initial_data(db_session)
     total_db_prods = db_session.query(Product).filter(Product.is_active.is_(True), Product.is_archived.is_(False)).count()
-    assert total_db_prods == 120
+    assert total_db_prods == 100
+
+
+def test_single_source_curated_catalog_integrity(db_session):
+    """Verify CURATED_CATALOG single-source-of-truth 100-product integrity, assertions, and startup sync."""
+    from app.db.seed import CURATED_CATALOG, sync_curated_catalog, ensure_initial_data
+    from app.models import Product, ProductImage
+
+    # 1. Exact 100 distinct items
+    assert len(CURATED_CATALOG) == 100
+    # 2. Zero duplicate (brand, name) pairs
+    assert len({(p["brand"], p["name"]) for p in CURATED_CATALOG}) == 100
+    # 3. Zero duplicate image URLs
+    assert len({p["image_url"] for p in CURATED_CATALOG}) == 100
+    # 4. Zero duplicate slugs
+    assert len({p["slug"] for p in CURATED_CATALOG}) == 100
+    # 5. Zero duplicate product names
+    assert len({p["name"] for p in CURATED_CATALOG}) == 100
+
+    # 6. No product name redundantly repeats the brand name
+    for p in CURATED_CATALOG:
+        assert not p["name"].lower().startswith(p["brand"].lower() + " "), f"Brand in name: {p['brand']} - {p['name']}"
+        assert p["image_url"].startswith(("https://", "/images/products/"))
+        assert 4.7 <= p["rating"] <= 4.9
+        assert 95 <= p["review_count"] <= 450
+
+    # 7. Startup sync loads exactly 100 products with 100 unique primary images into the database
+    sync_curated_catalog(db_session)
+    prods = db_session.query(Product).filter(Product.is_active.is_(True), Product.is_archived.is_(False)).all()
+    assert len(prods) == 100
+
+    images = db_session.query(ProductImage).filter(ProductImage.is_primary.is_(True)).all()
+    assert len(images) == 100
+    assert len({img.image_url for img in images}) == 100
+
 
 
 

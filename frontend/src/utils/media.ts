@@ -52,7 +52,7 @@ export function getRealFallbackImage(productName?: string, categoryName?: string
       return url;
     }
   }
-  return 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80';
+  return '/images/products/art-moisturizer-jar.jpg';
 }
 
 export function resolveMediaUrl(
