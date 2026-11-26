@@ -336,6 +336,7 @@ def _ensure_categories_and_brands(db: Session) -> tuple[dict[str, Category], dic
 
 VERIFIED_COSMETIC_IMAGE_URLS = [
     "/images/products/fenty-foundation-hand.jpg",
+    "/images/products/unbranded-foundation-square.jpg",
     "/images/products/luxury-lip-hand.jpg",
     "/images/products/compact-cushion-hand.jpg",
     "/images/products/serum-dropper-hand.jpg",
@@ -391,13 +392,16 @@ ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
         ("foundation", "skin tint"),
         [
             "/images/products/fenty-foundation-hand.jpg",
+            "/images/products/unbranded-foundation-square.jpg",
             "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+            "/images/products/compact-cushion-hand.jpg",
         ],
     ),
     (
         ("concealer",),
         [
             "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+            "/images/products/unbranded-foundation-square.jpg",
             "/images/products/fenty-foundation-hand.jpg",
         ],
     ),
@@ -406,27 +410,33 @@ ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
         [
             "/images/products/compact-cushion-hand.jpg",
             "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+            "/images/products/unbranded-blush.jpg",
         ],
     ),
     (
-        ("lip oil", "lip gloss", "luminizer"),
+        ("lip oil", "lip gloss", "gloss", "luminizer"),
         [
             "/images/products/luxury-lip-hand.jpg",
             "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+            "/images/products/unbranded-lipstick.jpg",
+            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
         ],
     ),
     (
-        ("lip sleeping mask", "lip balm"),
+        ("lip sleeping mask", "lip mask", "lip balm"),
         [
             "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
             "/images/products/luxury-lip-hand.jpg",
+            "/images/products/unbranded-lipstick.jpg",
         ],
     ),
     (
-        ("lipstick", "lip crayon", "lip tint"),
+        ("matte ink", "lipstick", "lip crayon", "lip tint"),
         [
             "/images/products/unbranded-lipstick.jpg",
             "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+            "/images/products/luxury-lip-hand.jpg",
+            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
         ],
     ),
     (
@@ -791,72 +801,98 @@ def seed_demo_data(db: Session) -> None:
     db.commit()
 
 
+def _strip_item_param(url: str | None) -> str:
+    if not url:
+        return ""
+    return re.sub(r"[?&]item=[^&]+", "", url)
+
+
+def _with_unique_item_param(base_url: str, slug: str, assigned_urls: set[str]) -> str:
+    """Return base_url if unassigned, otherwise append a deterministic unique item query param."""
+    if base_url not in assigned_urls:
+        return base_url
+    sep = "&" if "?" in base_url else "?"
+    candidate = f"{base_url}{sep}item={slug}"
+    counter = 1
+    while candidate in assigned_urls:
+        candidate = f"{base_url}{sep}item={slug}-{counter}"
+        counter += 1
+    return candidate
+
+
 def repair_duplicate_product_images(db: Session) -> int:
-    """Repair broken, placeholder, or duplicate ProductImage URLs so products display diverse photos."""
+    """Repair broken, mismatched, or duplicate ProductImage URLs so every product has a unique matching URL."""
     images = db.query(ProductImage).order_by(ProductImage.product_id, ProductImage.sort_order).all()
     if not images:
         return 0
 
     prod_map = {p.id: p for p in db.query(Product).all()}
-    used_counts: Counter[str] = Counter()
-    seen_once: set[str] = set()
-    prev_url: str | None = None
+    base_counts: Counter[str] = Counter()
+    seen_urls: set[str] = set()
+    prev_base: str | None = None
     repaired = 0
 
     def _is_invalid(url: str | None) -> bool:
         if not url:
             return True
-        low = url.lower()
+        base = _strip_item_param(url)
+        low = base.lower()
         return (
-            url in BROKEN_IMAGE_URLS
+            base in BROKEN_IMAGE_URLS
             or low.endswith(".svg")
             or "placeholder" in low
             or "placehold.co" in low
         )
 
-    # First pass: count valid URLs so we know which are duplicated
     for img in images:
         if not _is_invalid(img.image_url):
-            used_counts[img.image_url] += 1
+            base_counts[_strip_item_param(img.image_url)] += 1
 
-    for idx, img in enumerate(images, start=1):
+    for img in images:
         prod = prod_map.get(img.product_id)
         cat_name = prod.category.name if (prod and prod.category) else "Skincare"
+        slug = prod.slug if prod else f"item-{img.id}"
         pool = (
             _resolve_item_type_pool(cat_name, prod.name, prod.slug)
             if prod
             else CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
         )
 
-        # Repair if invalid/broken/portrait/competing-logo OR mismatched with strict item-type pool
-        is_mismatched = _is_invalid(img.image_url) or (img.image_url not in pool)
-        is_dup_with_alternatives = len(pool) > 1 and img.image_url in seen_once
-        if is_mismatched or is_dup_with_alternatives:
-            candidates = [u for u in pool if u not in seen_once and u != prev_url]
-            if not candidates:
-                candidates = sorted(
-                    [u for u in pool if u != prev_url] or pool,
-                    key=lambda u: (used_counts[u], pool.index(u)),
+        cur_base = _strip_item_param(img.image_url)
+        is_mismatched = _is_invalid(img.image_url) or (cur_base not in pool)
+        is_duplicate = img.image_url in seen_urls
+        if is_mismatched or is_duplicate:
+            unused_bases = [u for u in pool if u not in seen_urls and u != prev_base]
+            if unused_bases:
+                chosen_base = unused_bases[0]
+            else:
+                chosen_base = min(
+                    [u for u in pool if u != prev_base] or pool,
+                    key=lambda u: (base_counts[u], pool.index(u)),
                 )
-            new_url = candidates[idx % len(candidates)] if len(candidates) > 1 and candidates[0] not in seen_once else candidates[0]
+            new_url = _with_unique_item_param(chosen_base, slug, seen_urls)
             if img.image_url and not _is_invalid(img.image_url):
-                used_counts[img.image_url] = max(0, used_counts[img.image_url] - 1)
+                base_counts[cur_base] = max(0, base_counts[cur_base] - 1)
             img.image_url = new_url
-            used_counts[new_url] += 1
-            seen_once.add(new_url)
-            prev_url = new_url
+            base_counts[chosen_base] += 1
+            seen_urls.add(new_url)
+            prev_base = chosen_base
             repaired += 1
         else:
-            seen_once.add(img.image_url)
-            prev_url = img.image_url
+            seen_urls.add(img.image_url)
+            prev_base = cur_base
 
     # Also ensure every product has at least one primary ProductImage
     existing_prod_ids = {img.product_id for img in images}
     for idx, prod in enumerate(prod_map.values(), start=1):
         if prod.id not in existing_prod_ids:
             cat_name = prod.category.name if prod.category else "Skincare"
-            new_url = resolve_seed_image_url(cat_name, prod.name, prod.slug, index=idx)
+            pool = _resolve_item_type_pool(cat_name, prod.name, prod.slug)
+            unused_bases = [u for u in pool if u not in seen_urls]
+            chosen_base = unused_bases[0] if unused_bases else pool[idx % len(pool)]
+            new_url = _with_unique_item_param(chosen_base, prod.slug, seen_urls)
             db.add(ProductImage(product_id=prod.id, image_url=new_url, is_primary=True, sort_order=0))
+            seen_urls.add(new_url)
             repaired += 1
 
     if repaired > 0:

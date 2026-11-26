@@ -712,7 +712,9 @@ def test_strict_item_type_image_matching_and_no_competing_logos(db_session):
     mac_url = resolve_seed_image_url("Makeup", "MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy")
     assert mac_url in {
         "/images/products/unbranded-lipstick.jpg",
+        "/images/products/luxury-lip-hand.jpg",
         "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
     }
     ct_url = resolve_seed_image_url("Makeup", "Charlotte Tilbury Pillow Talk Matte Revolution Lipstick", "ct-pillow-talk-lipstick")
     assert ct_url != clinique_url
@@ -747,6 +749,34 @@ def test_strict_item_type_image_matching_and_no_competing_logos(db_session):
         prod = db_session.query(Product).filter(Product.slug == pslug).one()
         img = db_session.query(ProductImage).filter(ProductImage.product_id == prod.id).one()
         assert img.image_url != bad_url
+
+
+def test_zero_duplicate_image_urls_across_full_catalog_and_lip_matching(db_session):
+    """Ensure every product in the catalog has a unique image_url and lip/foundation items match cleanly."""
+    from app.db.seed import ensure_initial_data, resolve_seed_image_url
+    from app.models import Product, ProductImage
+
+    # Lip items like Matte Ink and Gloss Bomb must never resolve to eyeliner or brush flatlay
+    eyeliner_url = "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80"
+    brush_flatlay_url = "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
+
+    gloss_url = resolve_seed_image_url("Makeup", "Fenty Beauty Gloss Bomb Universal Lip Luminizer", "fenty-gloss-bomb-luminizer")
+    matte_ink_url = resolve_seed_image_url("Makeup", "Maybelline SuperStay Matte Ink", "maybelline-superstay-matte-ink")
+    assert gloss_url not in (eyeliner_url, brush_flatlay_url)
+    assert matte_ink_url not in (eyeliner_url, brush_flatlay_url)
+
+    ensure_initial_data(db_session)
+    all_images = db_session.query(ProductImage).all()
+    all_urls = [img.image_url for img in all_images]
+    assert len(all_urls) == len(set(all_urls))
+
+    # MAC Foundation and Maybelline Fit Me Foundation must not share the same image URL
+    mac_prod = db_session.query(Product).filter(Product.slug == "mac-studio-fix-fluid-spf15").one()
+    mayb_prod = db_session.query(Product).filter(Product.slug == "maybelline-fit-me-foundation").one()
+    mac_img = db_session.query(ProductImage).filter(ProductImage.product_id == mac_prod.id).one()
+    mayb_img = db_session.query(ProductImage).filter(ProductImage.product_id == mayb_prod.id).one()
+    assert mac_img.image_url != mayb_img.image_url
+
 
 
 
