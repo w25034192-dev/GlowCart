@@ -13,18 +13,22 @@ from app.core.security import hash_password
 from app.models import (
     Brand,
     Cart,
+    CartItem,
     Category,
     Coupon,
     Inventory,
     InventoryBatch,
     InventoryMovement,
+    OrderItem,
     Product,
     ProductImage,
     ProductVariant,
     Promotion,
+    Review,
     Role,
     User,
     Wishlist,
+    WishlistItem,
 )
 from app.repositories.user_repository import UserRepository
 
@@ -208,6 +212,10 @@ CATALOG_BLUEPRINT = [
     ("Makeup", "MAC", "MAC Studio Fix Fluid SPF15 Foundation", "mac-studio-fix-fluid-spf15", ["oily", "combination"], "shades_foundation", "30ml", "35.00"),
     ("Makeup", "Huda Beauty", "Huda Beauty GloWish Multidew Skin Tint", "huda-glowish-multidew-skin-tint", ["dry", "normal"], "shades_foundation", "30ml", "44.00"),
     ("Makeup", "NYX", "NYX Professional Makeup Butter Gloss Lip Gloss", "nyx-butter-gloss-lip-gloss", ["all"], "shades_lip", "8ml", "7.00"),
+    ("Makeup", "Charlotte Tilbury", "Charlotte Tilbury Airbrush Flawless Setting Spray", "ct-airbrush-flawless-setting-spray", ["all"], "volumes", "100ml", "38.00"),
+    ("Makeup", "MAC", "MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy", ["all"], "shades_lip", "3g", "23.00"),
+    ("Skincare", "Estée Lauder", "Estée Lauder Advanced Night Repair Serum", "estee-lauder-advanced-night-repair", ["dry", "mature", "all"], "volumes", "50ml", "85.00"),
+    ("Skincare", "Medicube", "Medicube Collagen Jelly Cream", "medicube-collagen-jelly-cream", ["dry", "mature", "all"], "volumes", "110ml", "33.00"),
 ]
 
 VARIANT_TEMPLATES = {
@@ -711,9 +719,52 @@ def repair_duplicate_product_images(db: Session) -> int:
     return repaired
 
 
+def cleanup_generic_generated_products(db: Session) -> int:
+    """Remove or archive old generic '#N' generated products while keeping orders, users, and carts safe."""
+    generic_pattern = re.compile(r" #\d+$")
+    candidates = [p for p in db.query(Product).all() if generic_pattern.search(p.name or "")]
+    if not candidates:
+        return 0
+
+    cleaned = 0
+    for prod in candidates:
+        variant_ids = [v.id for v in db.query(ProductVariant).filter(ProductVariant.product_id == prod.id).all()]
+        has_orders = False
+        if variant_ids:
+            has_orders = (
+                db.query(OrderItem).filter(OrderItem.variant_id.in_(variant_ids)).first()
+                is not None
+            )
+
+        if has_orders:
+            if not prod.is_archived or prod.is_active:
+                prod.is_archived = True
+                prod.is_active = False
+                cleaned += 1
+            continue
+
+        if variant_ids:
+            db.query(CartItem).filter(CartItem.variant_id.in_(variant_ids)).delete(synchronize_session=False)
+            db.query(InventoryMovement).filter(InventoryMovement.variant_id.in_(variant_ids)).delete(synchronize_session=False)
+            db.query(InventoryBatch).filter(InventoryBatch.variant_id.in_(variant_ids)).delete(synchronize_session=False)
+            db.query(Inventory).filter(Inventory.variant_id.in_(variant_ids)).delete(synchronize_session=False)
+
+        db.query(WishlistItem).filter(WishlistItem.product_id == prod.id).delete(synchronize_session=False)
+        db.query(Review).filter(Review.product_id == prod.id).delete(synchronize_session=False)
+        db.query(ProductImage).filter(ProductImage.product_id == prod.id).delete(synchronize_session=False)
+        db.query(ProductVariant).filter(ProductVariant.product_id == prod.id).delete(synchronize_session=False)
+        db.delete(prod)
+        cleaned += 1
+
+    if cleaned > 0:
+        db.commit()
+    return cleaned
+
+
 def ensure_initial_data(db: Session) -> bool:
     """Ensure default admin exists and ensure all canonical categories, brands, and catalog items exist with diverse real images."""
     ensure_default_admin_and_roles(db)
+    cleaned = cleanup_generic_generated_products(db)
     cat_map, brand_map = _ensure_categories_and_brands(db)
     all_blueprint_entries = list(enumerate(CATALOG_BLUEPRINT, start=1))
     created = _seed_blueprint_entries(db, all_blueprint_entries, cat_map, brand_map)
@@ -721,7 +772,7 @@ def ensure_initial_data(db: Session) -> bool:
     updated_images = repair_duplicate_product_images(db)
     topped_up = ensure_minimum_product_count(db, target_count=100)
 
-    if created > 0 or updated_images > 0 or topped_up > 0:
+    if cleaned > 0 or created > 0 or updated_images > 0 or topped_up > 0:
         db.commit()
         return True
     return False

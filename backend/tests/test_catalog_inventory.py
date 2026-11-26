@@ -646,6 +646,46 @@ def test_fenty_showcase_and_portrait_only_urls_replaced(db_session):
     assert updated.image_url == "/images/products/fenty-foundation-hand.jpg"
 
 
+def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
+    """Startup cleanup removes generic #N products while keeping orders safe, and blueprint has >=100 unique items."""
+    from app.db.seed import (
+        CATALOG_BLUEPRINT,
+        cleanup_generic_generated_products,
+        ensure_initial_data,
+        generate_single_product,
+        seed_generated_products,
+    )
+    from app.models import Product
+
+    # 1. Blueprint itself must have >= 100 unique real products with zero duplicate names/slugs
+    assert len(CATALOG_BLUEPRINT) >= 100
+    names = [e[2] for e in CATALOG_BLUEPRINT]
+    slugs = [e[3] for e in CATALOG_BLUEPRINT]
+    assert len(set(names)) == len(CATALOG_BLUEPRINT)
+    assert len(set(slugs)) == len(CATALOG_BLUEPRINT)
+    lower_names = {n.lower() for n in names}
+    for required in (
+        "charlotte tilbury airbrush flawless setting spray",
+        "mac matte lipstick velvet teddy",
+        "estée lauder advanced night repair serum",
+        "medicube collagen jelly cream",
+    ):
+        assert required in lower_names
+
+    # 2. Simulate old generic #N generated products in live DB
+    generic_items = [generate_single_product(index=i) for i in range(1, 11)]
+    seed_generated_products(db_session, generic_items)
+    assert db_session.query(Product).filter(Product.name.like("%#1%")).count() >= 1
+
+    cleaned = cleanup_generic_generated_products(db_session)
+    assert cleaned == 10
+    assert db_session.query(Product).filter(Product.name.like("%#1%")).count() == 0
+
+    ensure_initial_data(db_session)
+    assert db_session.query(Product).filter(Product.is_active.is_(True), Product.is_archived.is_(False)).count() >= 100
+
+
+
 
 
 
