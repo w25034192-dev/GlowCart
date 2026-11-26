@@ -655,7 +655,9 @@ def ensure_initial_data(db: Session) -> bool:
             db.add(ProductImage(product_id=prod.id, image_url=real_url, is_primary=True, sort_order=0))
             updated_images += 1
 
-    if created > 0 or updated_images > 0:
+    topped_up = ensure_minimum_product_count(db, target_count=100)
+
+    if created > 0 or updated_images > 0 or topped_up > 0:
         db.commit()
         return True
     return False
@@ -924,12 +926,39 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
     return created_count
 
 
+def ensure_minimum_product_count(db: Session, target_count: int = 100) -> int:
+    """Top up the catalog with generated products if total product count is below target_count."""
+    current_count = db.query(Product).count()
+    if current_count >= target_count:
+        return 0
+
+    needed = target_count - current_count
+    existing_slugs: set[str] = {s for (s,) in db.query(Product.slug).all()}
+    batch: list[dict] = []
+    seq = current_count + 1
+
+    while len(batch) < needed:
+        item = generate_single_product(index=seq)
+        raw_slug = f"{item['brand']}-{item['name']}".lower()
+        slug = re.sub(r"[^a-z0-9]+", "-", raw_slug).strip("-")
+        seq += 1
+        if slug in existing_slugs:
+            continue
+        existing_slugs.add(slug)
+        batch.append(item)
+
+    return seed_generated_products(db, batch)
+
+
 if __name__ == "__main__":
     import sys
     from app.db.session import SessionLocal
 
     with SessionLocal() as session:
         seed_demo_data(session)
+        topped_up = ensure_minimum_product_count(session, target_count=100)
+        if topped_up > 0:
+            print(f"Topped up {topped_up} products to reach minimum catalog count of 100.")
         if "--json" in sys.argv:
             json_prods = load_products_from_json()
             gen_count = seed_generated_products(session, json_prods)

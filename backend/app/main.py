@@ -29,7 +29,7 @@ async def lifespan(_app: FastAPI):
             with SessionLocal() as db:
                 seeded = ensure_initial_data(db)
                 if seeded:
-                    logger.info("GlowCart startup auto-seed applied missing catalog/admin records.")
+                    logger.info("GlowCart startup auto-seed applied missing catalog/admin records (minimum 100 products).")
         except Exception as exc:  # pragma: no cover - surfaced in startup logs if DB unreachable
             logger.exception("Startup auto-seed skipped or failed: %s", exc)
     yield

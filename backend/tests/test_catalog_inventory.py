@@ -525,5 +525,30 @@ def test_ensure_initial_data_and_generated_seed_survive_sku_collisions(db_sessio
     assert db_session.query(Product).count() == len(CATALOG_BLUEPRINT) + 2
 
 
+def test_ensure_minimum_product_count_tops_up_from_70_to_100(db_session):
+    """When DB has 70 existing products, ensure_minimum_product_count adds only 30 to reach 100."""
+    from app.db.seed import (
+        ensure_minimum_product_count,
+        generate_single_product,
+        seed_generated_products,
+    )
+    from app.models import Product
+
+    initial_70 = [generate_single_product(index=i) for i in range(1, 71)]
+    seed_generated_products(db_session, initial_70)
+    before_count = db_session.query(Product).count()
+    assert before_count == 70
+
+    added = ensure_minimum_product_count(db_session, target_count=100)
+    assert added == 30
+    assert db_session.query(Product).count() == 100
+
+    # Calling again when already at 100 should add 0
+    added_again = ensure_minimum_product_count(db_session, target_count=100)
+    assert added_again == 0
+    assert db_session.query(Product).count() == 100
+
+
+
 
 
