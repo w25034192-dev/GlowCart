@@ -172,9 +172,10 @@ describe('GlowCart Frontend', () => {
     expect(screen.getByText(/15 days return policy/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /SUBSCRIBE/i })).toBeInTheDocument();
 
-    // Test carousel arrow interaction
+    // Test carousel arrow interaction & floating glassmorphism featured card
+    expect(screen.getByText(/Advanced Night Repair Serum/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Next hero slide/i }));
-    expect(screen.getByText(/Weightless SPF\. Glass-Skin Glow\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Velvet Lips & Luminous Glow\./i)).toBeInTheDocument();
   });
 
   it('redirects unauthenticated visitors away from protected admin routes', async () => {

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  ArrowRight,
   ChevronLeft,
   ChevronRight,
   FlaskConical,
   HeartHandshake,
   Leaf,
   Recycle,
+  Sparkles,
 } from 'lucide-react';
 import { catalogApi } from '@/services/api';
 import { ProductCard } from '@/components/customer/ProductCard';
@@ -14,34 +16,55 @@ import type { ProductSummary } from '@/types';
 
 const HERO_SLIDES = [
   {
-    eyebrow: 'NEW ARRIVAL • BARRIER RITUAL',
+    eyebrow: 'LUXURY GOLDEN SERUM • EDITION',
     headline: 'Radiant Skin. Real Confidence.',
     subtext:
       'Clean, clinically proven beauty curated to nourish and elevate your daily ritual.',
     ctaLabel: 'SHOP NOW',
     ctaTo: '/catalog',
-    image: '/images/products/art-moisturizer-jar.jpg',
-    imageAlt: 'Luxury frosted glass moisturizer cream jar on warm stone pedestal',
+    image:
+      'https://images.unsplash.com/photo-1688955665338-fb430ff8436d?auto=format&fit=crop&w=1600&q=85',
+    imageAlt:
+      'Moody sunlit studio arrangement of luxury golden serum dropper, sleek bottle, and velvet lipsticks',
+    featuredTitle: 'Advanced Night Repair Serum',
+    featuredPrice: '$85',
+    featuredSlug: 'estee-lauder-advanced-night-repair',
+    featuredThumb:
+      'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=200&q=80',
   },
   {
-    eyebrow: 'DAILY UV DEFENSE • ZERO WHITE CAST',
-    headline: 'Weightless SPF. Glass-Skin Glow.',
+    eyebrow: 'HIGH-FASHION MAKEUP EDITORIAL',
+    headline: 'Velvet Lips & Luminous Glow.',
     subtext:
-      'Dermatologist-loved Korean & Japanese sun formulas crafted for effortless daily protection.',
-    ctaLabel: 'SHOP SUN CARE',
-    ctaTo: '/category/sun-care',
-    image: '/images/products/art-torriden-dive-in-sun-cream.jpg',
-    imageAlt: 'Hydrating watery sun cream tube in minimalist studio lighting',
+      'Runway pigments, silk foundations, and cashmere matte palettes crafted for effortless radiance.',
+    ctaLabel: 'SHOP MAKEUP',
+    ctaTo: '/category/makeup',
+    image:
+      'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1600&q=85',
+    imageAlt:
+      'Curated luxury makeup flatlay with eyeshadow palette, lipsticks, foundation, and brushes',
+    featuredTitle: 'Master Mattes Eyeshadow Palette',
+    featuredPrice: '$50',
+    featuredSlug: 'makeup-by-mario-master-mattes',
+    featuredThumb:
+      'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=200&q=80',
   },
   {
-    eyebrow: 'HAUTE PARFUMERIE & VELVET PIGMENTS',
-    headline: 'Iconic Scents. Timeless Color.',
+    eyebrow: 'HAUTE PARFUMERIE • PARIS',
+    headline: 'Signature Scents of Paris.',
     subtext:
-      'Authentic designer flacons and buildable pigments sourced with batch-verified freshness.',
-    ctaLabel: 'EXPLORE COLLECTION',
+      'Artisanal glass flacons and warm amber accords sourced with batch-verified authenticity.',
+    ctaLabel: 'SHOP FRAGRANCE',
     ctaTo: '/category/fragrance',
-    image: '/images/products/art-soleil-blanc-flacon.jpg',
-    imageAlt: 'Luxury square glass perfume flacon on travertine marble',
+    image:
+      'https://images.unsplash.com/photo-1632928145408-ef47a7672964?auto=format&fit=crop&w=1600&q=85',
+    imageAlt:
+      'Luxury Parisian glass perfume flacon illuminated by warm golden-hour shadows',
+    featuredTitle: 'Philosykos Eau de Toilette',
+    featuredPrice: '$175',
+    featuredSlug: 'diptyque-philosykos-edt',
+    featuredThumb:
+      'https://images.unsplash.com/photo-1632928145408-ef47a7672964?auto=format&fit=crop&w=200&q=80',
   },
 ];
 
@@ -181,28 +204,71 @@ export const HomePage: React.FC = () => {
   }, []);
 
   const currentSlide = HERO_SLIDES[slideIdx];
+  const matchedFeatured = bestSellers.find((p) => p.slug === currentSlide.featuredSlug);
+  const featuredHref = matchedFeatured
+    ? `/products/${matchedFeatured.id}`
+    : `/catalog?q=${encodeURIComponent(currentSlide.featuredTitle)}`;
+
   const prevSlide = () => setSlideIdx((i) => (i - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
   const nextSlide = () => setSlideIdx((i) => (i + 1) % HERO_SLIDES.length);
 
   return (
     <div className="bg-cream-warm text-foreground">
-      {/* 2. Split-Screen Hero Banner Carousel */}
+      {/* 2. Full-Bleed Split-Screen Editorial Hero Banner Carousel */}
       <section
         aria-label="Featured beauty collection"
-        className="relative overflow-hidden border-b border-border/50 bg-gradient-to-br from-[#FBF3F0] via-[#F7EAEB] to-[#F2DFE3]"
+        className="relative overflow-hidden border-b border-border/50 bg-[#F9EFF1]"
       >
-        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-12 lg:py-20">
-          {/* Left Editorial Copy */}
-          <div className="space-y-6 lg:col-span-6">
+        {/* Full-Bleed Right Campaign Image (Desktop) with Soft Left Gradient Blend */}
+        <div className="relative h-72 w-full sm:h-96 lg:absolute lg:inset-y-0 lg:right-0 lg:h-full lg:w-[60%]">
+          <img
+            src={currentSlide.image}
+            alt={currentSlide.imageAlt}
+            className="h-full w-full object-cover transition-opacity duration-500"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#F9EFF1] via-transparent to-transparent lg:bg-gradient-to-r lg:from-[#F9EFF1] lg:via-[#F9EFF1]/45 lg:to-transparent"
+          />
+
+          {/* Floating Glassmorphism Featured Product Tag */}
+          <Link
+            to={featuredHref}
+            className="glass-panel group absolute bottom-5 left-5 z-20 flex items-center gap-3.5 rounded-2xl px-4 py-3 shadow-luxury transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring sm:bottom-8 sm:left-8 lg:left-16"
+          >
+            <img
+              src={currentSlide.featuredThumb}
+              alt={currentSlide.featuredTitle}
+              className="h-11 w-11 rounded-xl border border-white/80 object-cover shadow-sm"
+            />
+            <div className="text-left">
+              <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] text-mauve-deep">
+                <Sparkles className="h-3 w-3" aria-hidden="true" />
+                <span>Featured</span>
+              </p>
+              <p className="text-xs font-semibold text-plum sm:text-sm">
+                {currentSlide.featuredTitle} — <span className="font-mono font-bold">{currentSlide.featuredPrice}</span>
+              </p>
+            </div>
+            <ArrowRight
+              className="h-4 w-4 text-plum transition-transform duration-200 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
+        </div>
+
+        {/* Left Editorial Typography & Controls */}
+        <div className="relative z-10 mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-24">
+          <div className="max-w-xl space-y-6">
             <span className="inline-block text-[11px] font-bold uppercase tracking-[0.22em] text-mauve-deep">
               {currentSlide.eyebrow}
             </span>
 
-            <h1 className="font-serif text-4xl font-bold leading-[1.06] tracking-tight text-plum sm:text-5xl lg:text-6xl">
+            <h1 className="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-plum sm:text-5xl lg:text-6xl">
               {currentSlide.headline}
             </h1>
 
-            <p className="max-w-md text-base leading-relaxed text-muted-fg sm:text-lg">
+            <p className="max-w-md text-base leading-relaxed text-foreground/80 sm:text-lg">
               {currentSlide.subtext}
             </p>
 
@@ -216,7 +282,7 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Subtle Carousel Slide Indicators */}
-            <div className="flex items-center gap-2 pt-2" role="tablist" aria-label="Hero slides">
+            <div className="flex items-center gap-2 pt-3" role="tablist" aria-label="Hero slides">
               {HERO_SLIDES.map((s, idx) => (
                 <button
                   key={s.headline}
@@ -232,35 +298,25 @@ export const HomePage: React.FC = () => {
               ))}
             </div>
           </div>
-
-          {/* Right Packaging Photography + Carousel Arrows */}
-          <div className="relative lg:col-span-6">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/80 bg-card shadow-xl">
-              <img
-                src={currentSlide.image}
-                alt={currentSlide.imageAlt}
-                className="h-full w-full object-cover transition-opacity duration-300"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={prevSlide}
-              aria-label="Previous hero slide"
-              className="touch-target absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-card/90 text-plum shadow-md backdrop-blur-sm transition-colors hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={nextSlide}
-              aria-label="Next hero slide"
-              className="touch-target absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-card/90 text-plum shadow-md backdrop-blur-sm transition-colors hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <ChevronRight className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
         </div>
+
+        {/* Edge Carousel Arrows */}
+        <button
+          type="button"
+          onClick={prevSlide}
+          aria-label="Previous hero slide"
+          className="touch-target absolute left-3 top-36 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-card/85 text-plum shadow-md backdrop-blur-md transition-colors hover:bg-card focus-visible:ring-2 focus-visible:ring-ring sm:top-48 lg:left-5 lg:top-1/2"
+        >
+          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          onClick={nextSlide}
+          aria-label="Next hero slide"
+          className="touch-target absolute right-3 top-36 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-card/85 text-plum shadow-md backdrop-blur-md transition-colors hover:bg-card focus-visible:ring-2 focus-visible:ring-ring sm:top-48 lg:right-5 lg:top-1/2"
+        >
+          <ChevronRight className="h-5 w-5" aria-hidden="true" />
+        </button>
       </section>
 
       {/* 3. 4-Column Brand Value / Trust Strip */}
