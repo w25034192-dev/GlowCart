@@ -853,6 +853,108 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
         assert 95 <= item.review_count <= 450
 
 
+def test_purge_deprecated_ugly_products_and_verify_clean_replacements(db_session):
+    """Ensure the 8 deprecated products are absent from PRODUCTS_120 and purged from PostgreSQL on startup."""
+    from app.db.seed import (
+        PRODUCTS_120,
+        _ensure_categories_and_brands,
+        ensure_initial_data,
+        purge_deprecated_products,
+    )
+    from app.models import Product, ProductImage, ProductVariant
+
+    deprecated_slugs = {
+        "carolina-herrera-good-girl",
+        "garnier-hair-food-banana-mask",
+        "redken-acidic-bonding-concentrate",
+        "fino-premium-touch-hair-mask",
+        "innisfree-daily-uv-defense",
+        "coola-classic-face-sunscreen",
+        "eltamd-uv-clear-spf46",
+        "anessa-perfect-uv-milk",
+    }
+    slugs_120 = {p["slug"] for p in PRODUCTS_120}
+    names_120 = {p["name"].lower() for p in PRODUCTS_120}
+    urls_120 = [p["image_url"] for p in PRODUCTS_120]
+
+    # None of the 8 deleted products exist in PRODUCTS_120
+    for dslug in deprecated_slugs:
+        assert dslug not in slugs_120, f"{dslug} should not be in PRODUCTS_120"
+
+    assert "carolina herrera good girl" not in names_120
+    assert "garnier fructis hair food banana mask" not in names_120
+    assert "redken acidic bonding concentrate" not in names_120
+    assert "fino premium touch hair mask" not in names_120
+    assert "innisfree daily uv defense sunscreen" not in names_120
+    assert "coola classic face sunscreen" not in names_120
+    assert "eltamd uv clear broad-spectrum spf 46" not in names_120
+    assert "anessa perfect uv sunscreen skincare milk" not in names_120
+
+    # 120 total distinct products with 120 unique images
+    assert len(PRODUCTS_120) == 120
+    assert len(set(urls_120)) == 120
+    assert len(set(slugs_120)) == 120
+    assert len(names_120) == 120
+
+    # The 8 clean replacements are in PRODUCTS_120
+    for req_slug in (
+        "tom-ford-soleil-blanc",
+        "moroccanoil-intense-hydrating-mask",
+        "kerastase-nutritive-8h-magic-night-serum",
+        "briogeo-scalp-revival-shampoo",
+        "paulas-choice-resist-daily-fluid-spf50",
+        "shiseido-urban-environment-spf42",
+        "kiehls-super-fluid-daily-uv-defense",
+        "torriden-dive-in-watery-sun-cream",
+    ):
+        assert req_slug in slugs_120, f"Expected clean replacement {req_slug} in PRODUCTS_120"
+
+    # Simulate dirty live database containing deprecated products and SKUs
+    cat_map, brand_map = _ensure_categories_and_brands(db_session)
+    brand = next(iter(brand_map.values()))
+
+    for dslug in deprecated_slugs:
+        p = Product(
+            category_id=cat_map["Sun Care"].id,
+            brand_id=brand.id,
+            name=f"Old Product {dslug}",
+            slug=dslug,
+            description="Deprecated test item",
+            skin_types=["all"],
+            specifications={},
+            is_demo=True,
+        )
+        db_session.add(p)
+        db_session.flush()
+        db_session.add(ProductVariant(
+            product_id=p.id,
+            sku=f"GC-{dslug[:15].upper()}-V01",
+            price=25.00,
+            is_available=True,
+            status="ACTIVE",
+        ))
+        db_session.add(ProductImage(
+            product_id=p.id,
+            image_url="https://images.unsplash.com/photo-1528720208104-3d9bd03cc9d4?auto=format&fit=crop&w=800&q=80",
+            is_primary=True,
+            sort_order=0,
+        ))
+    db_session.commit()
+
+    # Purge function must remove all 8 deprecated products
+    purged_count = purge_deprecated_products(db_session)
+    assert purged_count >= 8
+
+    for dslug in deprecated_slugs:
+        assert db_session.query(Product).filter(Product.slug == dslug).first() is None
+
+    # ensure_initial_data leaves exactly 120 products in the DB
+    ensure_initial_data(db_session)
+    total_db_prods = db_session.query(Product).filter(Product.is_active.is_(True), Product.is_archived.is_(False)).count()
+    assert total_db_prods == 120
+
+
+
 
 
 

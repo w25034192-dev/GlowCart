@@ -259,7 +259,7 @@ PRODUCTS_120: list[dict] = [
     _p("Sun Care", "Beauty of Joseon", "Beauty of Joseon Relief Sun Rice + Probiotics SPF50+", "boj-relief-sun", ["all", "sensitive"], "volumes", "50ml", "18.00", "/images/products/unbranded-sunscreen.jpg"),
     _p("Sun Care", "Round Lab", "Round Lab Birch Juice Moisturizing Sun Cream", "round-lab-birch-sun", ["dry", "normal"], "volumes", "50ml", "21.00", "https://plus.unsplash.com/premium_photo-1682535210542-21dceae4530c?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "SKIN1004", "SKIN1004 Hyalu-Cica Water-Fit Sun Serum SPF50+", "skin1004-sun-serum", ["dry", "all"], "volumes", "50ml", "16.50", "https://images.unsplash.com/photo-1643379855997-5344bd8d3e78?auto=format&fit=crop&w=800&q=80"),
-    _p("Sun Care", "Anessa", "Anessa Perfect UV Sunscreen Skincare Milk SPF50+", "anessa-perfect-uv-milk", ["oily", "combination"], "volumes", "60ml", "34.00", "https://plus.unsplash.com/premium_photo-1664300261771-f53155289841?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Torriden", "Torriden DIVE-IN Watery Moisture Sun Cream SPF 50+", "torriden-dive-in-watery-sun-cream", ["dry", "sensitive", "all"], "volumes", "60ml", "22.00", "/images/products/art-torriden-dive-in-sun-cream.jpg"),
     _p("Sun Care", "Supergoop!", "Supergoop! Unseen Sunscreen SPF 40", "supergoop-unseen-sunscreen-spf40", ["all"], "volumes", "50ml", "38.00", "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Supergoop!", "Supergoop! Glowscreen SPF 40", "supergoop-glowscreen-spf40", ["all", "dry"], "volumes", "50ml", "38.00", "https://images.unsplash.com/photo-1784256543053-076f2a8e4e40?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "La Roche-Posay", "La Roche-Posay Anthelios UVMune 400 Fluid", "lrp-anthelios-fluid", ["sensitive", "all"], "volumes", "50ml", "33.50", "https://plus.unsplash.com/premium_photo-1663100784433-ac60688b5fe3?auto=format&fit=crop&w=800&q=80"),
@@ -267,13 +267,13 @@ PRODUCTS_120: list[dict] = [
     _p("Sun Care", "Tocobo", "Tocobo Cotton Soft Sun Stick SPF50+", "tocobo-cotton-soft-sun-stick", ["oily", "combination"], "sizes", "19g", "17.00", "https://plus.unsplash.com/premium_photo-1673628167571-532a6c5f5d16?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Biore", "Biore UV Aqua Rich Watery Essence", "biore-uv-aqua-rich-essence", ["all", "oily"], "volumes", "50g", "15.00", "https://images.unsplash.com/photo-1786298300597-1e05c974aafa?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Shiseido", "Shiseido Clear Sunscreen Stick SPF 50+", "shiseido-clear-sunscreen-stick", ["all"], "sizes", "20g", "30.00", "https://images.unsplash.com/photo-1576426863848-c21f53c60b19?auto=format&fit=crop&w=800&q=80"),
-    _p("Sun Care", "EltaMD", "EltaMD UV Clear Broad-Spectrum SPF 46", "eltamd-uv-clear-spf46", ["acne-prone", "sensitive"], "volumes", "48g", "41.00", "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Kiehl's", "Kiehl's Super Fluid Daily UV Defense SPF 50+", "kiehls-super-fluid-daily-uv-defense", ["normal", "all"], "volumes", "50ml", "48.00", "/images/products/art-kiehls-super-fluid-uv.jpg"),
     _p("Sun Care", "Haruharu Wonder", "Haruharu Wonder Black Rice Moisture Airyfit Sunscreen", "haruharu-black-rice-sunscreen", ["all"], "volumes", "50ml", "18.00", "/images/products/art-sunscreen-tube.jpg"),
     _p("Sun Care", "Canmake", "Canmake Mermaid Skin Gel UV", "canmake-mermaid-skin-gel", ["dry", "all"], "volumes", "40g", "12.00", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Abib", "Abib Quick Sunstick Protection Bar", "abib-quick-sunstick-bar", ["all"], "sizes", "22g", "20.00", "https://images.unsplash.com/photo-1680063122329-69ef93b72c53?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Eucerin", "Eucerin Oil Control Sun Gel-Cream", "eucerin-oil-control-sun-gel", ["oily", "acne-prone"], "volumes", "50ml", "22.00", "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"),
-    _p("Sun Care", "Coola", "Coola Classic Face Sunscreen", "coola-classic-face-sunscreen", ["all"], "volumes", "50ml", "32.00", "https://images.unsplash.com/photo-1563178406-4cdc2923acbc?auto=format&fit=crop&w=800&q=80"),
-    _p("Sun Care", "Innisfree", "Innisfree Daily UV Defense Sunscreen", "innisfree-daily-uv-defense", ["dry", "normal"], "volumes", "50ml", "16.00", "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Shiseido", "Shiseido Urban Environment Oil-Free Sunscreen SPF 42", "shiseido-urban-environment-spf42", ["oily", "combination", "all"], "volumes", "50ml", "50.00", "/images/products/art-shiseido-urban-environment.jpg"),
+    _p("Sun Care", "Paula's Choice", "Paula's Choice Resist Daily Hydrating Fluid SPF 50", "paulas-choice-resist-daily-fluid-spf50", ["all", "combination"], "volumes", "60ml", "37.00", "/images/products/art-paulas-choice-sun-fluid.jpg"),
     _p("Sun Care", "COSRX", "Cosrx Aloe Soothing Sun Cream", "cosrx-aloe-soothing-sun-cream", ["dry", "sensitive"], "volumes", "50ml", "16.00", "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "d'Alba", "d'Alba Waterfull Essence Sun Cream", "dalba-waterfull-sun-cream", ["all", "dry"], "volumes", "50ml", "26.00", "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80"),
 
@@ -289,7 +289,7 @@ PRODUCTS_120: list[dict] = [
     _p("Hair Care", "Briogeo", "Briogeo Don't Despair Repair Mask", "briogeo-dont-despair-repair-mask", ["dry", "damaged"], "volumes", "237ml", "39.00", "https://plus.unsplash.com/premium_photo-1661898281541-b0b724b6257b?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Color Wow", "Color Wow Dream Coat Supernatural Spray", "color-wow-dream-coat-spray", ["all"], "volumes", "200ml", "28.00", "https://images.unsplash.com/photo-1661347243240-5ce7c9992369?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Mielle Organics", "Mielle Rosemary Mint Scalp & Hair Strengthening Oil", "mielle-rosemary-mint-oil", ["all"], "volumes", "59ml", "10.00", "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Fino", "Fino Premium Touch Hair Mask", "fino-premium-touch-hair-mask", ["damaged", "dry"], "sizes", "230g", "15.00", "https://plus.unsplash.com/premium_photo-1700162640179-cd0c0005320c?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Briogeo", "Briogeo Scalp Revival Charcoal Micro-Exfoliating Shampoo", "briogeo-scalp-revival-shampoo", ["oily", "all"], "volumes", "236ml", "42.00", "/images/products/art-briogeo-scalp-revival-jar.jpg"),
     _p("Hair Care", "Tsubaki", "Tsubaki Premium Repair Mask", "tsubaki-premium-repair-mask", ["damaged", "dry"], "sizes", "180g", "16.00", "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Dae", "Dae Cactus Fruit 3-in-1 Styling Cream", "dae-cactus-fruit-styling-cream", ["all"], "volumes", "150ml", "30.00", "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Vegamour", "Vegamour GRO Hair Serum", "vegamour-gro-hair-serum", ["thinning", "all"], "volumes", "30ml", "64.00", "https://images.unsplash.com/photo-1771955216611-0a826d819978?auto=format&fit=crop&w=800&q=80"),
@@ -298,8 +298,8 @@ PRODUCTS_120: list[dict] = [
     _p("Hair Care", "Oribe", "Oribe Gold Lust Repair & Restore Shampoo", "oribe-gold-lust-shampoo", ["all", "damaged"], "volumes", "250ml", "49.00", "https://cdn.dummyjson.com/product-images/skin-care/olay-ultra-moisture-shea-butter-body-wash/thumbnail.webp"),
     _p("Hair Care", "Aveda", "Aveda Botanical Repair Strengthening Leave-In", "aveda-botanical-repair-leave-in", ["all", "damaged"], "volumes", "100ml", "38.00", "https://cdn.dummyjson.com/product-images/skin-care/vaseline-men-body-and-face-lotion/thumbnail.webp"),
     _p("Hair Care", "Bumble and bumble", "Bumble and bumble Hairdresser's Invisible Oil", "bumble-hairdressers-invisible-oil", ["all", "dry"], "volumes", "100ml", "45.00", "https://images.unsplash.com/photo-1765726951362-df46f5a74cdf?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Redken", "Redken Acidic Bonding Concentrate", "redken-acidic-bonding-concentrate", ["damaged", "all"], "volumes", "150ml", "32.00", "https://plus.unsplash.com/premium_photo-1679046947964-139a2256afb5?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Garnier", "Garnier Fructis Hair Food Banana Mask", "garnier-hair-food-banana-mask", ["dry", "all"], "volumes", "390ml", "9.00", "https://images.unsplash.com/photo-1568584711271-6c929fb49b60?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Kérastase", "Kérastase Nutritive 8H Magic Night Hair Serum", "kerastase-nutritive-8h-magic-night-serum", ["dry", "damaged", "all"], "volumes", "90ml", "60.00", "/images/products/art-kerastase-magic-night-serum.jpg"),
+    _p("Hair Care", "Moroccanoil", "Moroccanoil Intense Hydrating Mask", "moroccanoil-intense-hydrating-mask", ["dry", "damaged"], "volumes", "250ml", "42.00", "/images/products/art-moroccanoil-mask-jar.jpg"),
 
     # =========================================================================
     # 5. FRAGRANCE (20 distinct viral products)
@@ -322,7 +322,7 @@ PRODUCTS_120: list[dict] = [
     _p("Fragrance", "Valentino", "Valentino Donna Born In Roma", "valentino-donna-born-in-roma", ["all"], "volumes", "50ml", "135.00", "https://images.unsplash.com/photo-1615397349754-cfa2066a298e?auto=format&fit=crop&w=800&q=80"),
     _p("Fragrance", "Prada", "Prada Paradoxe Eau de Parfum", "prada-paradoxe-edp", ["all"], "volumes", "50ml", "135.00", "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&w=800&q=80"),
     _p("Fragrance", "Diptyque", "Diptyque Philosykos Eau de Toilette", "diptyque-philosykos-edt", ["all"], "volumes", "100ml", "175.00", "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?auto=format&fit=crop&w=800&q=80"),
-    _p("Fragrance", "Carolina Herrera", "Carolina Herrera Good Girl", "carolina-herrera-good-girl", ["all"], "volumes", "80ml", "140.00", "https://images.unsplash.com/photo-1528720208104-3d9bd03cc9d4?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Tom Ford", "Tom Ford Soleil Blanc Eau de Parfum", "tom-ford-soleil-blanc", ["all"], "volumes", "50ml", "195.00", "/images/products/art-soleil-blanc-flacon.jpg"),
     _p("Fragrance", "Marc Jacobs", "Marc Jacobs Daisy Eau So Fresh", "marc-jacobs-daisy-eau-so-fresh", ["all"], "volumes", "75ml", "118.00", "https://images.unsplash.com/photo-1587017539504-67cfbddac569?auto=format&fit=crop&w=800&q=80"),
 
     # =========================================================================
@@ -1013,7 +1013,61 @@ RETIRED_DUPLICATE_SLUGS = {
     "solawave-radiant-renewal-wand",
     "moroccanoil-treatment-original",
     "kerastase-elixir-ultime",
+    "carolina-herrera-good-girl",
+    "garnier-hair-food-banana-mask",
+    "redken-acidic-bonding-concentrate",
+    "fino-premium-touch-hair-mask",
+    "innisfree-daily-uv-defense",
+    "coola-classic-face-sunscreen",
+    "eltamd-uv-clear-spf46",
+    "anessa-perfect-uv-milk",
 }
+
+DEPRECATED_PRODUCT_SKUS = {
+    "GC-GARNIER-HAIR-FOOD-BANANA-MASK-V01",
+    "GC-079-01",
+    "GC-FINO-PREMIUM-TOUCH-HAIR-MASK-V01",
+    "GC-058-01",
+    "GC-COOLA-CLASSIC-FACE-SUNSCREEN-V01",
+    "GC-ELTAMD-UV-CLEAR-SPF46-V01",
+    "GC-ANESSA-PERFECT-UV-MILK-V01",
+}
+
+DEPRECATED_PRODUCT_NAMES = {
+    "carolina herrera good girl",
+    "garnier fructis hair food banana mask",
+    "redken acidic bonding concentrate",
+    "fino premium touch hair mask",
+    "innisfree daily uv defense sunscreen",
+    "coola classic face sunscreen",
+    "eltamd uv clear broad-spectrum spf 46",
+    "anessa perfect uv sunscreen skincare milk",
+    "anessa perfect uv sunscreen skincare milk spf50+",
+}
+
+
+def purge_deprecated_products(db: Session) -> int:
+    """Permanently delete deprecated products and their variants, images, inventory, carts, and wishlists."""
+    candidates: list[Product] = []
+    seen_ids = set()
+
+    for p in db.query(Product).filter(Product.slug.in_(RETIRED_DUPLICATE_SLUGS)).all():
+        if p.id not in seen_ids:
+            seen_ids.add(p.id)
+            candidates.append(p)
+
+    for v in db.query(ProductVariant).filter(ProductVariant.sku.in_(DEPRECATED_PRODUCT_SKUS)).all():
+        if v.product and v.product.id not in seen_ids:
+            seen_ids.add(v.product.id)
+            candidates.append(v.product)
+
+    for p in db.query(Product).all():
+        if p.name and p.name.strip().lower() in DEPRECATED_PRODUCT_NAMES:
+            if p.id not in seen_ids:
+                seen_ids.add(p.id)
+                candidates.append(p)
+
+    return _delete_or_archive_products(db, candidates)
 
 
 def _delete_or_archive_products(db: Session, candidates: list[Product]) -> int:
@@ -1075,13 +1129,16 @@ def sync_catalog_120(
     if cat_map is None or brand_map is None:
         cat_map, brand_map = _ensure_categories_and_brands(db)
 
+    # 0. Unconditionally purge deprecated / rejected products from PostgreSQL
+    purged = purge_deprecated_products(db)
+
     # 1. Remove/archive any old demo/stale products not in PRODUCTS_120 (preserve non-demo admin products)
     stale_candidates = [
         p
         for p in db.query(Product).all()
-        if p.is_demo and p.slug not in SLUG_IMAGE_MAP
+        if (p.is_demo and p.slug not in SLUG_IMAGE_MAP) or p.slug in RETIRED_DUPLICATE_SLUGS
     ]
-    removed = _delete_or_archive_products(db, stale_candidates)
+    removed = _delete_or_archive_products(db, stale_candidates) + purged
 
     # 2. Seed any missing products from PRODUCTS_120
     all_blueprint_entries = list(enumerate(CATALOG_BLUEPRINT, start=1))
