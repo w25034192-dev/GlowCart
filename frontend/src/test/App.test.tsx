@@ -165,7 +165,8 @@ describe('GlowCart Frontend', () => {
     expect(screen.getByRole('link', { name: /SHOP NOW/i })).toHaveAttribute('href', '/catalog');
     expect(screen.getByText('Clean Ingredients')).toBeInTheDocument();
     expect(screen.getByText('Clinically Proven')).toBeInTheDocument();
-    expect(screen.getByText(/SHOP BY CATEGORY/i)).toBeInTheDocument();
+    expect(screen.getByText('SHOP BY CATEGORY')).toBeInTheDocument();
+    expect(screen.getByText('Dewy Serums & Barrier Creams')).toBeInTheDocument();
     expect(screen.getByText(/Up to 30% Off on Best Sellers/i)).toBeInTheDocument();
     expect(screen.getByText('BEST SELLERS')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /VIEW ALL/i })).toHaveAttribute('href', '/catalog');

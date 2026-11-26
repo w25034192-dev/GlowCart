@@ -68,42 +68,54 @@ const HERO_SLIDES = [
   },
 ];
 
-const CATEGORY_CIRCLES = [
+const CATEGORY_EDITORIAL_CARDS = [
   {
     label: 'SKINCARE',
+    subtitle: 'Dewy Serums & Barrier Creams',
     to: '/category/skincare',
-    image: '/images/products/art-minimalist-toner.jpg',
-    alt: 'Minimalist hydrating skincare toner bottle',
+    image:
+      'https://images.unsplash.com/photo-1767256046031-743d33937c4e?auto=format&fit=crop&w=900&q=85',
+    alt: 'Amber glass skincare serum dropper bottles arranged on warm stone',
   },
   {
     label: 'MAKEUP',
+    subtitle: 'Velvet Lips & Luminous Glow',
     to: '/category/makeup',
-    image: '/images/products/art-nude-lipstick.jpg',
-    alt: 'Satin nude-pink lipstick bullet',
+    image:
+      'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=85',
+    alt: 'Open eyeshadow palette, blush compact, lipstick, and brushes flatlay',
   },
   {
     label: 'HAIRCARE',
+    subtitle: 'Botanical Oils & Silk Repair',
     to: '/category/hair-care',
-    image: '/images/products/art-kerastase-magic-night-serum.jpg',
-    alt: 'Amber glass overnight hair serum bottle',
+    image:
+      'https://images.unsplash.com/photo-1669281393011-c335050cf0e9?auto=format&fit=crop&w=900&q=85',
+    alt: 'Amber glass hair oil dropper bottles on travertine stone',
   },
   {
     label: 'SUN CARE',
+    subtitle: 'Weightless SPF & UV Defense',
     to: '/category/sun-care',
-    image: '/images/products/art-sunscreen-tube.jpg',
-    alt: 'Minimalist daily sunscreen squeeze tube',
+    image:
+      'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=900&q=85',
+    alt: 'Curated sunlit flatlay of SPF skincare tubes and jars',
   },
   {
     label: 'FRAGRANCE',
+    subtitle: 'Sculptural Parisian Flacons',
     to: '/category/fragrance',
-    image: '/images/products/art-soleil-blanc-flacon.jpg',
-    alt: 'Luxury eau de parfum glass flacon',
+    image:
+      'https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?auto=format&fit=crop&w=900&q=85',
+    alt: 'Luxury crystal glass perfume flacon catching warm light',
   },
   {
     label: 'TOOLS & BRUSHES',
+    subtitle: 'Pro Brushes & Sculpting Stones',
     to: '/category/beauty-tools',
-    image: '/images/products/art-beautyblender-sponge.jpg',
-    alt: 'Pastel pink teardrop makeup blending sponge',
+    image:
+      'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=900&q=85',
+    alt: 'Rose-gold makeup brushes, compact, and beauty tools flatlay',
   },
 ];
 
@@ -364,33 +376,49 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Shop by Category (6-Column Circular Thumbnail Grid) */}
+      {/* 4. Shop by Category (6-Column Editorial Arch Portrait Cards) */}
       <section aria-labelledby="shop-by-category-heading" className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-        <h2
-          id="shop-by-category-heading"
-          className="text-center font-serif text-3xl font-bold tracking-wide text-plum sm:text-4xl"
-        >
-          SHOP BY CATEGORY
-        </h2>
+        <div className="text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-mauve-deep">
+            CURATED COLLECTIONS
+          </p>
+          <h2
+            id="shop-by-category-heading"
+            className="mt-1 font-serif text-3xl font-bold tracking-wide text-plum sm:text-4xl"
+          >
+            SHOP BY CATEGORY
+          </h2>
+        </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
-          {CATEGORY_CIRCLES.map((cat) => (
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-6">
+          {CATEGORY_EDITORIAL_CARDS.map((cat) => (
             <Link
               key={cat.label}
               to={cat.to}
-              className="group flex flex-col items-center gap-3 text-center focus-visible:ring-2 focus-visible:ring-ring rounded-2xl p-2"
+              className="group relative flex aspect-[3/4.3] flex-col justify-end overflow-hidden rounded-t-full rounded-b-2xl border border-border/70 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c59b27]/70 hover:shadow-[0_18px_36px_-10px_rgba(197,155,39,0.28)] focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <div className="aspect-square w-32 overflow-hidden rounded-full border-2 border-blush bg-card p-1 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-mauve-deep group-hover:shadow-md sm:w-36">
-                <img
-                  src={cat.image}
-                  alt={cat.alt}
-                  loading="lazy"
-                  className="h-full w-full rounded-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+              <img
+                src={cat.image}
+                alt={cat.alt}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-plum/95 via-plum/45 to-transparent transition-opacity duration-300 group-hover:from-plum"
+              />
+              <div className="relative z-10 flex flex-col items-center p-4 text-center">
+                <span className="font-serif text-lg font-bold tracking-wider text-white sm:text-xl">
+                  {cat.label}
+                </span>
+                <span className="mt-0.5 text-[11px] leading-snug text-blush/95">
+                  {cat.subtitle}
+                </span>
+                <span className="mt-3 inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur-md transition-all duration-200 group-hover:border-white group-hover:bg-white group-hover:text-plum">
+                  <span>Explore</span>
+                  <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
+                </span>
               </div>
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-plum transition-colors group-hover:text-mauve-deep">
-                {cat.label}
-              </span>
             </Link>
           ))}
         </div>
