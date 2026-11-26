@@ -490,7 +490,7 @@ def test_ensure_initial_data_and_generated_seed_survive_sku_collisions(db_sessio
         description="Already in DB before new blueprint items",
         skin_types=["all"],
         specifications={},
-        is_demo=True,
+        is_demo=False,
     )
     db_session.add(legacy_prod)
     db_session.flush()
@@ -626,7 +626,7 @@ def test_fenty_showcase_and_portrait_only_urls_replaced(db_session):
 
     assert (
         resolve_seed_image_url("Makeup", "Fenty Beauty Pro Filt'r", "fenty-pro-filtr-soft-matte-foundation")
-        == "/images/products/fenty-foundation-hand.jpg"
+        == "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80"
     )
 
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
@@ -650,7 +650,7 @@ def test_fenty_showcase_and_portrait_only_urls_replaced(db_session):
     repaired = repair_duplicate_product_images(db_session)
     assert repaired == 1
     updated = db_session.query(ProductImage).filter(ProductImage.product_id == fenty.id).one()
-    assert updated.image_url == "/images/products/fenty-foundation-hand.jpg"
+    assert updated.image_url == "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80"
 
 
 def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
@@ -707,24 +707,19 @@ def test_strict_item_type_image_matching_and_no_competing_logos(db_session):
 
     assert (
         resolve_seed_image_url("Makeup", "Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation")
-        == "/images/products/fenty-foundation-hand.jpg"
+        == "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80"
     )
     mac_url = resolve_seed_image_url("Makeup", "MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy")
-    assert mac_url in {
-        "/images/products/unbranded-lipstick.jpg",
-        "/images/products/luxury-lip-hand.jpg",
-        "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
-    }
-    ct_url = resolve_seed_image_url("Makeup", "Charlotte Tilbury Pillow Talk Matte Revolution Lipstick", "ct-pillow-talk-lipstick")
+    assert mac_url == "https://images.unsplash.com/photo-1635011340525-87de5b4f170e?auto=format&fit=crop&w=800&q=80"
+    ct_url = resolve_seed_image_url("Makeup", "Charlotte Tilbury Airbrush Flawless Setting Spray", "ct-airbrush-flawless-setting-spray")
     assert ct_url != clinique_url
 
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
     brand = next(iter(brand_map.values()))
     mismatches = [
-        ("Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation", eyeliner_url),
+        ("Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation", hair_woman_url),
         ("MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy", hair_woman_url),
-        ("Charlotte Tilbury Pillow Talk Matte Revolution Lipstick", "ct-pillow-talk-lipstick", clinique_url),
+        ("Charlotte Tilbury Airbrush Flawless Setting Spray", "ct-airbrush-flawless-setting-spray", clinique_url),
     ]
     for pname, pslug, bad_url in mismatches:
         p = Product(
@@ -761,21 +756,21 @@ def test_zero_duplicate_image_urls_across_full_catalog_and_lip_matching(db_sessi
     brush_flatlay_url = "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
 
     gloss_url = resolve_seed_image_url("Makeup", "Fenty Beauty Gloss Bomb Universal Lip Luminizer", "fenty-gloss-bomb-luminizer")
-    matte_ink_url = resolve_seed_image_url("Makeup", "Maybelline SuperStay Matte Ink", "maybelline-superstay-matte-ink")
+    matte_ink_url = resolve_seed_image_url("Makeup", "Maybelline SuperStay Matte Ink Liquid Lip", "maybelline-superstay-matte-ink")
     assert gloss_url not in (eyeliner_url, brush_flatlay_url)
     assert matte_ink_url not in (eyeliner_url, brush_flatlay_url)
 
     ensure_initial_data(db_session)
     all_images = db_session.query(ProductImage).all()
     all_urls = [img.image_url for img in all_images]
-    assert len(all_urls) == len(set(all_urls))
+    assert len(all_urls) == 100
+    assert len(set(all_urls)) == 100
 
-    # MAC Foundation and Maybelline Fit Me Foundation must not share the same image URL
-    mac_prod = db_session.query(Product).filter(Product.slug == "mac-studio-fix-fluid-spf15").one()
-    mayb_prod = db_session.query(Product).filter(Product.slug == "maybelline-fit-me-foundation").one()
-    mac_img = db_session.query(ProductImage).filter(ProductImage.product_id == mac_prod.id).one()
-    mayb_img = db_session.query(ProductImage).filter(ProductImage.product_id == mayb_prod.id).one()
-    assert mac_img.image_url != mayb_img.image_url
+    # Verify Beauty Tools has 10 distinct items with 10 unique images
+    beauty_tools = [p for p in db_session.query(Product).all() if p.category.slug == "beauty-tools"]
+    assert len(beauty_tools) == 10
+    tool_urls = [db_session.query(ProductImage).filter(ProductImage.product_id == p.id).one().image_url for p in beauty_tools]
+    assert len(set(tool_urls)) == 10
 
 
 def test_all_seeded_products_have_unique_image_urls_and_type_groups(db_session):
@@ -803,7 +798,52 @@ def test_all_seeded_products_have_unique_image_urls_and_type_groups(db_session):
     products = db_session.query(Product).all()
     images = db_session.query(ProductImage).filter(ProductImage.is_primary.is_(True)).all()
     unique_urls = {img.image_url for img in images}
+    assert len(products) == 100
     assert len(unique_urls) == len(products)
+
+
+def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session):
+    """Verify PRODUCTS_100 has 100 unique products & Unsplash URLs, and sync_catalog_100 force-refreshes stale DB rows."""
+    from app.db.seed import PRODUCTS_100, _ensure_categories_and_brands, ensure_initial_data
+    from app.models import Product, ProductImage
+
+    assert len(PRODUCTS_100) == 100
+    assert len({p["image_url"] for p in PRODUCTS_100}) == 100
+    assert len({p["name"] for p in PRODUCTS_100}) == 100
+    assert len({p["slug"] for p in PRODUCTS_100}) == 100
+    for p in PRODUCTS_100:
+        assert p["image_url"].startswith("https://")
+        assert "unsplash.com/" in p["image_url"]
+
+    # Seed initial 100 products, then corrupt one image and insert a stale duplicate product
+    ensure_initial_data(db_session)
+    cat_map, brand_map = _ensure_categories_and_brands(db_session)
+    brand = next(iter(brand_map.values()))
+
+    mac_brush = db_session.query(Product).filter(Product.slug == "mac-217s-brush").one()
+    mac_img = db_session.query(ProductImage).filter(ProductImage.product_id == mac_brush.id).one()
+    mac_img.image_url = "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
+
+    stale = Product(
+        category_id=cat_map["Beauty Tools"].id,
+        brand_id=brand.id,
+        name="NYX Marshmellow Blending Sponge",
+        slug="nyx-blending-sponge",
+        description="Old duplicate sponge",
+        skin_types=["all"],
+        specifications={},
+        is_demo=True,
+    )
+    db_session.add(stale)
+    db_session.commit()
+
+    # Startup sync must delete the stale duplicate and force-refresh MAC brush back to its 1-to-1 URL
+    changed = ensure_initial_data(db_session)
+    assert changed is True
+    assert db_session.query(Product).filter(Product.slug == "nyx-blending-sponge").first() is None
+    refreshed_img = db_session.query(ProductImage).filter(ProductImage.product_id == mac_brush.id).one()
+    expected_mac_url = next(p["image_url"] for p in PRODUCTS_100 if p["slug"] == "mac-217s-brush")
+    assert refreshed_img.image_url == expected_mac_url
 
 
 
