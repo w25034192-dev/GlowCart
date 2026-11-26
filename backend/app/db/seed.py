@@ -347,6 +347,7 @@ VERIFIED_COSMETIC_IMAGE_URLS = [
     "/images/products/unbranded-cream-jar.jpg",
     "/images/products/unbranded-toner.jpg",
     "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
@@ -461,6 +462,7 @@ ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
     (
         ("eyeshadow", "palette"),
         [
+            "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
             "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
         ],
     ),
@@ -530,6 +532,7 @@ ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
     (
         ("set", "kit", "bundle"),
         [
+            "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
             "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
             "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
         ],
@@ -543,20 +546,18 @@ def _build_category_pool(priority_indices: list[int]) -> list[str]:
     for url in VERIFIED_COSMETIC_IMAGE_URLS:
         if url not in ordered:
             ordered.append(url)
-        if len(ordered) >= 18:
-            break
     return ordered
 
 
 CATEGORY_IMAGE_POOLS: dict[str, list[str]] = {
-    "Makeup": _build_category_pool([0, 1, 2, 4, 5, 6, 10, 11, 12, 13, 14, 15]),
-    "Skincare": _build_category_pool([3, 8, 9, 13, 16, 17, 18, 7]),
-    "Sun Care": _build_category_pool([7, 8, 9, 13, 16, 17, 18]),
-    "Hair Care": _build_category_pool([18, 19, 20, 9, 13, 16]),
-    "Body Care": _build_category_pool([8, 16, 17, 18, 13, 9]),
-    "Fragrance": _build_category_pool([21, 1, 4, 5, 10, 11]),
-    "Beauty Tools": _build_category_pool([10, 14, 15, 2, 5, 6]),
-    "Makeup Sets": _build_category_pool([10, 14, 15, 0, 1, 2, 4, 5]),
+    "Makeup": _build_category_pool([0, 1, 2, 3, 5, 6, 7, 11, 12, 13, 14, 15, 16]),
+    "Skincare": _build_category_pool([4, 9, 10, 14, 17, 18, 19, 8]),
+    "Sun Care": _build_category_pool([8, 9, 10, 14, 17, 18, 19]),
+    "Hair Care": _build_category_pool([19, 20, 21, 10, 14, 17]),
+    "Body Care": _build_category_pool([9, 17, 18, 19, 14, 10]),
+    "Fragrance": _build_category_pool([23, 2, 5, 6, 11, 12]),
+    "Beauty Tools": _build_category_pool([11, 15, 16, 3, 6, 7]),
+    "Makeup Sets": _build_category_pool([11, 12, 15, 16, 0, 1, 2, 3, 5, 6]),
 }
 
 
@@ -770,6 +771,7 @@ def seed_demo_data(db: Session) -> None:
 
     cat_map, brand_map = _ensure_categories_and_brands(db)
     _seed_blueprint_entries(db, list(enumerate(CATALOG_BLUEPRINT, start=1)), cat_map, brand_map)
+    repair_duplicate_product_images(db)
 
     # Demo Promotion & Coupon
     now = datetime.now(timezone.utc)
