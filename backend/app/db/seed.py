@@ -123,6 +123,9 @@ BRANDS_DATA = [
     ("Maison Margiela", "maison-margiela", "France", True),
     ("Gucci", "gucci", "Italy", True),
     ("Calvin Klein", "calvin-klein", "USA", True),
+    ("Oribe", "oribe", "USA", True),
+    ("Davines", "davines", "Italy", True),
+    ("Real Techniques", "real-techniques", "USA", True),
 ]
 
 def _p(
@@ -221,10 +224,10 @@ PRODUCTS_100: list[dict] = [
 
     # --- Hair Care (10 distinct viral product shots, zero hair strands) ---
     _p("Hair Care", "Gisou", "Gisou Honey Infused Hair Oil", "gisou-honey-infused-hair-oil", ["all", "dry"], "volumes", "50ml", "46.00", "https://images.unsplash.com/photo-1669281393011-c335050cf0e9?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Kérastase", "Kérastase Elixir Ultime L'Huile Originale", "kerastase-elixir-ultime", ["all", "dry"], "volumes", "100ml", "58.00", "https://plus.unsplash.com/premium_photo-1706800175868-1ef13f9016af?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Oribe", "Oribe Gold Lust Nourishing Hair Oil", "oribe-gold-lust-hair-oil", ["all", "dry"], "volumes", "100ml", "57.00", "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Olaplex", "Olaplex No. 7 Bonding Oil", "olaplex-no-7-bonding-oil", ["all"], "volumes", "30ml", "30.00", "https://images.unsplash.com/photo-1643123158489-634259c983b3?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Ouai", "Ouai Leave-In Conditioner", "ouai-leave-in-conditioner", ["all", "dry"], "volumes", "140ml", "30.00", "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Moroccanoil", "Moroccanoil Treatment Original", "moroccanoil-treatment-original", ["all", "dry"], "volumes", "100ml", "48.00", "https://plus.unsplash.com/premium_photo-1679106764781-1387196b5945?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Davines", "Davines OI All In One Hair Milk", "davines-oi-all-in-one-milk", ["all", "dry"], "volumes", "135ml", "42.00", "https://images.unsplash.com/photo-1597317628840-d3472f7aa7fc?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Amika", "Amika Soulfood Nourishing Hair Mask", "amika-soulfood-mask", ["dry", "all"], "volumes", "250ml", "34.00", "https://images.unsplash.com/photo-1758544518111-53274094598e?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Briogeo", "Briogeo Don't Despair, Repair! Deep Conditioning Mask", "briogeo-dont-despair-repair-mask", ["dry", "damaged"], "volumes", "237ml", "39.00", "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "K18", "K18 Leave-In Molecular Repair Hair Mask", "k18-leave-in-molecular-mask", ["all", "damaged"], "volumes", "50ml", "75.00", "https://images.unsplash.com/photo-1643123158251-3a66f53a4635?auto=format&fit=crop&w=800&q=80"),
@@ -255,7 +258,7 @@ PRODUCTS_100: list[dict] = [
     _p("Beauty Tools", "Dyson", "Dyson Airwrap Multi-Styler Complete Long", "dyson-airwrap-multi-styler", ["all"], "sizes", "Set", "599.00", "https://images.unsplash.com/photo-1712641966810-611ff1503c6d?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Dyson", "Dyson Supersonic Hair Dryer", "dyson-supersonic-hair-dryer", ["all"], "sizes", "Device", "429.00", "https://images.unsplash.com/photo-1727364438136-6edc10ef0a52?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Medicube", "Medicube Age-R Booster Pro", "medicube-age-r-booster-pro", ["all", "mature"], "sizes", "Device", "280.00", "https://plus.unsplash.com/premium_photo-1734469071552-3ac334be70f7?auto=format&fit=crop&w=800&q=80"),
-    _p("Beauty Tools", "Solawave", "Solawave 4-in-1 Radiant Renewal Skincare Wand", "solawave-radiant-renewal-wand", ["all"], "sizes", "Wand", "169.00", "https://plus.unsplash.com/premium_photo-1661407350987-9e9319ac11e6?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Real Techniques", "Real Techniques Everyday Essentials Brush Set", "real-techniques-brush-set", ["all"], "sizes", "5-pc Set", "22.00", "https://images.unsplash.com/photo-1748899440472-d044c12e8316?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Hourglass", "Hourglass Vanish Seamless Finish Foundation Brush", "hourglass-vanish-foundation-brush", ["all"], "sizes", "1 pc", "48.00", "https://images.unsplash.com/photo-1553380155-da0ccd2e55e0?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Shu Uemura", "Shu Uemura Eyelash Curler", "shu-uemura-eyelash-curler", ["all"], "sizes", "1 pc", "25.00", "/images/products/unbranded-mascara.jpg"),
     _p("Beauty Tools", "Beautyblender", "Beautyblender Original Makeup Sponge", "beautyblender-original-sponge", ["all"], "sizes", "1 pc", "20.00", "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80"),
@@ -929,6 +932,9 @@ RETIRED_DUPLICATE_SLUGS = {
     "olaplex-no-4-shampoo",
     "olaplex-no-5-conditioner",
     "olaplex-no8-moisture-mask",
+    "solawave-radiant-renewal-wand",
+    "moroccanoil-treatment-original",
+    "kerastase-elixir-ultime",
 }
 
 
