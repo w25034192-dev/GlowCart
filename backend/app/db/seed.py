@@ -1,9 +1,11 @@
+from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 import json
 from pathlib import Path
 import random
 import re
+import zlib
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -324,93 +326,78 @@ def _ensure_categories_and_brands(db: Session) -> tuple[dict[str, Category], dic
     return cat_map, brand_map
 
 
-REAL_COSMETIC_IMAGES = {
-    "shwe-pyi-nann-thanakha-pudding": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
-    "shwe-pyi-nann-lime-thanakha": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
-    "shwe-pyi-nann-sun-shield": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
-    "shwe-pyi-nann-body-lotion": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
-    "bella-matte-velvet-lip-crayon": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
-    "bella-glow-cushion-foundation": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
-    "bella-ultra-fine-hd-powder": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-    "bell-silk-matte-compact-powder": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-    "tayaw-kinpun-herbal-shampoo": "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
-    "royal-inle-jasmine-mist": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
-    "bell-flawless-beauty-sponge": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-    "bella-yangon-glam-set": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-    "laneige-lip-sleeping-mask": "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
-    "laneige-water-bank-cream": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-    "innisfree-green-tea-serum": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-    "innisfree-daily-uv-defense": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
-    "nars-radiant-creamy-concealer": "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-    "nars-orgasm-powder-blush": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
-    "ysl-rouge-pur-couture-slim": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
-    "ysl-libre-eau-de-parfum": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
-}
+VERIFIED_COSMETIC_IMAGE_URLS = [
+    "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+]
 
-CATEGORY_REAL_IMAGES = {
-    "Makeup": {
-        "foundation": "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-        "concealer": "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-        "lip": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
-        "gloss": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
-        "blush": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
-        "powder": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-        "mascara": "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
-    },
-    "Skincare": {
-        "serum": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-        "ampoule": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-        "cream": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-        "baume": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-        "toner": "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
-        "essence": "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
-        "cleanser": "https://images.unsplash.com/photo-1556228722-d0b5eb1c11d5?auto=format&fit=crop&w=800&q=80",
-        "thanakha": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-    },
-    "Sun Care": {
-        "stick": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1567928815116-3e33b006c6e7?auto=format&fit=crop&w=800&q=80",
-    },
-    "Hair Care": {
-        "oil": "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80",
-        "shampoo": "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
-        "conditioner": "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80",
-    },
-    "Body Care": {
-        "lotion": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
-        "butter": "https://images.unsplash.com/photo-1556228722-d0b5eb1c11d5?auto=format&fit=crop&w=800&q=80",
-        "wash": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
-    },
-    "Fragrance": {
-        "mist": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
-    },
-    "Beauty Tools": {
-        "brush": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
-        "sponge": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
-    },
-    "Makeup Sets": {
-        "kit": "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
-        "default": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-    },
+BROKEN_IMAGE_URLS = {
+    "https://images.unsplash.com/photo-1556228722-d0b5eb1c11d5?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1567928815116-3e33b006c6e7?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=600&q=80",
 }
 
 
-def resolve_seed_image_url(cat_name: str, prod_name: str, slug: str) -> str:
-    """Return high-resolution realistic cosmetic photograph URL matching the product item."""
-    if slug in REAL_COSMETIC_IMAGES:
-        return REAL_COSMETIC_IMAGES[slug]
-    cat_rules = CATEGORY_REAL_IMAGES.get(cat_name, {})
-    lower_name = prod_name.lower()
-    for keyword, url in cat_rules.items():
-        if keyword != "default" and keyword in lower_name:
-            return url
-    return cat_rules.get("default", "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80")
+def _build_category_pool(priority_indices: list[int]) -> list[str]:
+    """Build an ordered 18-item unique URL pool starting with category-specific indices."""
+    ordered = [VERIFIED_COSMETIC_IMAGE_URLS[i] for i in priority_indices]
+    for url in VERIFIED_COSMETIC_IMAGE_URLS:
+        if url not in ordered:
+            ordered.append(url)
+        if len(ordered) >= 18:
+            break
+    return ordered
+
+
+CATEGORY_IMAGE_POOLS: dict[str, list[str]] = {
+    "Makeup": _build_category_pool([0, 1, 2, 3, 4, 5, 6, 7, 13, 24, 25, 26]),
+    "Skincare": _build_category_pool([8, 9, 10, 11, 12, 13, 14, 15, 19, 4, 5]),
+    "Sun Care": _build_category_pool([15, 10, 14, 9, 8, 11, 12, 19, 16, 17]),
+    "Hair Care": _build_category_pool([16, 17, 18, 14, 11, 10, 19, 12, 8, 9]),
+    "Body Care": _build_category_pool([19, 9, 10, 11, 12, 14, 15, 16, 17, 18]),
+    "Fragrance": _build_category_pool([20, 21, 22, 23, 0, 1, 2, 5, 6, 7]),
+    "Beauty Tools": _build_category_pool([5, 6, 7, 1, 2, 3, 4, 0, 13, 24]),
+    "Makeup Sets": _build_category_pool([6, 5, 1, 0, 2, 3, 4, 7, 20, 21]),
+}
+
+
+def resolve_seed_image_url(
+    cat_name: str,
+    prod_name: str,
+    slug: str,
+    index: int | None = None,
+) -> str:
+    """Return a diverse, high-resolution verified cosmetic photograph URL for the product."""
+    pool = CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
+    selector = index if index is not None else zlib.crc32(slug.encode("utf-8"))
+    return pool[selector % len(pool)]
 
 
 def _resolve_unique_sku(existing_skus: set[str], preferred_sku: str, slug: str, suffix: str = "") -> str:
@@ -502,7 +489,7 @@ def _seed_blueprint_entries(
         db.add(
             ProductImage(
                 product_id=product.id,
-                image_url=resolve_seed_image_url(cat_name, prod_name, slug),
+                image_url=resolve_seed_image_url(cat_name, prod_name, slug, index=idx),
                 alt_text=prod_name,
                 is_primary=True,
                 sort_order=0,
@@ -631,30 +618,82 @@ def seed_demo_data(db: Session) -> None:
     db.commit()
 
 
+def repair_duplicate_product_images(db: Session) -> int:
+    """Repair broken, placeholder, or duplicate ProductImage URLs so products display diverse photos."""
+    images = db.query(ProductImage).order_by(ProductImage.product_id, ProductImage.sort_order).all()
+    if not images:
+        return 0
+
+    prod_map = {p.id: p for p in db.query(Product).all()}
+    used_counts: Counter[str] = Counter()
+    seen_once: set[str] = set()
+    prev_url: str | None = None
+    repaired = 0
+
+    def _is_invalid(url: str | None) -> bool:
+        if not url:
+            return True
+        low = url.lower()
+        return (
+            url in BROKEN_IMAGE_URLS
+            or low.endswith(".svg")
+            or "placeholder" in low
+            or "placehold.co" in low
+        )
+
+    # First pass: count valid URLs so we know which are duplicated
+    for img in images:
+        if not _is_invalid(img.image_url):
+            used_counts[img.image_url] += 1
+
+    for idx, img in enumerate(images, start=1):
+        prod = prod_map.get(img.product_id)
+        cat_name = prod.category.name if (prod and prod.category) else "Skincare"
+        pool = CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
+
+        needs_repair = _is_invalid(img.image_url) or img.image_url in seen_once
+        if needs_repair:
+            # Prefer a URL not yet used at all, otherwise pick the least-used URL in pool != prev_url
+            candidates = [u for u in pool if u not in seen_once and u != prev_url]
+            if not candidates:
+                candidates = sorted(
+                    [u for u in pool if u != prev_url] or pool,
+                    key=lambda u: (used_counts[u], pool.index(u)),
+                )
+            new_url = candidates[idx % len(candidates)] if len(candidates) > 1 and candidates[0] not in seen_once else candidates[0]
+            if img.image_url and not _is_invalid(img.image_url):
+                used_counts[img.image_url] = max(0, used_counts[img.image_url] - 1)
+            img.image_url = new_url
+            used_counts[new_url] += 1
+            seen_once.add(new_url)
+            prev_url = new_url
+            repaired += 1
+        else:
+            seen_once.add(img.image_url)
+            prev_url = img.image_url
+
+    # Also ensure every product has at least one primary ProductImage
+    existing_prod_ids = {img.product_id for img in images}
+    for idx, prod in enumerate(prod_map.values(), start=1):
+        if prod.id not in existing_prod_ids:
+            cat_name = prod.category.name if prod.category else "Skincare"
+            new_url = resolve_seed_image_url(cat_name, prod.name, prod.slug, index=idx)
+            db.add(ProductImage(product_id=prod.id, image_url=new_url, is_primary=True, sort_order=0))
+            repaired += 1
+
+    if repaired > 0:
+        db.commit()
+    return repaired
+
+
 def ensure_initial_data(db: Session) -> bool:
-    """Ensure default admin exists and ensure all canonical categories, brands, and catalog items exist with real images."""
+    """Ensure default admin exists and ensure all canonical categories, brands, and catalog items exist with diverse real images."""
     ensure_default_admin_and_roles(db)
     cat_map, brand_map = _ensure_categories_and_brands(db)
     all_blueprint_entries = list(enumerate(CATALOG_BLUEPRINT, start=1))
     created = _seed_blueprint_entries(db, all_blueprint_entries, cat_map, brand_map)
 
-    # Upgrade any existing product images pointing to generic SVG or placeholders to real photographs
-    updated_images = 0
-    for img in db.query(ProductImage).all():
-        if not img.image_url or img.image_url.endswith(".svg") or "placeholder" in img.image_url.lower() or "placehold.co" in img.image_url.lower():
-            prod = db.query(Product).filter(Product.id == img.product_id).first()
-            if prod and prod.category:
-                img.image_url = resolve_seed_image_url(prod.category.name, prod.name, prod.slug)
-                updated_images += 1
-
-    # Ensure all products have at least one primary ProductImage
-    for prod in db.query(Product).all():
-        has_img = db.query(ProductImage).filter(ProductImage.product_id == prod.id).first()
-        if not has_img and prod.category:
-            real_url = resolve_seed_image_url(prod.category.name, prod.name, prod.slug)
-            db.add(ProductImage(product_id=prod.id, image_url=real_url, is_primary=True, sort_order=0))
-            updated_images += 1
-
+    updated_images = repair_duplicate_product_images(db)
     topped_up = ensure_minimum_product_count(db, target_count=100)
 
     if created > 0 or updated_images > 0 or topped_up > 0:
@@ -678,12 +717,7 @@ CATEGORY_CATALOG = {
             "Dewy Setting Spray",
             "Shimmer Eyeshadow Palette",
         ],
-        "images": [
-            "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=600&q=80",
-        ],
+        "images": CATEGORY_IMAGE_POOLS["Makeup"],
     },
     "Skincare": {
         "items": [
@@ -696,11 +730,7 @@ CATEGORY_CATALOG = {
             "Gentle Foaming Facial Cleanser",
             "Ceramide Eye Contour Gel",
         ],
-        "images": [
-            "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=600&q=80",
-        ],
+        "images": CATEGORY_IMAGE_POOLS["Skincare"],
     },
     "Sun Care": {
         "items": [
@@ -710,10 +740,7 @@ CATEGORY_CATALOG = {
             "Matte Mineral Sun Stick",
             "Soothing After-Sun Cooling Mist",
         ],
-        "images": [
-            "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=600&q=80",
-        ],
+        "images": CATEGORY_IMAGE_POOLS["Sun Care"],
     },
     "Hair Care": {
         "items": [
@@ -723,10 +750,7 @@ CATEGORY_CATALOG = {
             "Heat Protectant Styling Mist",
             "Scalp Revitalizing Tonic",
         ],
-        "images": [
-            "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=600&q=80",
-        ],
+        "images": CATEGORY_IMAGE_POOLS["Hair Care"],
     },
     "Fragrance": {
         "items": [
@@ -735,10 +759,7 @@ CATEGORY_CATALOG = {
             "Vanilla Amber Hair & Body Mist",
             "White Peony Botanical Perfume",
         ],
-        "images": [
-            "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=600&q=80",
-        ],
+        "images": CATEGORY_IMAGE_POOLS["Fragrance"],
     },
 }
 
@@ -755,9 +776,10 @@ def generate_single_product(index: int | None = None, category: str | None = Non
         else random.choice(list(CATEGORY_CATALOG.keys()))
     )
     product_base_name = random.choice(CATEGORY_CATALOG[category_name]["items"])
-    image_url = random.choice(CATEGORY_CATALOG[category_name]["images"])
     brand = random.choice(BRANDS)
     name = f"{product_base_name} #{index}" if index is not None else product_base_name
+    slug_hint = f"{brand}-{name}".lower()
+    image_url = resolve_seed_image_url(category_name, name, slug_hint, index=index)
     price = round(random.uniform(18.0, 68.0), 2)
     stock = random.randint(20, 120)
     shade_hex = random.choice(SHADE_HEXES)
@@ -876,8 +898,8 @@ def seed_generated_products(db: Session, products: list[dict] | None = None) -> 
             db.add(variant)
             db.flush()
 
-            # Primary Real Image (custom image_url or resolved unsplash)
-            real_url = item.get("image_url") or resolve_seed_image_url(cat.name, item["name"], slug)
+            # Primary Real Image (custom image_url or diverse resolved unsplash)
+            real_url = item.get("image_url") or resolve_seed_image_url(cat.name, item["name"], slug, index=idx)
             db.add(
                 ProductImage(
                     product_id=product.id,

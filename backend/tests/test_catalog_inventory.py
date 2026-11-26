@@ -549,6 +549,55 @@ def test_ensure_minimum_product_count_tops_up_from_70_to_100(db_session):
     assert db_session.query(Product).count() == 100
 
 
+def test_repair_duplicate_product_images_replaces_repeated_fallback_urls(db_session):
+    """Startup repair check replaces repeated/broken fallback URLs with diverse category pool URLs."""
+    from app.db.seed import (
+        CATEGORY_IMAGE_POOLS,
+        _ensure_categories_and_brands,
+        repair_duplicate_product_images,
+        resolve_seed_image_url,
+    )
+    from app.models import Product, ProductImage
+
+    # Each primary category pool must have at least 15 unique verified URLs
+    for cat_name in ("Makeup", "Skincare", "Sun Care", "Hair Care", "Fragrance", "Body Care", "Beauty Tools"):
+        assert len(set(CATEGORY_IMAGE_POOLS[cat_name])) >= 15
+
+    # Adjacent products in the same category should resolve to distinct image URLs
+    resolved_urls = [
+        resolve_seed_image_url("Skincare", f"Skincare Serum {i}", f"skincare-serum-{i}", index=i)
+        for i in range(1, 16)
+    ]
+    assert len(set(resolved_urls)) == 15
+
+    cat_map, brand_map = _ensure_categories_and_brands(db_session)
+    brand = next(iter(brand_map.values()))
+    repeated_url = "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80"
+
+    for i in range(1, 6):
+        prod = Product(
+            category_id=cat_map["Skincare"].id,
+            brand_id=brand.id,
+            name=f"Repeated Serum {i}",
+            slug=f"repeated-serum-{i}",
+            description="Test product",
+            skin_types=["all"],
+            specifications={},
+            is_demo=True,
+        )
+        db_session.add(prod)
+        db_session.flush()
+        db_session.add(ProductImage(product_id=prod.id, image_url=repeated_url, is_primary=True, sort_order=0))
+    db_session.commit()
+
+    repaired = repair_duplicate_product_images(db_session)
+    assert repaired >= 4
+
+    final_urls = [img.image_url for img in db_session.query(ProductImage).all()]
+    assert len(set(final_urls)) == 5
+
+
+
 
 
 
