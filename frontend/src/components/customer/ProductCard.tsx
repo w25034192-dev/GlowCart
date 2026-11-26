@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Eye } from 'lucide-react';
 import { StarRating } from '@/components/common/UI';
+import { QuickViewModal } from '@/components/customer/QuickViewModal';
 import { cartApi, catalogApi } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useToastStore } from '@/store/toastStore';
 import { getRealFallbackImage, resolveMediaUrl } from '@/utils/media';
 import type { ProductSummary } from '@/types';
 
@@ -20,11 +23,13 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => Boolean(s.user));
   const setCart = useCartStore((s) => s.setCart);
+  const showBagToast = useToastStore((s) => s.showBagToast);
 
   const [wishlisted, setWishlisted] = useState(false);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
   const [selectedSwatchIdx, setSelectedSwatchIdx] = useState(0);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
 
   const hasDiscount =
     product.original_price &&
@@ -75,6 +80,12 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
       const updatedCart = await cartApi.addItem(firstAvailable.id, 1);
       setCart(updatedCart);
       setAdded(true);
+      showBagToast({
+        name: product.name,
+        brand: product.brand_name,
+        imageUrl: product.primary_image_url,
+        price: firstAvailable.price ?? product.min_price,
+      });
       setTimeout(() => setAdded(false), 1800);
     } catch {
       navigate(`/products/${product.id}`);
@@ -126,29 +137,44 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
           )}
         </div>
 
-        {/* Floating Wishlist Heart Button (44x44px accessible touch target) */}
-        <button
-          type="button"
-          onClick={handleToggleWishlist}
-          aria-label={wishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-          className="absolute right-2.5 top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-card/90 text-foreground shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className={`h-5 w-5 transition-colors duration-200 ${
-              wishlisted ? 'fill-rose-600 text-rose-600' : 'fill-none text-foreground/80'
-            }`}
-            stroke="currentColor"
-            strokeWidth={1.8}
-            aria-hidden="true"
+        {/* Floating Wishlist & Quick View Buttons (44x44px accessible touch targets) */}
+        <div className="absolute right-2.5 top-2.5 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            aria-label={wishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card/90 text-foreground shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-            />
-          </svg>
-        </button>
+            <svg
+              viewBox="0 0 24 24"
+              className={`h-5 w-5 transition-colors duration-200 ${
+                wishlisted ? 'fill-rose-600 text-rose-600' : 'fill-none text-foreground/80'
+              }`}
+              stroke="currentColor"
+              strokeWidth={1.8}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setQuickViewOpen(true);
+            }}
+            aria-label={`Quick view ${product.name}`}
+            title="Quick View"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card/90 text-foreground opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-card focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
+          >
+            <Eye className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
@@ -221,6 +247,11 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
           </button>
         </div>
       </div>
+      <QuickViewModal
+        product={product}
+        isOpen={quickViewOpen}
+        onClose={() => setQuickViewOpen(false)}
+      />
     </article>
   );
 };

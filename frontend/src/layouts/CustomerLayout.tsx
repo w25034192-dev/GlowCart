@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { AtelierBagToast } from '@/components/customer/AtelierBagToast';
 
 export const CustomerLayout: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -482,6 +483,7 @@ export const CustomerLayout: React.FC = () => {
           © {new Date().getFullYear()} GlowCart Atelier. All rights reserved. Built with React, TypeScript, FastAPI &amp; PostgreSQL.
         </div>
       </footer>
+      <AtelierBagToast />
     </div>
   );
 };

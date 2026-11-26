@@ -1,10 +1,73 @@
 import React, { useDeferredValue, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Sparkles, X } from 'lucide-react';
 import { catalogApi } from '@/services/api';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { Button, Card } from '@/components/common/UI';
 import { API_BASE_URL } from '@/utils/apiConfig';
+
+const CATEGORY_EDITORIAL: Record<
+  string,
+  { eyebrow: string; title: string; subtitle: string; gradient: string }
+> = {
+  'sun-care': {
+    eyebrow: 'Daily UV Defense',
+    title: 'Sun Care',
+    subtitle:
+      'Weightless Korean, Japanese & dermatologist-loved SPF formulas with zero white cast.',
+    gradient: 'from-amber-50/90 via-card to-blush/30',
+  },
+  skincare: {
+    eyebrow: 'Barrier & Glass Skin Rituals',
+    title: 'Skincare',
+    subtitle:
+      'Clinically proven actives, snail mucin essences, and ceramide-rich moisturizers.',
+    gradient: 'from-emerald-50/70 via-card to-beige/60',
+  },
+  'hair-care': {
+    eyebrow: 'Salon-Grade Gloss & Repair',
+    title: 'Hair Care',
+    subtitle:
+      'Honey-infused oils, molecular bond-building masks, and leave-in treatments.',
+    gradient: 'from-amber-50/70 via-card to-beige/70',
+  },
+  fragrance: {
+    eyebrow: 'Haute Parfumerie & Mists',
+    title: 'Fragrance',
+    subtitle:
+      'Iconic niche eau de parfum flacons, warm gourmand mists, and signature florals.',
+    gradient: 'from-rose-50/80 via-card to-blush/40',
+  },
+  'beauty-tools': {
+    eyebrow: 'Precision Devices & Brushes',
+    title: 'Tools & Brushes',
+    subtitle:
+      'Pro-grade multi-stylers, microcurrent wands, silk pillowcases, and sculpting stones.',
+    gradient: 'from-slate-100/80 via-card to-beige/60',
+  },
+  makeup: {
+    eyebrow: 'Runway Color & Complexion',
+    title: 'Makeup',
+    subtitle:
+      'Viral liquid blushes, blurring setting sprays, lip oils, and velvet matte icons.',
+    gradient: 'from-blush/50 via-card to-rose-50/60',
+  },
+  'body-care': {
+    eyebrow: 'Silk-Smooth Body Rituals',
+    title: 'Body Care',
+    subtitle:
+      'Whipped body butters, smoothing AHA washes, and nourishing botanical oils.',
+    gradient: 'from-beige/80 via-card to-blush/30',
+  },
+  'makeup-sets': {
+    eyebrow: 'Curated Gift Editions',
+    title: 'Makeup & Skincare Sets',
+    subtitle:
+      'Limited-edition discovery kits, lip vaults, and travel-ready beauty rituals.',
+    gradient: 'from-blush/40 via-card to-amber-50/60',
+  },
+};
 
 export const CatalogPage: React.FC = () => {
   const { categorySlug, brandSlug } = useParams();
@@ -274,41 +337,177 @@ export const CatalogPage: React.FC = () => {
       </aside>
 
       <section className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl font-bold capitalize">
-              {activeCategory?.name ||
-                activeBrand?.name ||
-                categorySlug?.replace(/-/g, ' ') ||
-                brandSlug?.replace(/-/g, ' ') ||
-                'Cosmetic Catalog'}
-            </h1>
-            {!isError && (
-              <p className="text-sm text-muted-fg">
-                {isLoading ? 'Loading products...' : `${data?.total ?? 0} products available`}
-              </p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="sort-select" className="mr-2 text-sm text-muted-fg">
-              Sort:
-            </label>
-            <select
-              id="sort-select"
-              value={sort}
-              onChange={(e) => {
-                setSort(e.target.value);
-                setPage(1);
-              }}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
+        {/* Editorial Category Header Banner */}
+        {(() => {
+          const editorial = activeCategorySlug
+            ? CATEGORY_EDITORIAL[activeCategorySlug]
+            : undefined;
+          const heading =
+            editorial?.title ||
+            activeCategory?.name ||
+            activeBrand?.name ||
+            categorySlug?.replace(/-/g, ' ') ||
+            brandSlug?.replace(/-/g, ' ') ||
+            'Cosmetic Catalog';
+          const eyebrow = editorial?.eyebrow || (activeBrand ? 'Brand Atelier' : 'Curated Collection');
+          const subtitle =
+            editorial?.subtitle ||
+            activeCategory?.description ||
+            (activeBrand
+              ? `Explore authentic best-sellers from ${activeBrand.name}.`
+              : 'Authentic luxury makeup, barrier skincare, UV defense, and salon hair rituals.');
+          const gradient = editorial?.gradient || 'from-beige/60 via-card to-blush/30';
+
+          return (
+            <div
+              className={`rounded-3xl border border-border/80 bg-gradient-to-br ${gradient} p-6 shadow-sm sm:p-8`}
             >
-              <option value="newest">Newest</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="rating">Top Rated</option>
-            </select>
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div className="max-w-2xl space-y-2">
+                  <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-primary">
+                    <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                    {eyebrow}
+                  </p>
+                  <h1 className="font-serif text-3xl font-bold capitalize text-foreground sm:text-4xl">
+                    {heading}
+                  </h1>
+                  <p className="text-sm text-muted-fg">{subtitle}</p>
+                  {!isError && (
+                    <p className="pt-1 font-mono text-xs font-medium text-foreground/80">
+                      {isLoading ? 'Loading products...' : `${data?.total ?? 0} products available`}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="sort-select" className="mr-2 text-sm text-muted-fg">
+                    Sort:
+                  </label>
+                  <select
+                    id="sort-select"
+                    value={sort}
+                    onChange={(e) => {
+                      setSort(e.target.value);
+                      setPage(1);
+                    }}
+                    className="min-h-[44px] rounded-xl border border-border bg-card px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <option value="newest">Newest</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="rating">Top Rated</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Interactive Removable Active Filter Chips */}
+        {hasExtraFilters && (
+          <div className="flex flex-wrap items-center gap-2" aria-label="Active filters">
+            {q.trim() && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQ('');
+                  setPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>Keyword: {q.trim()}</span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
+            {!categorySlug && selectedCategory && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory('');
+                  setPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>Category: {activeCategory?.name || selectedCategory}</span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
+            {!brandSlug && selectedBrand && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedBrand('');
+                  setPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>Brand: {activeBrand?.name || selectedBrand}</span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
+            {skinType && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSkinType('');
+                  setPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium capitalize text-primary transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>Skin: {skinType}</span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
+            {shade.trim() && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShade('');
+                  setPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>Shade: {shade.trim()}</span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
+            {(minPrice || maxPrice) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMinPrice('');
+                  setMaxPrice('');
+                  setPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>
+                  Price: {minPrice ? `$${minPrice}` : '$0'} – {maxPrice ? `$${maxPrice}` : 'Any'}
+                </span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
+            {inStockOnly && (
+              <button
+                type="button"
+                onClick={() => {
+                  setInStockOnly(false);
+                  setPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>In Stock Only</span>
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="px-2 py-1 text-xs font-semibold text-muted-fg underline underline-offset-4 hover:text-foreground"
+            >
+              Clear all
+            </button>
           </div>
-        </div>
+        )}
 
         {isError ? (
           <div role="alert">

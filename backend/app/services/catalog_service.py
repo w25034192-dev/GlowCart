@@ -358,6 +358,9 @@ class CatalogService:
                 continue
 
             avg_rating, rev_count = rating_map.get(p.id, (0.0, 0))
+            if rev_count == 0 and p.is_demo and isinstance(p.specifications, dict):
+                avg_rating = float(p.specifications.get("rating", 0.0) or 0.0)
+                rev_count = int(p.specifications.get("review_count", 0) or 0)
             primary_img = next((img.image_url for img in p.images if img.is_primary), None)
             if not primary_img and p.images:
                 primary_img = p.images[0].image_url
@@ -436,6 +439,12 @@ class CatalogService:
         if not primary_img and product.images:
             primary_img = product.images[0].image_url
 
+        avg_rating = round(float(avg_r or 0.0), 2)
+        rev_count = int(cnt or 0)
+        if rev_count == 0 and product.is_demo and isinstance(product.specifications, dict):
+            avg_rating = float(product.specifications.get("rating", 0.0) or 0.0)
+            rev_count = int(product.specifications.get("review_count", 0) or 0)
+
         return ProductDetailResponse(
             id=product.id,
             name=product.name,
@@ -450,8 +459,8 @@ class CatalogService:
             max_price=max(prices) if prices else None,
             original_price=min(orig_prices) if orig_prices else None,
             primary_image_url=primary_img,
-            average_rating=round(float(avg_r or 0.0), 2),
-            review_count=int(cnt or 0),
+            average_rating=avg_rating,
+            review_count=rev_count,
             in_stock=any(stock_map.get(v.id, 0) > 0 for v in active_variants),
             is_featured=product.is_featured,
             is_new_arrival=product.is_new_arrival,

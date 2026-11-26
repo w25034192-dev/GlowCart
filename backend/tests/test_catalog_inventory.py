@@ -820,9 +820,9 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
     brand = next(iter(brand_map.values()))
 
-    mac_brush = db_session.query(Product).filter(Product.slug == "mac-217s-brush").one()
-    mac_img = db_session.query(ProductImage).filter(ProductImage.product_id == mac_brush.id).one()
-    mac_img.image_url = "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
+    brush = db_session.query(Product).filter(Product.slug == "hourglass-vanish-foundation-brush").one()
+    brush_img = db_session.query(ProductImage).filter(ProductImage.product_id == brush.id).one()
+    brush_img.image_url = "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
 
     stale = Product(
         category_id=cat_map["Beauty Tools"].id,
@@ -837,13 +837,21 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
     db_session.add(stale)
     db_session.commit()
 
-    # Startup sync must delete the stale duplicate and force-refresh MAC brush back to its 1-to-1 URL
+    # Startup sync must delete the stale duplicate and force-refresh Hourglass brush back to its 1-to-1 URL
     changed = ensure_initial_data(db_session)
     assert changed is True
     assert db_session.query(Product).filter(Product.slug == "nyx-blending-sponge").first() is None
-    refreshed_img = db_session.query(ProductImage).filter(ProductImage.product_id == mac_brush.id).one()
-    expected_mac_url = next(p["image_url"] for p in PRODUCTS_100 if p["slug"] == "mac-217s-brush")
-    assert refreshed_img.image_url == expected_mac_url
+    refreshed_img = db_session.query(ProductImage).filter(ProductImage.product_id == brush.id).one()
+    expected_brush_url = next(p["image_url"] for p in PRODUCTS_100 if p["slug"] == "hourglass-vanish-foundation-brush")
+    assert refreshed_img.image_url == expected_brush_url
+
+    # Verify realistic seeded ratings (4.7-4.9) and review counts (85-420) via CatalogService
+    from app.services.catalog_service import CatalogService
+    listed = CatalogService(db_session).list_products(page=1, page_size=20)
+    assert len(listed["items"]) == 20
+    for item in listed["items"]:
+        assert 4.7 <= item.average_rating <= 4.9
+        assert 85 <= item.review_count <= 420
 
 
 
