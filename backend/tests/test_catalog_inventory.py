@@ -626,7 +626,7 @@ def test_fenty_showcase_and_portrait_only_urls_replaced(db_session):
 
     assert (
         resolve_seed_image_url("Makeup", "Fenty Beauty Pro Filt'r", "fenty-pro-filtr-soft-matte-foundation")
-        == "/images/products/fenty-foundation-hand.jpg"
+        == "https://plus.unsplash.com/premium_photo-1673628167571-532a6c5f5d16?auto=format&fit=crop&w=800&q=80"
     )
 
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
@@ -650,7 +650,7 @@ def test_fenty_showcase_and_portrait_only_urls_replaced(db_session):
     repaired = repair_duplicate_product_images(db_session)
     assert repaired == 1
     updated = db_session.query(ProductImage).filter(ProductImage.product_id == fenty.id).one()
-    assert updated.image_url == "/images/products/fenty-foundation-hand.jpg"
+    assert updated.image_url == "https://plus.unsplash.com/premium_photo-1673628167571-532a6c5f5d16?auto=format&fit=crop&w=800&q=80"
 
 
 def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
@@ -707,7 +707,7 @@ def test_strict_item_type_image_matching_and_no_competing_logos(db_session):
 
     assert (
         resolve_seed_image_url("Makeup", "Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation")
-        == "/images/products/fenty-foundation-hand.jpg"
+        == "https://plus.unsplash.com/premium_photo-1673628167571-532a6c5f5d16?auto=format&fit=crop&w=800&q=80"
     )
     mac_url = resolve_seed_image_url("Makeup", "MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy")
     assert mac_url == "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80"
