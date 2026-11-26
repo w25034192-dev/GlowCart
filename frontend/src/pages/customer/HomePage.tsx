@@ -1,22 +1,102 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  ChevronLeft,
+  ChevronRight,
+  FlaskConical,
+  HeartHandshake,
+  Leaf,
+  Recycle,
+} from 'lucide-react';
 import { catalogApi } from '@/services/api';
 import { ProductCard } from '@/components/customer/ProductCard';
 import type { ProductSummary } from '@/types';
 
-const FALLBACK_TRENDING: ProductSummary[] = [
+const HERO_SLIDES = [
   {
-    id: 'fenty-gloss-bomb',
-    name: 'Fenty Beauty Gloss Bomb Universal Lip Luminizer',
-    slug: 'fenty-gloss-bomb-luminizer',
+    eyebrow: 'NEW ARRIVAL • BARRIER RITUAL',
+    headline: 'Radiant Skin. Real Confidence.',
+    subtext:
+      'Clean, clinically proven beauty curated to nourish and elevate your daily ritual.',
+    ctaLabel: 'SHOP NOW',
+    ctaTo: '/catalog',
+    image: '/images/products/art-moisturizer-jar.jpg',
+    imageAlt: 'Luxury frosted glass moisturizer cream jar on warm stone pedestal',
+  },
+  {
+    eyebrow: 'DAILY UV DEFENSE • ZERO WHITE CAST',
+    headline: 'Weightless SPF. Glass-Skin Glow.',
+    subtext:
+      'Dermatologist-loved Korean & Japanese sun formulas crafted for effortless daily protection.',
+    ctaLabel: 'SHOP SUN CARE',
+    ctaTo: '/category/sun-care',
+    image: '/images/products/art-torriden-dive-in-sun-cream.jpg',
+    imageAlt: 'Hydrating watery sun cream tube in minimalist studio lighting',
+  },
+  {
+    eyebrow: 'HAUTE PARFUMERIE & VELVET PIGMENTS',
+    headline: 'Iconic Scents. Timeless Color.',
+    subtext:
+      'Authentic designer flacons and buildable pigments sourced with batch-verified freshness.',
+    ctaLabel: 'EXPLORE COLLECTION',
+    ctaTo: '/category/fragrance',
+    image: '/images/products/art-soleil-blanc-flacon.jpg',
+    imageAlt: 'Luxury square glass perfume flacon on travertine marble',
+  },
+];
+
+const CATEGORY_CIRCLES = [
+  {
+    label: 'SKINCARE',
+    to: '/category/skincare',
+    image: '/images/products/art-minimalist-toner.jpg',
+    alt: 'Minimalist hydrating skincare toner bottle',
+  },
+  {
+    label: 'MAKEUP',
+    to: '/category/makeup',
+    image: '/images/products/art-nude-lipstick.jpg',
+    alt: 'Satin nude-pink lipstick bullet',
+  },
+  {
+    label: 'HAIRCARE',
+    to: '/category/hair-care',
+    image: '/images/products/art-kerastase-magic-night-serum.jpg',
+    alt: 'Amber glass overnight hair serum bottle',
+  },
+  {
+    label: 'SUN CARE',
+    to: '/category/sun-care',
+    image: '/images/products/art-sunscreen-tube.jpg',
+    alt: 'Minimalist daily sunscreen squeeze tube',
+  },
+  {
+    label: 'FRAGRANCE',
+    to: '/category/fragrance',
+    image: '/images/products/art-soleil-blanc-flacon.jpg',
+    alt: 'Luxury eau de parfum glass flacon',
+  },
+  {
+    label: 'TOOLS & BRUSHES',
+    to: '/category/beauty-tools',
+    image: '/images/products/art-beautyblender-sponge.jpg',
+    alt: 'Pastel pink teardrop makeup blending sponge',
+  },
+];
+
+const FALLBACK_BEST_SELLERS: ProductSummary[] = [
+  {
+    id: 'rare-beauty-soft-pinch-blush',
+    name: 'Soft Pinch Liquid Blush',
+    slug: 'rare-beauty-soft-pinch-blush',
     category_id: 'cat-makeup',
     category_name: 'Makeup',
-    brand_id: 'brand-fenty',
-    brand_name: 'Fenty Beauty',
-    min_price: '21.00',
-    primary_image_url: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80',
+    brand_id: 'brand-rare',
+    brand_name: 'Rare Beauty',
+    min_price: '23.00',
+    primary_image_url: '/images/products/art-blush-compact.jpg',
     average_rating: 4.8,
-    review_count: 320,
+    review_count: 424,
     in_stock: true,
     is_featured: true,
     is_new_arrival: false,
@@ -26,8 +106,8 @@ const FALLBACK_TRENDING: ProductSummary[] = [
   },
   {
     id: 'boj-relief-sun',
-    name: 'Beauty of Joseon Relief Sun Rice + Probiotics SPF50+',
-    slug: 'beauty-of-joseon-relief-sun',
+    name: 'Relief Sun Rice + Probiotics SPF50+',
+    slug: 'boj-relief-sun',
     category_id: 'cat-suncare',
     category_name: 'Sun Care',
     brand_id: 'brand-boj',
@@ -35,7 +115,7 @@ const FALLBACK_TRENDING: ProductSummary[] = [
     min_price: '18.00',
     primary_image_url: '/images/products/art-sunscreen-tube.jpg',
     average_rating: 4.9,
-    review_count: 450,
+    review_count: 358,
     in_stock: true,
     is_featured: true,
     is_new_arrival: false,
@@ -44,384 +124,279 @@ const FALLBACK_TRENDING: ProductSummary[] = [
     skin_types: ['all', 'sensitive'],
   },
   {
-    id: 'cosrx-snail-essence',
-    name: 'COSRX Advanced Snail 96 Mucin Power Essence',
-    slug: 'cosrx-advanced-snail-96-mucin-power-essence',
+    id: 'torriden-dive-in-ha-serum',
+    name: 'DIVE-IN Hyaluronic Acid Serum',
+    slug: 'torriden-dive-in-ha-serum',
     category_id: 'cat-skincare',
     category_name: 'Skincare',
-    brand_id: 'brand-cosrx',
-    brand_name: 'COSRX',
-    min_price: '25.00',
-    primary_image_url: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80',
-    average_rating: 4.8,
-    review_count: 390,
+    brand_id: 'brand-torriden',
+    brand_name: 'Torriden',
+    min_price: '20.00',
+    primary_image_url: '/images/products/serum-dropper-hand.jpg',
+    average_rating: 4.7,
+    review_count: 303,
     in_stock: true,
     is_featured: true,
     is_new_arrival: false,
     is_best_seller: true,
     is_demo: false,
-    skin_types: ['dry', 'sensitive', 'all'],
+    skin_types: ['dry', 'all'],
   },
   {
-    id: 'gisou-hair-oil',
-    name: 'Gisou Honey Infused Hair Oil',
-    slug: 'gisou-honey-infused-hair-oil',
+    id: 'kerastase-nutritive-8h-magic-night-serum',
+    name: 'Nutritive 8H Magic Night Hair Serum',
+    slug: 'kerastase-nutritive-8h-magic-night-serum',
     category_id: 'cat-haircare',
     category_name: 'Hair Care',
-    brand_id: 'brand-gisou',
-    brand_name: 'Gisou',
-    min_price: '46.00',
-    primary_image_url: 'https://images.unsplash.com/photo-1608248597359-58b163351ec1?auto=format&fit=crop&w=800&q=80',
-    average_rating: 4.8,
-    review_count: 215,
+    brand_id: 'brand-kerastase',
+    brand_name: 'Kérastase',
+    min_price: '60.00',
+    primary_image_url: '/images/products/art-kerastase-magic-night-serum.jpg',
+    average_rating: 4.9,
+    review_count: 289,
     in_stock: true,
     is_featured: true,
     is_new_arrival: false,
     is_best_seller: true,
     is_demo: false,
-    skin_types: ['all'],
-  },
-];
-
-const SKIN_TONES = [
-  {
-    id: 'fair',
-    label: 'Fair',
-    hex: '#F6DFD2',
-    matches: [
-      { name: 'Petal Pink', shade: '#E58A9B' },
-      { name: 'Soft Peony', shade: '#D46A82' },
-      { name: 'Nude Blush', shade: '#C98276' },
-    ],
-  },
-  {
-    id: 'light',
-    label: 'Light',
-    hex: '#EBC8B2',
-    matches: [
-      { name: 'Rosy Day', shade: '#C85A74' },
-      { name: 'Warm Rose', shade: '#B84B62' },
-      { name: 'Peach Nude', shade: '#C97B68' },
-    ],
-  },
-  {
-    id: 'medium',
-    label: 'Medium',
-    hex: '#D7A382',
-    matches: [
-      { name: 'Rosy Day', shade: '#BD4265' },
-      { name: 'Brick Rose', shade: '#A44638' },
-      { name: 'Cinnamon', shade: '#9E4D36' },
-    ],
-  },
-  {
-    id: 'tan',
-    label: 'Tan',
-    hex: '#BA815C',
-    matches: [
-      { name: 'Spiced Terracotta', shade: '#9C4234' },
-      { name: 'Berry Crush', shade: '#8E2846' },
-      { name: 'Caramel Kiss', shade: '#8F4D38' },
-    ],
-  },
-  {
-    id: 'deep',
-    label: 'Deep',
-    hex: '#8C583A',
-    matches: [
-      { name: 'Rich Plum', shade: '#6E223B' },
-      { name: 'Mahogany Rose', shade: '#7D3232' },
-      { name: 'Espresso Glaze', shade: '#5E2C24' },
-    ],
-  },
-  {
-    id: 'rich',
-    label: 'Rich',
-    hex: '#5E3824',
-    matches: [
-      { name: 'Velvet Bordeaux', shade: '#59182D' },
-      { name: 'Deep Garnet', shade: '#6B1D29' },
-      { name: 'Cocoa Berry', shade: '#4F2024' },
-    ],
+    skin_types: ['dry', 'all'],
   },
 ];
 
 export const HomePage: React.FC = () => {
-  const [selectedTone, setSelectedTone] = useState(SKIN_TONES[2]); // Default: Medium
-  const [trendCategory, setTrendCategory] = useState<string>('all');
-  const [products, setProducts] = useState<ProductSummary[]>(FALLBACK_TRENDING);
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [bestSellers, setBestSellers] = useState<ProductSummary[]>(FALLBACK_BEST_SELLERS);
 
-  // Load products from backend catalog API, filtered by selected trending category
   useEffect(() => {
-    const params: Record<string, string | number | boolean | undefined> = {
-      page_size: 8,
-      sort: 'rating',
-    };
-    if (trendCategory !== 'all') {
-      params.category_slug = trendCategory;
-    }
     catalogApi
-      .getProducts(params)
+      .getProducts({ page_size: 4, sort: 'rating' })
       .then((data) => {
         if (data?.items?.length) {
-          setProducts(data.items);
+          setBestSellers(data.items.slice(0, 4));
         }
       })
       .catch(() => {
-        fetch(`/api/catalog/products?limit=8&category_slug=${trendCategory !== 'all' ? trendCategory : ''}`)
-          .then((res) => (res.ok ? res.json() : null))
-          .then((data) => {
-            if (data?.items?.length) {
-              setProducts(data.items);
-            }
-          })
-          .catch(() => {});
+        // Keep verified fallback best sellers if API is offline
       });
-  }, [trendCategory]);
+  }, []);
+
+  const currentSlide = HERO_SLIDES[slideIdx];
+  const prevSlide = () => setSlideIdx((i) => (i - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  const nextSlide = () => setSlideIdx((i) => (i + 1) % HERO_SLIDES.length);
 
   return (
-    <div className="min-h-screen bg-[#FDF7F8] text-stone-900 font-sans">
-      {/* 1. HERO SECTION (Soft Pink Split Layout) */}
-      <section className="bg-gradient-to-br from-[#FBECEF] via-[#F7DFE5] to-[#F3D1DA] border-b border-rose-200/50">
-        <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          {/* Left Content */}
-          <div className="lg:col-span-6 space-y-6">
-            <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
-              NEW • SOFT MATTE RANGE
+    <div className="bg-cream-warm text-foreground">
+      {/* 2. Split-Screen Hero Banner Carousel */}
+      <section
+        aria-label="Featured beauty collection"
+        className="relative overflow-hidden border-b border-border/50 bg-gradient-to-br from-[#FBF3F0] via-[#F7EAEB] to-[#F2DFE3]"
+      >
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-12 lg:py-20">
+          {/* Left Editorial Copy */}
+          <div className="space-y-6 lg:col-span-6">
+            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.22em] text-mauve-deep">
+              {currentSlide.eyebrow}
             </span>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-stone-900 leading-[1.08]">
-              Colour That <br />
-              <span className="text-[#B8295B]">Feels Like You.</span>
+            <h1 className="font-serif text-4xl font-bold leading-[1.06] tracking-tight text-plum sm:text-5xl lg:text-6xl">
+              {currentSlide.headline}
             </h1>
 
-            <p className="text-stone-600 text-base sm:text-lg max-w-md leading-relaxed">
-              Creamy, comfortable lipstick &amp; skincare essentials backed by live shade matching and FEFO freshness.
+            <p className="max-w-md text-base leading-relaxed text-muted-fg sm:text-lg">
+              {currentSlide.subtext}
             </p>
 
-            {/* Dual Pill Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
+            <div className="flex flex-wrap items-center gap-4 pt-1">
               <Link
-                to="/products"
-                className="bg-[#B8295B] hover:bg-[#991F4A] text-white font-semibold text-sm px-7 py-3.5 rounded-full shadow-md shadow-rose-900/15 transition-all"
+                to={currentSlide.ctaTo}
+                className="touch-target inline-flex items-center justify-center rounded-full bg-mauve-deep px-8 py-3.5 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-md transition-colors hover:bg-plum focus-visible:ring-2 focus-visible:ring-ring"
               >
-                Shop Cosmetics
+                {currentSlide.ctaLabel}
               </Link>
-              <a
-                href="#shade-finder"
-                className="bg-white/90 hover:bg-white text-stone-900 border border-stone-300 font-semibold text-sm px-7 py-3.5 rounded-full transition-all"
-              >
-                Find My Shade
-              </a>
             </div>
 
-            {/* Social Proof Avatars */}
-            <div className="flex items-center gap-3 pt-2">
-              <div className="flex -space-x-2">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80"
-                  alt="Customer"
-                  className="w-7 h-7 rounded-full object-cover ring-2 ring-white"
+            {/* Subtle Carousel Slide Indicators */}
+            <div className="flex items-center gap-2 pt-2" role="tablist" aria-label="Hero slides">
+              {HERO_SLIDES.map((s, idx) => (
+                <button
+                  key={s.headline}
+                  type="button"
+                  role="tab"
+                  aria-selected={idx === slideIdx}
+                  aria-label={`Slide ${idx + 1}: ${s.headline}`}
+                  onClick={() => setSlideIdx(idx)}
+                  className={`h-2.5 rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring ${
+                    idx === slideIdx ? 'w-8 bg-plum' : 'w-2.5 bg-mauve/40 hover:bg-mauve'
+                  }`}
                 />
-                <img
-                  src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80"
-                  alt="Customer"
-                  className="w-7 h-7 rounded-full object-cover ring-2 ring-white"
-                />
-                <img
-                  src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=80&q=80"
-                  alt="Customer"
-                  className="w-7 h-7 rounded-full object-cover ring-2 ring-white"
-                />
-              </div>
-              <span className="text-xs font-medium text-stone-600">
-                Loved by <strong className="text-stone-900">200,000+</strong> customers
-              </span>
+              ))}
             </div>
           </div>
 
-          {/* Right Model Visual + Floating Rating Card */}
-          <div className="lg:col-span-6 relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-xl bg-rose-200 aspect-[4/3.6]">
+          {/* Right Packaging Photography + Carousel Arrows */}
+          <div className="relative lg:col-span-6">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/80 bg-card shadow-xl">
               <img
-                src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1000&q=85"
-                alt="GlowCart Beauty Model"
-                className="w-full h-full object-cover"
+                src={currentSlide.image}
+                alt={currentSlide.imageAlt}
+                className="h-full w-full object-cover transition-opacity duration-300"
               />
             </div>
 
-            {/* Floating Rating Badge */}
-            <div className="absolute -bottom-4 right-4 sm:right-6 bg-white rounded-2xl px-4 py-3 shadow-lg border border-rose-100 flex items-center gap-2.5">
-              <span className="text-amber-400 text-lg">★</span>
-              <div>
-                <div className="text-xs font-bold text-stone-900">4.8 rating</div>
-                <div className="text-[11px] text-stone-500">12k reviews</div>
-              </div>
+            <button
+              type="button"
+              onClick={prevSlide}
+              aria-label="Previous hero slide"
+              className="touch-target absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-card/90 text-plum shadow-md backdrop-blur-sm transition-colors hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={nextSlide}
+              aria-label="Next hero slide"
+              className="touch-target absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-card/90 text-plum shadow-md backdrop-blur-sm transition-colors hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. 4-Column Brand Value / Trust Strip */}
+      <section aria-label="Brand values" className="border-b border-border/60 bg-card py-8">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 sm:px-6 lg:grid-cols-4">
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blush-soft text-mauve-deep">
+              <Leaf className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-plum">Clean Ingredients</p>
+              <p className="text-xs text-muted-fg">Safe &amp; toxin-free</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blush-soft text-mauve-deep">
+              <FlaskConical className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-plum">Clinically Proven</p>
+              <p className="text-xs text-muted-fg">Dermatologically tested</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blush-soft text-mauve-deep">
+              <HeartHandshake className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-plum">Cruelty Free</p>
+              <p className="text-xs text-muted-fg">Never tested on animals</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blush-soft text-mauve-deep">
+              <Recycle className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-plum">Sustainable Beauty</p>
+              <p className="text-xs text-muted-fg">Thoughtfully packaged</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. TRUST FEATURE BAR */}
-      <div className="bg-white border-b border-rose-100">
-        <div className="max-w-6xl mx-auto px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-medium text-stone-700">
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-[#B8295B]">🌿</span> Vegan &amp; Cruelty-Free
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-[#B8295B]">⏱</span> 12-Hour Wear
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-[#B8295B]">💧</span> Hydrating Formula
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-[#B8295B]">↺</span> Free Returns
-          </div>
-        </div>
-      </div>
-
-      {/* 3. TRENDING NOW / VIRAL BEST-SELLERS */}
-      <section className="max-w-7xl mx-auto px-6 py-14">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-          <div>
-            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
-              TRENDING NOW • BESTSELLERS
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">
-              Viral Best-Sellers &amp; Our Most-Loved Shades
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-500 mt-1">
-              Top-rated formulations and pro beauty rituals loved worldwide with FEFO freshness.
-            </p>
-          </div>
-          <Link
-            to={trendCategory === 'all' ? '/catalog' : `/category/${trendCategory}`}
-            className="inline-flex items-center text-xs font-semibold text-stone-700 hover:text-[#B8295B] transition-colors"
-          >
-            Explore All 120 Products →
-          </Link>
-        </div>
-
-        {/* Category Filter Pills */}
-        <div
-          className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none"
-          aria-label="Filter trending products by category"
+      {/* 4. Shop by Category (6-Column Circular Thumbnail Grid) */}
+      <section aria-labelledby="shop-by-category-heading" className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+        <h2
+          id="shop-by-category-heading"
+          className="text-center font-serif text-3xl font-bold tracking-wide text-plum sm:text-4xl"
         >
-          {[
-            { label: 'All Best-Sellers', slug: 'all' },
-            { label: 'Makeup', slug: 'makeup' },
-            { label: 'Skincare', slug: 'skincare' },
-            { label: 'Sun Care', slug: 'sun-care' },
-            { label: 'Hair Care', slug: 'hair-care' },
-            { label: 'Fragrance', slug: 'fragrance' },
-            { label: 'Tools & Brushes', slug: 'beauty-tools' },
-          ].map((cat) => {
-            const active = trendCategory === cat.slug;
-            return (
-              <button
-                key={cat.slug}
-                type="button"
-                onClick={() => setTrendCategory(cat.slug)}
-                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold transition-all ${
-                  active
-                    ? 'bg-[#B8295B] text-white shadow-sm'
-                    : 'bg-white border border-rose-100/80 text-stone-600 hover:border-rose-300 hover:text-stone-900'
-                }`}
-              >
-                {cat.label}
-              </button>
-            );
-          })}
-        </div>
+          SHOP BY CATEGORY
+        </h2>
 
-        {/* Product Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((item) => (
-            <ProductCard key={item.id} product={item} />
+        <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
+          {CATEGORY_CIRCLES.map((cat) => (
+            <Link
+              key={cat.label}
+              to={cat.to}
+              className="group flex flex-col items-center gap-3 text-center focus-visible:ring-2 focus-visible:ring-ring rounded-2xl p-2"
+            >
+              <div className="aspect-square w-32 overflow-hidden rounded-full border-2 border-blush bg-card p-1 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-mauve-deep group-hover:shadow-md sm:w-36">
+                <img
+                  src={cat.image}
+                  alt={cat.alt}
+                  loading="lazy"
+                  className="h-full w-full rounded-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-plum transition-colors group-hover:text-mauve-deep">
+                {cat.label}
+              </span>
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* 4. INTERACTIVE SHADE FINDER ("Find Your Perfect Match") */}
-      <section
-        id="shade-finder"
-        className="bg-gradient-to-b from-[#FBECEF] to-[#F6DCE3] py-14 px-6 border-t border-rose-200/50"
-      >
-        <div className="max-w-3xl mx-auto text-center">
-          <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
-            SHADE FINDER
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">
-            Find Your Perfect Match
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1.5">
-            Pick your skin tone to see your best shades.
-          </p>
-
-          {/* 6 Skin Tone Swatches */}
-          <div className="flex flex-wrap justify-center gap-5 sm:gap-7 my-8">
-            {SKIN_TONES.map((tone) => {
-              const isSelected = selectedTone.id === tone.id;
-              return (
-                <button
-                  key={tone.id}
-                  type="button"
-                  onClick={() => setSelectedTone(tone)}
-                  className="flex flex-col items-center gap-2 group"
-                >
-                  <span
-                    className={`w-11 h-11 rounded-full transition-all ${isSelected
-                      ? 'ring-2 ring-offset-2 ring-stone-900 scale-110'
-                      : 'hover:scale-105'
-                      }`}
-                    style={{ backgroundColor: tone.hex }}
-                  />
-                  <span
-                    className={`text-xs ${isSelected ? 'font-bold text-stone-900' : 'text-stone-600'
-                      }`}
-                  >
-                    {tone.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 3 Matching Lip/Shade Preview Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-            {selectedTone.matches.map((match) => (
-              <div
-                key={match.name}
-                className="bg-white rounded-2xl p-3 shadow-sm border border-rose-100"
+      {/* 5. Asymmetric Two-Column Promotional Split Banner (~35% Dusty-Mauve / ~65% Flatlay) */}
+      <section aria-label="Seasonal promotional offer" className="mx-auto max-w-7xl px-4 pb-14 sm:px-6">
+        <div className="grid grid-cols-1 overflow-hidden rounded-3xl border border-border/60 shadow-lg lg:grid-cols-12">
+          <div className="flex flex-col justify-center bg-mauve-deep p-8 text-white sm:p-12 lg:col-span-4">
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-blush">
+              LIMITED TIME OFFER
+            </span>
+            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight sm:text-4xl">
+              Up to 30% Off on Best Sellers
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-white/85">
+              Elevate your daily ritual with curated skincare icons, velvet lip colors, and weightless SPF essentials.
+            </p>
+            <div className="mt-7">
+              <Link
+                to="/catalog?sort=rating"
+                className="touch-target inline-flex items-center justify-center rounded-full bg-card px-7 py-3 text-xs font-bold uppercase tracking-[0.18em] text-plum shadow-sm transition-colors hover:bg-blush-soft focus-visible:ring-2 focus-visible:ring-white"
               >
-                <div
-                  className="h-28 rounded-xl flex items-center justify-center relative overflow-hidden"
-                  style={{ backgroundColor: selectedTone.hex }}
-                >
-                  {/* Lip / Swatch Stroke Visual */}
-                  <div
-                    className="w-24 h-10 rounded-full shadow-inner opacity-95"
-                    style={{ backgroundColor: match.shade }}
-                  />
-                </div>
-                <p className="text-xs font-bold text-stone-900 mt-2.5">{match.name}</p>
-              </div>
-            ))}
+                SHOP THE SALE
+              </Link>
+            </div>
           </div>
 
-          {/* Take the Full Quiz Button */}
-          <div className="mt-8">
-            <Link
-              to="/products"
-              className="inline-block bg-[#B8295B] hover:bg-[#991F4A] text-white text-xs font-semibold px-7 py-3 rounded-full shadow-md transition"
-            >
-              Take the Full Quiz
-            </Link>
+          <div className="relative min-h-[260px] bg-beige lg:col-span-8 lg:min-h-[380px]">
+            <img
+              src="https://images.pexels.com/photos/8981523/pexels-photo-8981523.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              alt="Curated luxury skincare and fragrance flatlay collection"
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
           </div>
+        </div>
+      </section>
+
+      {/* 6. Best Sellers Product Grid (4-Column Card Grid) */}
+      <section aria-labelledby="best-sellers-heading" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+        <div className="mb-8 flex items-end justify-between border-b border-border/60 pb-4">
+          <h2
+            id="best-sellers-heading"
+            className="font-serif text-3xl font-bold tracking-wide text-plum sm:text-4xl"
+          >
+            BEST SELLERS
+          </h2>
+          <Link
+            to="/catalog"
+            className="touch-target inline-flex items-center text-xs font-bold uppercase tracking-[0.18em] text-mauve-deep transition-colors hover:text-plum"
+          >
+            VIEW ALL
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {bestSellers.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
       </section>
     </div>
   );
 };
-
-export default HomePage;

@@ -157,20 +157,24 @@ function renderAt(path: string) {
 }
 
 describe('GlowCart Frontend', () => {
-  it('renders storefront hero, trust bar, best sellers, and interactive shade finder', async () => {
+  it('renders storefront hero, trust bar, category grid, promo split, best sellers, guarantees, and plum footer', async () => {
     useAuthStore.setState({ user: null, isLoading: false });
     const user = userEvent.setup();
     renderAt('/');
-    expect(await screen.findByText(/Colour That/i)).toBeInTheDocument();
-    expect(screen.getByText(/Feels Like You\./i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Shop Cosmetics/i })).toHaveAttribute('href', '/products');
-    expect(screen.getByText(/Vegan & Cruelty-Free/i)).toBeInTheDocument();
-    expect(screen.getByText(/Our Most-Loved Shades/i)).toBeInTheDocument();
-    expect(screen.getByText(/Find Your Perfect Match/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Radiant Skin\. Real Confidence\./i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /SHOP NOW/i })).toHaveAttribute('href', '/catalog');
+    expect(screen.getByText('Clean Ingredients')).toBeInTheDocument();
+    expect(screen.getByText('Clinically Proven')).toBeInTheDocument();
+    expect(screen.getByText(/SHOP BY CATEGORY/i)).toBeInTheDocument();
+    expect(screen.getByText(/Up to 30% Off on Best Sellers/i)).toBeInTheDocument();
+    expect(screen.getByText('BEST SELLERS')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /VIEW ALL/i })).toHaveAttribute('href', '/catalog');
+    expect(screen.getByText(/15 days return policy/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /SUBSCRIBE/i })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Deep' }));
-    expect(screen.getByText(/Rich Plum/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Take the Full Quiz/i })).toHaveAttribute('href', '/products');
+    // Test carousel arrow interaction
+    await user.click(screen.getByRole('button', { name: /Next hero slide/i }));
+    expect(screen.getByText(/Weightless SPF\. Glass-Skin Glow\./i)).toBeInTheDocument();
   });
 
   it('redirects unauthenticated visitors away from protected admin routes', async () => {
