@@ -597,6 +597,56 @@ def test_repair_duplicate_product_images_replaces_repeated_fallback_urls(db_sess
     assert len(set(final_urls)) == 5
 
 
+def test_fenty_showcase_and_portrait_only_urls_replaced(db_session):
+    """Ensure portrait-only URLs are excluded and replaced with product-in-hand showcase images."""
+    from app.db.seed import (
+        CATEGORY_IMAGE_POOLS,
+        VERIFIED_COSMETIC_IMAGE_URLS,
+        _ensure_categories_and_brands,
+        repair_duplicate_product_images,
+        resolve_seed_image_url,
+    )
+    from app.models import Product, ProductImage
+
+    portrait_only_urls = {
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+    }
+    assert portrait_only_urls.isdisjoint(set(VERIFIED_COSMETIC_IMAGE_URLS))
+    for pool in CATEGORY_IMAGE_POOLS.values():
+        assert portrait_only_urls.isdisjoint(set(pool))
+
+    assert (
+        resolve_seed_image_url("Makeup", "Fenty Beauty Pro Filt'r", "fenty-pro-filtr-soft-matte-foundation")
+        == "/images/products/fenty-foundation-hand.jpg"
+    )
+
+    cat_map, brand_map = _ensure_categories_and_brands(db_session)
+    brand = next(iter(brand_map.values()))
+    fenty = Product(
+        category_id=cat_map["Makeup"].id,
+        brand_id=brand.id,
+        name="Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation",
+        slug="fenty-pro-filtr-soft-matte-foundation",
+        description="Foundation",
+        skin_types=["oily"],
+        specifications={},
+        is_demo=True,
+    )
+    db_session.add(fenty)
+    db_session.flush()
+    old_portrait = next(iter(portrait_only_urls))
+    db_session.add(ProductImage(product_id=fenty.id, image_url=old_portrait, is_primary=True, sort_order=0))
+    db_session.commit()
+
+    repaired = repair_duplicate_product_images(db_session)
+    assert repaired == 1
+    updated = db_session.query(ProductImage).filter(ProductImage.product_id == fenty.id).one()
+    assert updated.image_url == "/images/products/fenty-foundation-hand.jpg"
+
+
+
 
 
 

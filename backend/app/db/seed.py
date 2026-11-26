@@ -327,6 +327,10 @@ def _ensure_categories_and_brands(db: Session) -> tuple[dict[str, Category], dic
 
 
 VERIFIED_COSMETIC_IMAGE_URLS = [
+    "/images/products/fenty-foundation-hand.jpg",
+    "/images/products/luxury-lip-hand.jpg",
+    "/images/products/compact-cushion-hand.jpg",
+    "/images/products/serum-dropper-hand.jpg",
     "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
@@ -351,9 +355,6 @@ VERIFIED_COSMETIC_IMAGE_URLS = [
     "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
 ]
 
 BROKEN_IMAGE_URLS = {
@@ -362,6 +363,17 @@ BROKEN_IMAGE_URLS = {
     "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=600&q=80",
+    # Portrait-only photos (no cosmetic product in frame) — replace on startup
+    "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+}
+
+SLUG_SHOWCASE_IMAGES: dict[str, str] = {
+    "fenty-pro-filtr-soft-matte-foundation": "/images/products/fenty-foundation-hand.jpg",
+    "fenty-gloss-bomb-luminizer": "/images/products/luxury-lip-hand.jpg",
+    "laneige-neo-cushion-matte": "/images/products/compact-cushion-hand.jpg",
+    "torriden-dive-in-ha-serum": "/images/products/serum-dropper-hand.jpg",
 }
 
 
@@ -377,14 +389,14 @@ def _build_category_pool(priority_indices: list[int]) -> list[str]:
 
 
 CATEGORY_IMAGE_POOLS: dict[str, list[str]] = {
-    "Makeup": _build_category_pool([0, 1, 2, 3, 4, 5, 6, 7, 13, 24, 25, 26]),
-    "Skincare": _build_category_pool([8, 9, 10, 11, 12, 13, 14, 15, 19, 4, 5]),
-    "Sun Care": _build_category_pool([15, 10, 14, 9, 8, 11, 12, 19, 16, 17]),
-    "Hair Care": _build_category_pool([16, 17, 18, 14, 11, 10, 19, 12, 8, 9]),
-    "Body Care": _build_category_pool([19, 9, 10, 11, 12, 14, 15, 16, 17, 18]),
-    "Fragrance": _build_category_pool([20, 21, 22, 23, 0, 1, 2, 5, 6, 7]),
-    "Beauty Tools": _build_category_pool([5, 6, 7, 1, 2, 3, 4, 0, 13, 24]),
-    "Makeup Sets": _build_category_pool([6, 5, 1, 0, 2, 3, 4, 7, 20, 21]),
+    "Makeup": _build_category_pool([0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 17]),
+    "Skincare": _build_category_pool([3, 12, 13, 14, 15, 16, 17, 18, 19, 23, 8, 9]),
+    "Sun Care": _build_category_pool([19, 14, 18, 13, 12, 15, 16, 23, 20, 21]),
+    "Hair Care": _build_category_pool([20, 21, 22, 18, 15, 14, 23, 16, 12, 13]),
+    "Body Care": _build_category_pool([23, 13, 14, 15, 16, 18, 19, 20, 21, 22]),
+    "Fragrance": _build_category_pool([24, 25, 26, 27, 1, 4, 5, 9, 10, 11]),
+    "Beauty Tools": _build_category_pool([9, 10, 11, 2, 5, 6, 7, 8, 0, 1]),
+    "Makeup Sets": _build_category_pool([10, 9, 2, 0, 1, 5, 6, 7, 8, 24]),
 }
 
 
@@ -395,6 +407,8 @@ def resolve_seed_image_url(
     index: int | None = None,
 ) -> str:
     """Return a diverse, high-resolution verified cosmetic photograph URL for the product."""
+    if slug in SLUG_SHOWCASE_IMAGES:
+        return SLUG_SHOWCASE_IMAGES[slug]
     pool = CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
     selector = index if index is not None else zlib.crc32(slug.encode("utf-8"))
     return pool[selector % len(pool)]
@@ -650,6 +664,17 @@ def repair_duplicate_product_images(db: Session) -> int:
         prod = prod_map.get(img.product_id)
         cat_name = prod.category.name if (prod and prod.category) else "Skincare"
         pool = CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
+
+        showcase_url = SLUG_SHOWCASE_IMAGES.get(prod.slug) if prod else None
+        if showcase_url and img.image_url != showcase_url:
+            if img.image_url and not _is_invalid(img.image_url):
+                used_counts[img.image_url] = max(0, used_counts[img.image_url] - 1)
+            img.image_url = showcase_url
+            used_counts[showcase_url] += 1
+            seen_once.add(showcase_url)
+            prev_url = showcase_url
+            repaired += 1
+            continue
 
         needs_repair = _is_invalid(img.image_url) or img.image_url in seen_once
         if needs_repair:
