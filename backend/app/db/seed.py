@@ -63,6 +63,14 @@ BRANDS_DATA = [
     ("Round Lab", "round-lab", "South Korea", False),
     ("Torriden", "torriden", "South Korea", False),
     ("Olaplex", "olaplex", "USA", False),
+    ("Gisou", "gisou", "Netherlands", True),
+    ("Kérastase", "kerastase", "France", True),
+    ("Dyson", "dyson", "UK", True),
+    ("Chanel", "chanel", "France", True),
+    ("Supergoop!", "supergoop", "USA", True),
+    ("Shiseido", "shiseido", "Japan", True),
+    ("Biore", "biore", "Japan", False),
+    ("Ouai", "ouai", "USA", False),
     ("Dior", "dior", "France", True),
     ("Sol de Janeiro", "sol-de-janeiro", "USA", False),
     # Popular Local Brands (Myanmar)
@@ -127,8 +135,6 @@ CATALOG_BLUEPRINT = [
     ("Sun Care", "SKIN1004", "SKIN1004 Hyalu-Cica Water-Fit Sun Serum", "skin1004-sun-serum", ["dry", "all"], "volumes", "16.50"),
     ("Sun Care", "Round Lab", "Round Lab Birch Juice Moisturizing Sun Cream", "round-lab-birch-sun", ["dry", "normal"], "volumes", "21.00"),
     ("Hair Care", "Olaplex", "Olaplex No. 3 Hair Perfector", "olaplex-no-3", ["all"], "volumes", "30.00"),
-    ("Hair Care", "Olaplex", "Olaplex No. 4 Bond Maintenance Shampoo", "olaplex-no-4-shampoo", ["all"], "volumes", "30.00"),
-    ("Hair Care", "Olaplex", "Olaplex No. 5 Bond Maintenance Conditioner", "olaplex-no-5-conditioner", ["all"], "volumes", "30.00"),
     ("Hair Care", "Olaplex", "Olaplex No. 7 Bonding Oil", "olaplex-no-7-oil", ["all"], "volumes", "30.00"),
     ("Hair Care", "L'Oréal Paris", "L'Oréal Elvive Hyaluron Plump Serum", "loreal-hyaluron-hair-serum", ["all"], "volumes", "11.99"),
     ("Body Care", "Sol de Janeiro", "Sol de Janeiro Brazilian Bum Bum Cream", "sdj-bum-bum-cream", ["all", "dry"], "volumes", "22.00"),
@@ -172,20 +178,21 @@ CATALOG_BLUEPRINT = [
     # --- Batch 3: 30 New Products (Sun Care / Hair Care / Fragrance / Body Care / Skincare / Makeup) ---
 
     # Sun Care (6)
-    ("Sun Care", "Beauty of Joseon", "Beauty of Joseon Relief Sun Rice + Probiotics SPF50+ PA++++", "boj-relief-sun-rice-probiotics", ["sensitive", "all"], "volumes", "50ml", "15.00"),
+    ("Sun Care", "Supergoop!", "Supergoop! Unseen Sunscreen SPF 40", "supergoop-unseen-sunscreen-spf40", ["all", "oily"], "volumes", "50ml", "38.00"),
     ("Sun Care", "COSRX", "COSRX Aloe Soothing Sun Cream SPF50+ PA+++", "cosrx-aloe-sun-cream-spf50", ["sensitive", "dry"], "volumes", "50ml", "14.00"),
-    ("Sun Care", "La Roche-Posay", "La Roche-Posay Anthelios Invisible Fluid SPF50+", "lrp-anthelios-invisible-fluid-spf50", ["all", "oily"], "volumes", "50ml", "29.00"),
+    ("Sun Care", "Shiseido", "Shiseido Ultimate Sun Protector Lotion SPF 50+", "shiseido-ultimate-sun-protector", ["all"], "volumes", "150ml", "50.00"),
     ("Sun Care", "Anua", "Anua Heartleaf Calming Sun Serum SPF50+ PA++++", "anua-heartleaf-sun-serum-spf50", ["sensitive", "acne-prone"], "volumes", "50ml", "18.00"),
-    ("Sun Care", "Round Lab", "Round Lab Birch Juice Moisturizing Sun Cream SPF50+ PA++++", "round-lab-birch-sun-cream-spf50", ["dry", "sensitive"], "volumes", "50ml", "16.00"),
+    ("Sun Care", "Biore", "Biore UV Aqua Rich Watery Essence SPF 50+", "biore-uv-aqua-rich-essence", ["oily", "combination"], "volumes", "70g", "16.00"),
     ("Sun Care", "Torriden", "Torriden Dive-In Sun Serum SPF50+ PA++++", "torriden-dive-in-sun-serum-spf50", ["dry", "dehydrated"], "volumes", "50ml", "17.00"),
 
     # Hair Care (6)
-    ("Hair Care", "Olaplex", "Olaplex No. 3 Hair Perfector Bond Repair Treatment", "olaplex-no3-hair-perfector", ["all"], "volumes", "100ml", "30.00"),
-    ("Hair Care", "Olaplex", "Olaplex No. 8 Bond Intense Moisture Mask", "olaplex-no8-moisture-mask", ["all"], "volumes", "100ml", "32.00"),
+    ("Hair Care", "Gisou", "Gisou Honey Infused Hair Oil", "gisou-honey-infused-hair-oil", ["all", "dry"], "volumes", "50ml", "46.00"),
+    ("Hair Care", "Kérastase", "Kérastase Elixir Ultime L'Huile Originale Hair Oil", "kerastase-elixir-ultime-hair-oil", ["all", "dry"], "volumes", "100ml", "58.00"),
     ("Hair Care", "L'Oréal Paris", "L'Oréal Paris Elvive Extraordinary Oil Hair Serum", "loreal-elvive-extraordinary-oil-serum", ["all"], "volumes", "100ml", "12.00"),
-    ("Hair Care", "L'Oréal Paris", "L'Oréal Paris EverPure Sulfate Free Color Care Shampoo", "loreal-everpure-color-shampoo", ["all"], "volumes", "250ml", "9.99"),
+    ("Hair Care", "Ouai", "Ouai Detox Shampoo", "ouai-detox-shampoo", ["oily", "all"], "volumes", "300ml", "32.00"),
     ("Hair Care", "COSRX", "COSRX Full Fit Propolis Nourishing Hair Ampoule", "cosrx-propolis-hair-ampoule", ["dry", "damaged"], "volumes", "100ml", "22.00"),
     ("Hair Care", "Innisfree", "Innisfree My Hair Recipe Moisture Treatment", "innisfree-hair-recipe-moisture", ["dry", "all"], "volumes", "150ml", "14.00"),
+    ("Beauty Tools", "Dyson", "Dyson Airwrap Multi-Styler Complete Long", "dyson-airwrap-multi-styler", ["all"], "sizes", "Set", "599.00"),
 
     # Fragrance (5)
     ("Fragrance", "Sol de Janeiro", "Sol de Janeiro Cheirosa 71 Perfume Mist", "sdj-cheirosa-71-mist", ["all"], "volumes", "240ml", "36.00"),
@@ -355,8 +362,6 @@ VERIFIED_COSMETIC_IMAGE_URLS = [
     "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
 ]
@@ -373,11 +378,12 @@ BROKEN_IMAGE_URLS = {
     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
-    # Competing brand logos (Clinique, Chanel, Curology, Maui Moisture)
+    # Competing brand logos (Clinique, Chanel, Curology, Maui Moisture, Cocooil)
     "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80",
 }
 
 SLUG_SHOWCASE_IMAGES: dict[str, str] = {
@@ -477,7 +483,9 @@ ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
         ("sun", "spf", "uv"),
         [
             "/images/products/unbranded-sunscreen.jpg",
+            "/images/products/unbranded-toner.jpg",
             "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+            "/images/products/unbranded-cream-jar.jpg",
         ],
     ),
     (
@@ -509,11 +517,18 @@ ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
         ],
     ),
     (
-        ("shampoo", "conditioner", "hair", "olaplex"),
+        ("dyson", "airwrap", "styler"),
         [
-            "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
             "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("shampoo", "conditioner", "hair", "olaplex", "gisou", "kérastase", "kerastase", "ouai"),
+        [
+            "/images/products/serum-dropper-hand.jpg",
+            "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
+            "/images/products/unbranded-cream-jar.jpg",
+            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
         ],
     ),
     (
@@ -553,9 +568,9 @@ CATEGORY_IMAGE_POOLS: dict[str, list[str]] = {
     "Makeup": _build_category_pool([0, 1, 2, 3, 5, 6, 7, 11, 12, 13, 14, 15, 16]),
     "Skincare": _build_category_pool([4, 9, 10, 14, 17, 18, 19, 8]),
     "Sun Care": _build_category_pool([8, 9, 10, 14, 17, 18, 19]),
-    "Hair Care": _build_category_pool([19, 20, 21, 10, 14, 17]),
+    "Hair Care": _build_category_pool([19, 20, 10, 14, 17]),
     "Body Care": _build_category_pool([9, 17, 18, 19, 14, 10]),
-    "Fragrance": _build_category_pool([23, 2, 5, 6, 11, 12]),
+    "Fragrance": _build_category_pool([21, 2, 5, 6, 11, 12]),
     "Beauty Tools": _build_category_pool([11, 15, 16, 3, 6, 7]),
     "Makeup Sets": _build_category_pool([11, 12, 15, 16, 0, 1, 2, 3, 5, 6]),
 }
@@ -902,10 +917,25 @@ def repair_duplicate_product_images(db: Session) -> int:
     return repaired
 
 
+RETIRED_DUPLICATE_SLUGS = {
+    "boj-relief-sun-rice-probiotics",
+    "lrp-anthelios-invisible-fluid-spf50",
+    "round-lab-birch-sun-cream-spf50",
+    "olaplex-no3-hair-perfector",
+    "olaplex-no-4-shampoo",
+    "olaplex-no-5-conditioner",
+    "olaplex-no8-moisture-mask",
+}
+
+
 def cleanup_generic_generated_products(db: Session) -> int:
-    """Remove or archive old generic '#N' generated products while keeping orders, users, and carts safe."""
+    """Remove or archive old generic '#N' and retired duplicate products while keeping orders, users, and carts safe."""
     generic_pattern = re.compile(r" #\d+$")
-    candidates = [p for p in db.query(Product).all() if generic_pattern.search(p.name or "")]
+    candidates = [
+        p
+        for p in db.query(Product).all()
+        if generic_pattern.search(p.name or "") or p.slug in RETIRED_DUPLICATE_SLUGS
+    ]
     if not candidates:
         return 0
 
