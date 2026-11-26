@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   BarChart3,
@@ -10,6 +10,7 @@ import {
   FolderTree,
   LayoutDashboard,
   LogOut,
+  Menu,
   MessageSquare,
   Package,
   Palette,
@@ -19,6 +20,7 @@ import {
   Star,
   Tag,
   Users,
+  X,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -46,56 +48,64 @@ const ADMIN_NAV = [
 export const AdminLayout: React.FC = () => {
   const { user, clearSession } = useAuthStore();
   const navigate = useNavigate();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const handleSignOut = () => {
+    clearSession();
+    navigate('/admin/login');
+  };
+
+  const renderNavItems = (onNavigate?: () => void) =>
+    ADMIN_NAV.map((item) => {
+      const Icon = item.icon;
+      return (
+        <NavLink
+          key={item.to}
+          to={item.to}
+          end={item.end}
+          onClick={onNavigate}
+          className={({ isActive }) =>
+            `touch-target flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? 'bg-plum text-white shadow-sm'
+                : 'text-foreground hover:bg-blush-soft hover:text-plum'
+            }`
+          }
+        >
+          <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>{item.label}</span>
+        </NavLink>
+      );
+    });
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen bg-cream-warm text-foreground">
+      {/* Desktop Sidebar */}
       <aside className="hidden w-64 shrink-0 border-r border-border bg-card lg:flex lg:flex-col">
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <Link to="/admin" className="font-serif text-2xl font-bold text-primary">
+          <Link to="/admin" className="font-serif text-2xl font-bold text-plum">
             GlowCart Admin
           </Link>
         </div>
         <nav aria-label="Admin sidebar" className="flex-1 space-y-1 overflow-y-auto p-3">
-          {ADMIN_NAV.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  `touch-target flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-fg'
-                      : 'text-foreground hover:bg-muted'
-                  }`
-                }
-              >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
+          {renderNavItems()}
         </nav>
         <div className="border-t border-border p-4">
           <div className="mb-2 text-xs text-muted-fg">
-            Signed in as <strong className="text-foreground">{user?.role}</strong>
+            Signed in as <strong className="text-plum">{user?.role}</strong>
           </div>
           <div className="flex gap-2">
             <Link
               to="/"
-              className="touch-target flex-1 rounded-lg border border-border px-3 py-2 text-center text-xs font-medium hover:bg-muted"
+              className="touch-target flex-1 rounded-lg border border-border px-3 py-2 text-center text-xs font-medium hover:bg-blush-soft"
             >
               Storefront
             </Link>
             <button
               type="button"
-              onClick={() => {
-                clearSession();
-                navigate('/admin/login');
-              }}
+              onClick={handleSignOut}
               aria-label="Sign out"
-              className="touch-target inline-flex items-center justify-center rounded-lg border border-border px-3 py-2 text-xs hover:bg-muted"
+              className="touch-target inline-flex items-center justify-center rounded-lg border border-border px-3 py-2 text-xs hover:bg-blush-soft"
             >
               <LogOut className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -104,18 +114,48 @@ export const AdminLayout: React.FC = () => {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-border bg-card px-4 py-3 lg:px-8">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-card/95 px-4 py-3 backdrop-blur-md lg:px-8">
           <div className="flex items-center gap-3">
-            <span className="font-serif text-lg font-semibold lg:hidden">GlowCart Admin</span>
-            <div className="flex flex-wrap gap-2 lg:hidden">
-              <Link to="/admin" className="rounded bg-muted px-2 py-1 text-xs">Dashboard</Link>
-              <Link to="/admin/products" className="rounded bg-muted px-2 py-1 text-xs">Products</Link>
-              <Link to="/admin/inventory" className="rounded bg-muted px-2 py-1 text-xs">Inventory</Link>
-              <Link to="/admin/orders" className="rounded bg-muted px-2 py-1 text-xs">Orders</Link>
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen((v) => !v)}
+              aria-label="Toggle admin navigation"
+              aria-expanded={mobileNavOpen}
+              className="touch-target inline-flex items-center justify-center rounded-lg border border-border bg-card p-2 text-plum hover:bg-blush-soft lg:hidden"
+            >
+              {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+            <span className="font-serif text-lg font-bold text-plum lg:hidden">GlowCart Admin</span>
+          </div>
+          <span className="truncate font-mono text-xs text-muted-fg">{user?.email}</span>
+        </header>
+
+        {/* Mobile Full Admin Navigation Drawer */}
+        {mobileNavOpen && (
+          <div className="border-b border-border bg-card p-4 shadow-lg lg:hidden">
+            <nav aria-label="Mobile admin navigation" className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+              {renderNavItems(() => setMobileNavOpen(false))}
+            </nav>
+            <div className="mt-4 flex items-center justify-between gap-2 border-t border-border pt-3">
+              <Link
+                to="/"
+                onClick={() => setMobileNavOpen(false)}
+                className="touch-target flex-1 rounded-lg border border-border px-3 py-2 text-center text-xs font-semibold hover:bg-blush-soft"
+              >
+                Back to Storefront
+              </Link>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="touch-target inline-flex items-center gap-1.5 rounded-lg bg-plum px-4 py-2 text-xs font-semibold text-white"
+              >
+                <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
-          <span className="text-xs font-mono text-muted-fg">{user?.email}</span>
-        </header>
+        )}
+
         <main className="flex-1 p-4 lg:p-8">
           <Outlet />
         </main>
@@ -123,4 +163,3 @@ export const AdminLayout: React.FC = () => {
     </div>
   );
 };
-

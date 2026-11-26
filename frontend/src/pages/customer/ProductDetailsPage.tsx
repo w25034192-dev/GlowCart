@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, Heart, ShieldCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
+import { Check, ChevronRight, Heart, ShieldCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
 import { cartApi, catalogApi, engagementApi } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
@@ -52,7 +52,21 @@ export const ProductDetailsPage: React.FC = () => {
   }, [product]);
 
   if (isLoading || !product) {
-    return <div className="py-12 text-center text-muted-fg">Loading product details...</div>;
+    return (
+      <div className="space-y-8 py-4" aria-busy="true" aria-label="Loading product details">
+        <div className="h-4 w-48 animate-pulse rounded bg-muted" />
+        <div className="grid gap-10 lg:grid-cols-2">
+          <div className="aspect-square animate-pulse rounded-2xl bg-blush-soft" />
+          <div className="space-y-4">
+            <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+            <div className="h-10 w-3/4 animate-pulse rounded bg-muted" />
+            <div className="h-6 w-40 animate-pulse rounded bg-muted" />
+            <div className="h-24 w-full animate-pulse rounded-xl bg-muted" />
+            <div className="h-12 w-full animate-pulse rounded-xl bg-blush-soft" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const activeVariant = selectedVariant || product.variants[0];
@@ -118,8 +132,23 @@ export const ProductDetailsPage: React.FC = () => {
     }
   };
 
+  const categorySlugGuess = product.category_name.toLowerCase().includes('tool')
+    ? 'beauty-tools'
+    : product.category_name.toLowerCase().replace(/\s+/g, '-');
+
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 pb-20 lg:pb-0">
+      {/* Accessible Breadcrumbs */}
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-muted-fg">
+        <Link to="/" className="transition-colors hover:text-plum">Home</Link>
+        <ChevronRight className="h-3.5 w-3.5 opacity-60" aria-hidden="true" />
+        <Link to={`/category/${categorySlugGuess}`} className="transition-colors hover:text-plum">
+          {product.category_name}
+        </Link>
+        <ChevronRight className="h-3.5 w-3.5 opacity-60" aria-hidden="true" />
+        <span className="font-medium text-plum">{product.name}</span>
+      </nav>
+
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="overflow-hidden rounded-2xl border border-border bg-beige">
           <img
@@ -241,7 +270,7 @@ export const ProductDetailsPage: React.FC = () => {
               type="button"
               onClick={handleAddToCart}
               disabled={!activeVariant || activeVariant.available_quantity <= 0}
-              className="flex-1"
+              className="flex-1 bg-mauve-deep text-white hover:bg-plum"
             >
               <ShoppingBag className="h-4 w-4" aria-hidden="true" />
               <span>Add to Cart</span>
@@ -398,6 +427,27 @@ export const ProductDetailsPage: React.FC = () => {
               ))}
           </div>
         </section>
+      )}
+
+      {/* Sticky Mobile Add-to-Cart Bar */}
+      {activeVariant && (
+        <div className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 border-t border-border bg-card/95 px-4 py-3 shadow-lg backdrop-blur-md lg:hidden">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-semibold text-plum">{product.name}</p>
+            <p className="font-mono text-sm font-bold text-foreground">
+              ${Number(activeVariant.price).toFixed(2)}
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={activeVariant.available_quantity <= 0}
+            className="shrink-0 rounded-full bg-mauve-deep px-6 text-xs font-bold uppercase tracking-wider text-white hover:bg-plum"
+          >
+            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+            <span>Add to Cart</span>
+          </Button>
+        </div>
       )}
     </div>
   );

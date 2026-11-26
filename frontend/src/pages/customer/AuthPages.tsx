@@ -66,7 +66,7 @@ export const LoginPage: React.FC = () => {
               className="mt-1 w-full rounded-lg border border-border px-3 py-2.5 text-sm"
             />
           </div>
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button type="submit" disabled={loading} className="w-full bg-mauve-deep text-white hover:bg-plum">
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>

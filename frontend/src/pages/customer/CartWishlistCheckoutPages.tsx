@@ -112,7 +112,7 @@ export const CartPage: React.FC = () => {
             <dd className="font-mono">${Number(cart.total_amount).toFixed(2)}</dd>
           </div>
         </dl>
-        <Button type="button" className="w-full" onClick={() => navigate('/checkout')}>
+        <Button type="button" className="w-full bg-mauve-deep text-white hover:bg-plum" onClick={() => navigate('/checkout')}>
           Proceed to Checkout
         </Button>
       </Card>

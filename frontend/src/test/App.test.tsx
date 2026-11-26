@@ -191,7 +191,7 @@ describe('GlowCart Frontend', () => {
     expect(await screen.findByText(/SKU: RB-JOY/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Hope/i }));
     expect(await screen.findByText(/SKU: RB-HOPE/i)).toBeInTheDocument();
-    expect(screen.getByText('$25.00')).toBeInTheDocument();
+    expect(screen.getAllByText('$25.00').length).toBeGreaterThanOrEqual(1);
   });
 
   it('loads skincare products and resets stale keyword filters when navigating between categories', async () => {
