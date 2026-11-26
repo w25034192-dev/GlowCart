@@ -38,10 +38,8 @@ CATEGORIES_DATA = [
     ("Skincare", "skincare", "Cleansers, toners, serums, essences, and moisturizers", 2),
     ("Sun Care", "sun-care", "Daily UV protection creams and sun sticks", 3),
     ("Hair Care", "hair-care", "Shampoos, conditioners, treatments, and hair masks", 4),
-    ("Body Care", "body-care", "Body washes, lotions, scrubs, and nourishing oils", 5),
-    ("Fragrance", "fragrance", "Perfumes, eau de parfum, and body mists", 6),
-    ("Beauty Tools", "beauty-tools", "Brushes, sponges, and vanity tools", 7),
-    ("Makeup Sets", "makeup-sets", "Curated gift sets and skincare bundles", 8),
+    ("Fragrance", "fragrance", "Perfumes, eau de parfum, and body mists", 5),
+    ("Beauty Tools", "beauty-tools", "Brushes, sponges, and vanity tools", 6),
 ]
 
 BRANDS_DATA = [
@@ -126,6 +124,55 @@ BRANDS_DATA = [
     ("Oribe", "oribe", "USA", True),
     ("Davines", "davines", "Italy", True),
     ("Real Techniques", "real-techniques", "USA", True),
+    # Additional Trending Global & Atelier Brands
+    ("Abib", "abib", "South Korea", True),
+    ("Ariana Grande", "ariana-grande", "USA", True),
+    ("Armani Beauty", "armani-beauty", "Italy", True),
+    ("Aveda", "aveda", "USA", True),
+    ("Bioderma", "bioderma", "France", True),
+    ("Bumble and bumble", "bumble-and-bumble", "USA", True),
+    ("Burberry", "burberry", "UK", True),
+    ("Canmake", "canmake", "Japan", True),
+    ("Carolina Herrera", "carolina-herrera", "USA", True),
+    ("Clinique", "clinique", "USA", True),
+    ("Color Wow", "color-wow", "USA", True),
+    ("Coola", "coola", "USA", True),
+    ("Dae", "dae", "USA", True),
+    ("Diptyque", "diptyque", "France", True),
+    ("E.l.f.", "elf", "USA", True),
+    ("EltaMD", "eltamd", "USA", True),
+    ("Eucerin", "eucerin", "Germany", True),
+    ("Fino", "fino", "Japan", True),
+    ("Foreo", "foreo", "Sweden", True),
+    ("Garnier", "garnier", "France", True),
+    ("Glossier", "glossier", "USA", True),
+    ("Glow Recipe", "glow-recipe", "USA", True),
+    ("Haruharu Wonder", "haruharu-wonder", "South Korea", True),
+    ("I'm From", "im-from", "South Korea", True),
+    ("Kayali", "kayali", "UAE", True),
+    ("Kiehl's", "kiehls", "USA", True),
+    ("Kosas", "kosas", "USA", True),
+    ("Kristin Ess", "kristin-ess", "USA", True),
+    ("Laura Mercier", "laura-mercier", "USA", True),
+    ("Living Proof", "living-proof", "USA", True),
+    ("Makeup By Mario", "makeup-by-mario", "USA", True),
+    ("Marc Jacobs", "marc-jacobs", "USA", True),
+    ("Mason Pearson", "mason-pearson", "UK", True),
+    ("Mielle Organics", "mielle-organics", "USA", True),
+    ("NuFACE", "nuface", "USA", True),
+    ("PMD", "pmd", "USA", True),
+    ("Patrick Ta", "patrick-ta", "USA", True),
+    ("Prada", "prada", "Italy", True),
+    ("Redken", "redken", "USA", True),
+    ("Revlon", "revlon", "USA", True),
+    ("Sulwhasoo", "sulwhasoo", "South Korea", True),
+    ("Tom Ford", "tom-ford", "USA", True),
+    ("Tower 28", "tower-28", "USA", True),
+    ("Tsubaki", "tsubaki", "Japan", True),
+    ("Tweezerman", "tweezerman", "USA", True),
+    ("Valentino", "valentino", "Italy", True),
+    ("Vegamour", "vegamour", "USA", True),
+    ("d'Alba", "dalba", "South Korea", True),
 ]
 
 def _p(
@@ -157,130 +204,161 @@ def _p(
     }
 
 
-PRODUCTS_100: list[dict] = [
-    # --- Makeup (24 distinct viral item types - 100% visually verified product photos) ---
+PRODUCTS_120: list[dict] = [
+    # =========================================================================
+    # 1. MAKEUP (20 distinct viral products)
+    # =========================================================================
     _p("Makeup", "Rare Beauty", "Rare Beauty Soft Pinch Liquid Blush", "rare-beauty-soft-pinch-blush", ["all"], "shades_blush", "7.5ml", "23.00", "https://s3.amazonaws.com/donovanbailey/products/api_featured_images/000/001/003/original/open-uri20171227-4-13ivnwv?1514343870"),
-    _p("Makeup", "Charlotte Tilbury", "Charlotte Tilbury Airbrush Flawless Setting Spray", "ct-airbrush-flawless-setting-spray", ["all"], "volumes", "100ml", "38.00", "https://images.unsplash.com/photo-1688955665338-fb430ff8436d?auto=format&fit=crop&w=800&q=80"),
     _p("Makeup", "Dior", "Dior Addict Lip Glow Oil", "dior-addict-lip-glow-oil", ["all"], "shades_lip", "6ml", "40.00", "/images/products/luxury-lip-hand.jpg"),
+    _p("Makeup", "Charlotte Tilbury", "Charlotte Tilbury Airbrush Flawless Setting Spray", "ct-airbrush-flawless-setting-spray", ["all"], "volumes", "100ml", "38.00", "https://images.unsplash.com/photo-1688955665338-fb430ff8436d?auto=format&fit=crop&w=800&q=80"),
     _p("Makeup", "Fenty Beauty", "Fenty Beauty Gloss Bomb Universal Lip Luminizer", "fenty-gloss-bomb-luminizer", ["all"], "shades_lip", "9ml", "21.00", "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80"),
     _p("Makeup", "NARS", "NARS Radiant Creamy Concealer", "nars-radiant-creamy-concealer", ["all"], "shades_foundation", "6ml", "32.00", "https://images.unsplash.com/photo-1571875257727-256c39da42af?auto=format&fit=crop&w=800&q=80"),
     _p("Makeup", "MAC", "MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy", ["all"], "shades_lip", "3g", "23.00", "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80"),
     _p("Makeup", "Yves Saint Laurent", "YSL Lash Clash Extreme Volume Mascara", "ysl-lash-clash-mascara", ["all"], "shades_eye", "9ml", "32.00", "https://images.unsplash.com/photo-1631214540553-ff044a3ff1d4?auto=format&fit=crop&w=800&q=80"),
     _p("Makeup", "Huda Beauty", "Huda Beauty Easy Bake Loose Baking & Setting Powder", "huda-easy-bake-loose-powder", ["oily", "combination"], "shades_powder", "20g", "38.00", "https://cdn.dummyjson.com/product-images/beauty/powder-canister/thumbnail.webp"),
-    _p("Makeup", "Benefit Cosmetics", "Benefit Cosmetics 24-HR Brow Setter Clear Gel", "benefit-24hr-brow-setter", ["all"], "volumes", "7ml", "26.00", "https://s3.amazonaws.com/donovanbailey/products/api_featured_images/000/001/040/original/open-uri20180630-4-1afkyee?1530390386"),
+    _p("Makeup", "Rhode", "Rhode Peptide Lip Tint", "rhode-peptide-lip-tint", ["all"], "shades_lip", "10ml", "18.00", "https://images.unsplash.com/photo-1571875227232-b7bd1fe2ed80?auto=format&fit=crop&w=800&q=80"),
+    _p("Makeup", "Summer Fridays", "Summer Fridays Lip Butter Balm", "summer-fridays-lip-butter-balm", ["all", "dry"], "shades_lip", "15g", "24.00", "/images/products/unbranded-lipstick.jpg"),
     _p("Makeup", "Saie", "Saie Glowy Super Gel Lightweight Dewy Highlighter", "saie-glowy-super-gel", ["all", "dry"], "shades_blush", "30ml", "28.00", "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "Fenty Beauty", "Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation", ["oily", "combination"], "shades_foundation", "32ml", "40.00", "/images/products/fenty-foundation-hand.jpg"),
-    _p("Makeup", "NARS", "NARS Orgasm Powder Blush", "nars-orgasm-powder-blush", ["all"], "shades_blush", "4.8g", "34.00", "/images/products/unbranded-blush.jpg"),
-    _p("Makeup", "Bell", "Bell Silk Matte Oil-Control Compact Powder", "bell-silk-matte-compact-powder", ["all", "oily"], "shades_powder", "10g", "7.50", "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "Laneige", "Laneige Neo Cushion Matte SPF42", "laneige-neo-cushion-matte", ["oily", "combination"], "shades_foundation", "15g", "34.00", "https://images.unsplash.com/photo-1737014892220-4123c7e020a1?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "Huda Beauty", "Huda Beauty GloWish Multidew Skin Tint", "huda-glowish-multidew-skin-tint", ["dry", "normal"], "shades_foundation", "30ml", "44.00", "/images/products/unbranded-foundation-square.jpg"),
-    _p("Makeup", "Bella Cosmetics", "Bella Glow BB Cream SPF30", "bella-glow-bb-cream", ["normal", "combination"], "shades_foundation", "30ml", "14.99", "https://images.unsplash.com/photo-1661347243240-5ce7c9992369?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "Yves Saint Laurent", "YSL Rouge Pur Couture The Slim Velvet Lipstick", "ysl-rouge-pur-couture-slim", ["all"], "shades_lip", "2.2g", "45.00", "https://cdn.dummyjson.com/product-images/beauty/red-lipstick/thumbnail.webp"),
+    _p("Makeup", "Kosas", "Kosas Revealer Concealer", "kosas-revealer-concealer", ["dry", "all"], "shades_foundation", "6ml", "30.00", "/images/products/unbranded-foundation-square.jpg"),
+    _p("Makeup", "Benefit Cosmetics", "Benefit 24-HR Brow Setter Clear Gel", "benefit-24hr-brow-setter", ["all"], "volumes", "7ml", "26.00", "https://s3.amazonaws.com/donovanbailey/products/api_featured_images/000/001/040/original/open-uri20180630-4-1afkyee?1530390386"),
+    _p("Makeup", "Patrick Ta", "Patrick Ta Major Headlines Blush", "patrick-ta-major-headlines-blush", ["all"], "shades_blush", "6g", "38.00", "/images/products/art-blush-compact.jpg"),
+    _p("Makeup", "Armani Beauty", "Armani Luminous Silk Foundation", "armani-luminous-silk-foundation", ["all", "combination"], "shades_foundation", "30ml", "69.00", "/images/products/art-foundation-beige.jpg"),
+    _p("Makeup", "Makeup By Mario", "Makeup By Mario SoftSculpt Skin Enhancer", "makeup-by-mario-skin-enhancer", ["all"], "shades_powder", "5g", "32.00", "/images/products/compact-cushion-hand.jpg"),
+    _p("Makeup", "Tower 28", "Tower 28 MakeWaves Mascara", "tower-28-makewaves-mascara", ["sensitive", "all"], "shades_eye", "8.5ml", "20.00", "/images/products/art-mascara-tube.jpg"),
+    _p("Makeup", "Clinique", "Clinique Almost Lipstick Black Honey", "clinique-almost-lipstick-black-honey", ["all"], "shades_lip", "1.9g", "24.00", "/images/products/art-nude-lipstick.jpg"),
+    _p("Makeup", "Laura Mercier", "Laura Mercier Translucent Loose Setting Powder", "laura-mercier-translucent-powder", ["all", "oily"], "shades_powder", "29g", "43.00", "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80"),
     _p("Makeup", "Rom&nd", "Rom&nd Juicy Lasting Tint", "romand-juicy-lasting-tint", ["all"], "shades_lip", "5.5g", "11.50", "https://images.unsplash.com/photo-1583209814683-c023dd293cc6?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "Rhode", "Rhode Peptide Lip Tint Espresso", "rhode-peptide-lip-tint", ["all"], "shades_lip", "10ml", "18.00", "https://images.unsplash.com/photo-1571875227232-b7bd1fe2ed80?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "Summer Fridays", "Summer Fridays Lip Butter Balm Vanilla", "summer-fridays-lip-butter-balm", ["all", "dry"], "shades_lip", "15g", "24.00", "/images/products/unbranded-lipstick.jpg"),
-    _p("Makeup", "NYX", "NYX Butter Gloss Hydrating Lip Balm", "nyx-butter-gloss-balm", ["all"], "shades_lip", "8ml", "7.00", "https://images.unsplash.com/photo-1512207576147-99bc3066b621?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "NYX", "NYX Epic Ink Waterproof Liquid Eyeliner", "nyx-epic-ink-eyeliner", ["all"], "shades_eye", "1ml", "10.00", "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup", "Huda Beauty", "Huda Beauty Empowered Eyeshadow Palette", "huda-empowered-eyeshadow-palette", ["all"], "sizes", "18 shades", "67.00", "https://cdn.dummyjson.com/product-images/beauty/eyeshadow-palette-with-mirror/thumbnail.webp"),
-    _p("Makeup", "Charlotte Tilbury", "Charlotte Tilbury Beautiful Skin Sun-Kissed Glow Bronzer", "ct-sun-kissed-glow-bronzer", ["all"], "shades_powder", "21g", "58.00", "https://s3.amazonaws.com/donovanbailey/products/api_featured_images/000/000/926/original/open-uri20171224-4-6mx0la?1514082656"),
 
-    # --- Skincare (26 distinct viral item types - 100% visually verified product photos) ---
+    # =========================================================================
+    # 2. SKINCARE (20 distinct viral products)
+    # =========================================================================
     _p("Skincare", "COSRX", "COSRX Advanced Snail 96 Mucin Power Essence", "cosrx-advanced-snail-96-essence", ["dry", "sensitive"], "volumes", "100ml", "21.00", "https://images.unsplash.com/photo-1777450793530-99a0e7b7fc53?auto=format&fit=crop&w=800&q=80"),
     _p("Skincare", "Anua", "Anua Heartleaf 77% Soothing Toner", "anua-heartleaf-77-soothing-toner", ["sensitive", "oily"], "volumes", "250ml", "23.00", "/images/products/unbranded-toner.jpg"),
-    _p("Skincare", "Torriden", "Torriden DIVE-IN Low Molecular Hyaluronic Acid Serum", "torriden-dive-in-ha-serum", ["dry", "dehydrated", "all"], "volumes", "50ml", "20.00", "/images/products/serum-dropper-hand.jpg"),
+    _p("Skincare", "Torriden", "Torriden DIVE-IN Hyaluronic Acid Serum", "torriden-dive-in-ha-serum", ["dry", "dehydrated", "all"], "volumes", "50ml", "20.00", "/images/products/serum-dropper-hand.jpg"),
+    _p("Skincare", "SKIN1004", "SKIN1004 Madagascar Centella Ampoule", "skin1004-madagascar-centella-ampoule", ["sensitive", "all"], "volumes", "55ml", "18.50", "https://images.unsplash.com/photo-1788700632990-d337396576a1?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "Laneige", "Laneige Lip Sleeping Mask", "laneige-lip-sleeping-mask", ["all", "dry"], "sizes", "20g", "24.00", "https://plus.unsplash.com/premium_photo-1674739375749-7efe56fc8bbb?auto=format&fit=crop&w=800&q=80"),
     _p("Skincare", "Medicube", "Medicube Collagen Night Wrapping Mask", "medicube-collagen-night-mask", ["dry", "all"], "volumes", "75ml", "28.00", "/images/products/unbranded-cream-jar.jpg"),
     _p("Skincare", "Rhode", "Rhode Glazing Milk Ceramide Facial Essence", "rhode-glazing-milk", ["dry", "sensitive", "all"], "volumes", "140ml", "30.00", "https://images.unsplash.com/photo-1771329064159-33f758d91f4a?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Laneige", "Laneige Cream Skin Cerapeptide Refiner", "laneige-cream-skin-cerapeptide", ["dry", "sensitive"], "volumes", "170ml", "36.00", "https://images.unsplash.com/photo-1770732766528-d0e9fd0df233?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Drunk Elephant", "Drunk Elephant Protini Polypeptide Cream", "drunk-elephant-protini-cream", ["all", "mature"], "volumes", "50ml", "68.00", "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80"),
     _p("Skincare", "Tatcha", "Tatcha The Dewy Skin Cream", "tatcha-dewy-skin-cream", ["dry", "normal"], "volumes", "50ml", "72.00", "https://images.unsplash.com/photo-1608068811588-3a67006b7489?auto=format&fit=crop&w=800&q=80"),
     _p("Skincare", "Paula's Choice", "Paula's Choice 2% BHA Liquid Exfoliant", "paulas-choice-2-bha-exfoliant", ["oily", "combination"], "volumes", "118ml", "35.00", "https://images.unsplash.com/photo-1764585966150-13611b2fee39?auto=format&fit=crop&w=800&q=80"),
     _p("Skincare", "Estée Lauder", "Estée Lauder Advanced Night Repair Serum", "estee-lauder-advanced-night-repair", ["dry", "mature", "all"], "volumes", "50ml", "85.00", "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "SK-II", "SK-II Facial Treatment Essence Pitera", "sk-ii-facial-treatment-essence", ["all", "mature"], "volumes", "160ml", "185.00", "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80&v=skii"),
-    _p("Skincare", "The Ordinary", "The Ordinary Niacinamide 10% + Zinc 1% Serum", "the-ordinary-niacinamide-10-zinc-1", ["oily", "combination"], "volumes", "30ml", "6.50", "https://images.unsplash.com/photo-1767256046031-743d33937c4e?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "La Roche-Posay", "La Roche-Posay Pure Vitamin C10 Serum", "lrp-pure-vitamin-c10-serum", ["all", "sensitive"], "volumes", "30ml", "44.99", "https://images.unsplash.com/photo-1741896135490-4062a3b21abf?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Innisfree", "Innisfree Retinol Cica Repair Ampoule", "innisfree-retinol-cica-ampoule", ["all", "acne-prone"], "volumes", "30ml", "36.00", "https://images.unsplash.com/photo-1765726951362-df46f5a74cdf?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "SKIN1004", "SKIN1004 Madagascar Centella Ampoule", "skin1004-madagascar-centella-ampoule", ["sensitive", "all"], "volumes", "55ml", "18.50", "https://images.unsplash.com/photo-1788700632990-d337396576a1?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "COSRX", "COSRX Full Fit Propolis Light Ampoule", "cosrx-propolis-light-ampule-70", ["all", "combination"], "volumes", "30ml", "24.00", "https://images.unsplash.com/photo-1782086816100-017c99c45109?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "The Ordinary", "The Ordinary AHA 30% + BHA 2% Peeling Solution", "the-ordinary-aha-30-bha-2-peeling", ["oily", "combination"], "volumes", "30ml", "9.50", "https://images.unsplash.com/photo-1771955216611-0a826d819978?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Medicube", "Medicube Zero Pore Pad 2.0", "medicube-zero-pore-pad-2", ["oily", "combination"], "sizes", "70 pads", "24.00", "https://images.unsplash.com/photo-1680063122329-69ef93b72c53?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "The Ordinary", "The Ordinary Niacinamide 10% + Zinc 1%", "the-ordinary-niacinamide-10-zinc-1", ["oily", "combination"], "volumes", "30ml", "6.50", "https://images.unsplash.com/photo-1767256046031-743d33937c4e?auto=format&fit=crop&w=800&q=80"),
     _p("Skincare", "CeraVe", "CeraVe Hydrating Facial Cleanser", "cerave-hydrating-facial-cleanser", ["dry", "sensitive"], "volumes", "236ml", "15.99", "https://images.unsplash.com/photo-1749599018738-b8fb6c4a83e0?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "La Roche-Posay", "La Roche-Posay Toleriane Purifying Foaming Cleanser", "lrp-toleriane-foaming-cleanser", ["oily", "combination"], "volumes", "400ml", "17.99", "https://images.unsplash.com/photo-1786298300597-1e05c974aafa?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "L'Oréal Paris", "L'Oréal Paris Micellar Cleansing Water", "loreal-micellar-cleansing-water", ["all", "sensitive"], "volumes", "400ml", "11.99", "https://images.unsplash.com/photo-1531895861208-8504b98fe814?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Medicube", "Medicube Collagen Jelly Cream", "medicube-collagen-jelly-cream", ["dry", "mature", "all"], "volumes", "110ml", "33.00", "https://images.unsplash.com/photo-1782687493430-228efc6a7d37?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "CeraVe", "CeraVe Daily Moisturizing Lotion", "cerave-daily-moisturizing-lotion", ["dry", "all"], "volumes", "355ml", "16.49", "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Beauty of Joseon", "Beauty of Joseon Revive Eye Serum Ginseng + Retinal", "boj-revive-eye-serum-ginseng-retinal", ["all", "mature"], "volumes", "30ml", "22.00", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Laneige", "Laneige Lip Sleeping Mask Intense Hydration", "laneige-lip-sleeping-mask", ["all", "dry"], "sizes", "20g", "24.00", "https://plus.unsplash.com/premium_photo-1674739375749-7efe56fc8bbb?auto=format&fit=crop&w=800&q=80"),
-    _p("Skincare", "Torriden", "Torriden Dive-In Soothing Sheet Mask Pack", "torriden-dive-in-sheet-mask", ["all", "dehydrated"], "sizes", "10 sheets", "22.00", "https://images.unsplash.com/photo-1743927773510-cc1ad4f46217?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "La Roche-Posay", "La Roche-Posay Cicaplast Baume B5", "lrp-cicaplast-baume-b5", ["sensitive", "dry"], "volumes", "100ml", "18.99", "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "SK-II", "SK-II Facial Treatment Essence", "sk-ii-facial-treatment-essence", ["all", "mature"], "volumes", "160ml", "185.00", "https://images.unsplash.com/photo-1770732766528-d0e9fd0df233?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "Drunk Elephant", "Drunk Elephant Protini Polypeptide Cream", "drunk-elephant-protini-cream", ["all", "mature"], "volumes", "50ml", "68.00", "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "Glow Recipe", "Glow Recipe Watermelon Glow Niacinamide Dew Drops", "glow-recipe-dew-drops", ["all", "dull"], "volumes", "40ml", "35.00", "https://images.unsplash.com/photo-1741896135490-4062a3b21abf?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "Bioderma", "Bioderma Sensibio H2O Micellar Water", "bioderma-sensibio-h2o", ["sensitive", "all"], "volumes", "500ml", "18.99", "https://images.unsplash.com/photo-1531895861208-8504b98fe814?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "Sulwhasoo", "Sulwhasoo First Care Activating Serum", "sulwhasoo-first-care-serum", ["all", "mature"], "volumes", "60ml", "89.00", "https://images.unsplash.com/photo-1782086816100-017c99c45109?auto=format&fit=crop&w=800&q=80"),
+    _p("Skincare", "Kiehl's", "Kiehl's Ultra Facial Cream", "kiehls-ultra-facial-cream", ["dry", "all"], "volumes", "50ml", "38.00", "/images/products/art-moisturizer-jar.jpg"),
+    _p("Skincare", "I'm From", "I'm From Rice Toner", "im-from-rice-toner", ["dry", "dull"], "volumes", "150ml", "28.00", "/images/products/art-minimalist-toner.jpg"),
 
-    # --- Sun Care (8 distinct viral product shots, zero skin close-ups or window cleaners) ---
+    # =========================================================================
+    # 3. SUN CARE (20 distinct viral products)
+    # =========================================================================
     _p("Sun Care", "Beauty of Joseon", "Beauty of Joseon Relief Sun Rice + Probiotics SPF50+", "boj-relief-sun", ["all", "sensitive"], "volumes", "50ml", "18.00", "/images/products/unbranded-sunscreen.jpg"),
     _p("Sun Care", "Round Lab", "Round Lab Birch Juice Moisturizing Sun Cream", "round-lab-birch-sun", ["dry", "normal"], "volumes", "50ml", "21.00", "https://plus.unsplash.com/premium_photo-1682535210542-21dceae4530c?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "SKIN1004", "SKIN1004 Hyalu-Cica Water-Fit Sun Serum SPF50+", "skin1004-sun-serum", ["dry", "all"], "volumes", "50ml", "16.50", "https://images.unsplash.com/photo-1643379855997-5344bd8d3e78?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Anessa", "Anessa Perfect UV Sunscreen Skincare Milk SPF50+", "anessa-perfect-uv-milk", ["oily", "combination"], "volumes", "60ml", "34.00", "https://plus.unsplash.com/premium_photo-1664300261771-f53155289841?auto=format&fit=crop&w=800&q=80"),
-    _p("Sun Care", "Supergoop!", "Supergoop! Glowscreen SPF 40 Sunrise", "supergoop-glowscreen-spf40", ["all", "dry"], "volumes", "50ml", "38.00", "https://images.unsplash.com/photo-1784256543053-076f2a8e4e40?auto=format&fit=crop&w=800&q=80"),
-    _p("Sun Care", "La Roche-Posay", "La Roche-Posay Anthelios UVMune 400 Invisible Fluid", "lrp-anthelios-fluid", ["sensitive", "all"], "volumes", "50ml", "33.50", "https://plus.unsplash.com/premium_photo-1663100784433-ac60688b5fe3?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Supergoop!", "Supergoop! Unseen Sunscreen SPF 40", "supergoop-unseen-sunscreen-spf40", ["all"], "volumes", "50ml", "38.00", "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Supergoop!", "Supergoop! Glowscreen SPF 40", "supergoop-glowscreen-spf40", ["all", "dry"], "volumes", "50ml", "38.00", "https://images.unsplash.com/photo-1784256543053-076f2a8e4e40?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "La Roche-Posay", "La Roche-Posay Anthelios UVMune 400 Fluid", "lrp-anthelios-fluid", ["sensitive", "all"], "volumes", "50ml", "33.50", "https://plus.unsplash.com/premium_photo-1663100784433-ac60688b5fe3?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Isntree", "Isntree Hyaluronic Acid Watery Sun Gel SPF50+", "isntree-watery-sun-gel", ["dry", "all"], "volumes", "50ml", "19.00", "https://plus.unsplash.com/premium_photo-1679046948909-ab47e96082e7?auto=format&fit=crop&w=800&q=80"),
     _p("Sun Care", "Tocobo", "Tocobo Cotton Soft Sun Stick SPF50+", "tocobo-cotton-soft-sun-stick", ["oily", "combination"], "sizes", "19g", "17.00", "https://plus.unsplash.com/premium_photo-1673628167571-532a6c5f5d16?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Biore", "Biore UV Aqua Rich Watery Essence", "biore-uv-aqua-rich-essence", ["all", "oily"], "volumes", "50g", "15.00", "https://images.unsplash.com/photo-1786298300597-1e05c974aafa?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Shiseido", "Shiseido Clear Sunscreen Stick SPF 50+", "shiseido-clear-sunscreen-stick", ["all"], "sizes", "20g", "30.00", "https://images.unsplash.com/photo-1576426863848-c21f53c60b19?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "EltaMD", "EltaMD UV Clear Broad-Spectrum SPF 46", "eltamd-uv-clear-spf46", ["acne-prone", "sensitive"], "volumes", "48g", "41.00", "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Haruharu Wonder", "Haruharu Wonder Black Rice Moisture Airyfit Sunscreen", "haruharu-black-rice-sunscreen", ["all"], "volumes", "50ml", "18.00", "/images/products/art-sunscreen-tube.jpg"),
+    _p("Sun Care", "Canmake", "Canmake Mermaid Skin Gel UV", "canmake-mermaid-skin-gel", ["dry", "all"], "volumes", "40g", "12.00", "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Abib", "Abib Quick Sunstick Protection Bar", "abib-quick-sunstick-bar", ["all"], "sizes", "22g", "20.00", "https://images.unsplash.com/photo-1680063122329-69ef93b72c53?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Eucerin", "Eucerin Oil Control Sun Gel-Cream", "eucerin-oil-control-sun-gel", ["oily", "acne-prone"], "volumes", "50ml", "22.00", "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Coola", "Coola Classic Face Sunscreen", "coola-classic-face-sunscreen", ["all"], "volumes", "50ml", "32.00", "https://images.unsplash.com/photo-1563178406-4cdc2923acbc?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "Innisfree", "Innisfree Daily UV Defense Sunscreen", "innisfree-daily-uv-defense", ["dry", "normal"], "volumes", "50ml", "16.00", "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "COSRX", "Cosrx Aloe Soothing Sun Cream", "cosrx-aloe-soothing-sun-cream", ["dry", "sensitive"], "volumes", "50ml", "16.00", "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80"),
+    _p("Sun Care", "d'Alba", "d'Alba Waterfull Essence Sun Cream", "dalba-waterfull-sun-cream", ["all", "dry"], "volumes", "50ml", "26.00", "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80"),
 
-    # --- Hair Care (10 distinct viral product shots, zero hair strands) ---
+    # =========================================================================
+    # 4. HAIR CARE (20 distinct viral products)
+    # =========================================================================
     _p("Hair Care", "Gisou", "Gisou Honey Infused Hair Oil", "gisou-honey-infused-hair-oil", ["all", "dry"], "volumes", "50ml", "46.00", "https://images.unsplash.com/photo-1669281393011-c335050cf0e9?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Oribe", "Oribe Gold Lust Nourishing Hair Oil", "oribe-gold-lust-hair-oil", ["all", "dry"], "volumes", "100ml", "57.00", "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "K18", "K18 Leave-In Molecular Repair Hair Mask", "k18-leave-in-molecular-mask", ["all", "damaged"], "volumes", "50ml", "75.00", "https://images.unsplash.com/photo-1643123158251-3a66f53a4635?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Olaplex", "Olaplex No. 3 Hair Perfector", "olaplex-no-3-hair-perfector", ["all", "damaged"], "volumes", "100ml", "30.00", "https://plus.unsplash.com/premium_photo-1692825694870-10196b7640f9?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Olaplex", "Olaplex No. 7 Bonding Oil", "olaplex-no-7-bonding-oil", ["all"], "volumes", "30ml", "30.00", "https://images.unsplash.com/photo-1643123158489-634259c983b3?auto=format&fit=crop&w=800&q=80"),
     _p("Hair Care", "Ouai", "Ouai Leave-In Conditioner", "ouai-leave-in-conditioner", ["all", "dry"], "volumes", "140ml", "30.00", "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Davines", "Davines OI All In One Hair Milk", "davines-oi-all-in-one-milk", ["all", "dry"], "volumes", "135ml", "42.00", "https://images.unsplash.com/photo-1597317628840-d3472f7aa7fc?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Amika", "Amika Soulfood Nourishing Hair Mask", "amika-soulfood-mask", ["dry", "all"], "volumes", "250ml", "34.00", "https://images.unsplash.com/photo-1758544518111-53274094598e?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Briogeo", "Briogeo Don't Despair, Repair! Deep Conditioning Mask", "briogeo-dont-despair-repair-mask", ["dry", "damaged"], "volumes", "237ml", "39.00", "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "K18", "K18 Leave-In Molecular Repair Hair Mask", "k18-leave-in-molecular-mask", ["all", "damaged"], "volumes", "50ml", "75.00", "https://images.unsplash.com/photo-1643123158251-3a66f53a4635?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Heritage Herbal", "Heritage Herbal Tayaw Kinpun Botanical Shampoo", "tayaw-kinpun-herbal-shampoo", ["all"], "volumes", "250ml", "12.00", "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80"),
-    _p("Hair Care", "Anua", "Anua Heartleaf Scalp Revitalizing Tonic", "anua-heartleaf-scalp-tonic", ["all", "oily"], "volumes", "150ml", "21.00", "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Amika", "Amika Soulfood Nourishing Mask", "amika-soulfood-mask", ["dry", "all"], "volumes", "250ml", "34.00", "https://images.unsplash.com/photo-1758544518111-53274094598e?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Briogeo", "Briogeo Don't Despair Repair Mask", "briogeo-dont-despair-repair-mask", ["dry", "damaged"], "volumes", "237ml", "39.00", "https://plus.unsplash.com/premium_photo-1661898281541-b0b724b6257b?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Color Wow", "Color Wow Dream Coat Supernatural Spray", "color-wow-dream-coat-spray", ["all"], "volumes", "200ml", "28.00", "https://images.unsplash.com/photo-1661347243240-5ce7c9992369?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Mielle Organics", "Mielle Rosemary Mint Scalp & Hair Strengthening Oil", "mielle-rosemary-mint-oil", ["all"], "volumes", "59ml", "10.00", "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Fino", "Fino Premium Touch Hair Mask", "fino-premium-touch-hair-mask", ["damaged", "dry"], "sizes", "230g", "15.00", "https://plus.unsplash.com/premium_photo-1700162640179-cd0c0005320c?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Tsubaki", "Tsubaki Premium Repair Mask", "tsubaki-premium-repair-mask", ["damaged", "dry"], "sizes", "180g", "16.00", "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Dae", "Dae Cactus Fruit 3-in-1 Styling Cream", "dae-cactus-fruit-styling-cream", ["all"], "volumes", "150ml", "30.00", "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Vegamour", "Vegamour GRO Hair Serum", "vegamour-gro-hair-serum", ["thinning", "all"], "volumes", "30ml", "64.00", "https://images.unsplash.com/photo-1771955216611-0a826d819978?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Kristin Ess", "Kristin Ess Signature Shampoo", "kristin-ess-signature-shampoo", ["all"], "volumes", "296ml", "15.00", "https://cdn.dummyjson.com/product-images/skin-care/attitude-super-leaves-hand-soap/thumbnail.webp"),
+    _p("Hair Care", "Living Proof", "Living Proof Perfect Hair Day Dry Shampoo", "living-proof-dry-shampoo", ["all"], "volumes", "198ml", "30.00", "https://plus.unsplash.com/premium_photo-1661630984481-e29093921ff7?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Oribe", "Oribe Gold Lust Repair & Restore Shampoo", "oribe-gold-lust-shampoo", ["all", "damaged"], "volumes", "250ml", "49.00", "https://cdn.dummyjson.com/product-images/skin-care/olay-ultra-moisture-shea-butter-body-wash/thumbnail.webp"),
+    _p("Hair Care", "Aveda", "Aveda Botanical Repair Strengthening Leave-In", "aveda-botanical-repair-leave-in", ["all", "damaged"], "volumes", "100ml", "38.00", "https://cdn.dummyjson.com/product-images/skin-care/vaseline-men-body-and-face-lotion/thumbnail.webp"),
+    _p("Hair Care", "Bumble and bumble", "Bumble and bumble Hairdresser's Invisible Oil", "bumble-hairdressers-invisible-oil", ["all", "dry"], "volumes", "100ml", "45.00", "https://images.unsplash.com/photo-1765726951362-df46f5a74cdf?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Redken", "Redken Acidic Bonding Concentrate", "redken-acidic-bonding-concentrate", ["damaged", "all"], "volumes", "150ml", "32.00", "https://plus.unsplash.com/premium_photo-1679046947964-139a2256afb5?auto=format&fit=crop&w=800&q=80"),
+    _p("Hair Care", "Garnier", "Garnier Fructis Hair Food Banana Mask", "garnier-hair-food-banana-mask", ["dry", "all"], "volumes", "390ml", "9.00", "https://images.unsplash.com/photo-1568584711271-6c929fb49b60?auto=format&fit=crop&w=800&q=80"),
 
-    # --- Body Care (8 distinct item types - zero butter/pills/thermometer/shower-couple) ---
-    _p("Body Care", "Sol de Janeiro", "Sol de Janeiro Brazilian Bum Bum Cream", "sdj-bum-bum-cream", ["all", "dry"], "volumes", "75ml", "22.00", "https://plus.unsplash.com/premium_photo-1700162640179-cd0c0005320c?auto=format&fit=crop&w=800&q=80"),
-    _p("Body Care", "Sol de Janeiro", "Sol de Janeiro Delicia Drench Body Butter", "sdj-delicia-body-butter", ["dry"], "volumes", "240ml", "48.00", "https://plus.unsplash.com/premium_photo-1661898281541-b0b724b6257b?auto=format&fit=crop&w=800&q=80"),
-    _p("Body Care", "CeraVe", "CeraVe SA Smoothing Body Wash", "cerave-sa-body-wash", ["rough", "all"], "volumes", "296ml", "15.99", "https://cdn.dummyjson.com/product-images/skin-care/olay-ultra-moisture-shea-butter-body-wash/thumbnail.webp"),
-    _p("Body Care", "La Roche-Posay", "La Roche-Posay Lipikar AP+M Body Balm", "lrp-lipikar-balm", ["dry", "sensitive"], "volumes", "400ml", "20.99", "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80"),
-    _p("Body Care", "Shwe Pyi Nann", "Shwe Pyi Nann Golden Thanakha Nourishing Body Lotion", "shwe-pyi-nann-body-lotion", ["all", "dry"], "volumes", "200ml", "13.50", "https://plus.unsplash.com/premium_photo-1661630984481-e29093921ff7?auto=format&fit=crop&w=800&q=80"),
-    _p("Body Care", "Anua", "Anua Peach 70% Niacinamide Body Serum", "anua-peach-niacin-body-serum", ["all", "dry"], "volumes", "200ml", "19.00", "https://plus.unsplash.com/premium_photo-1692825694870-10196b7640f9?auto=format&fit=crop&w=800&q=80"),
-    _p("Body Care", "GlowCart Studio", "GlowCart Studio Rose Quartz Sugar Body Scrub", "glowcart-rose-sugar-body-scrub", ["all", "dry"], "sizes", "250g", "24.00", "https://images.unsplash.com/photo-1568584711271-6c929fb49b60?auto=format&fit=crop&w=800&q=80"),
-    _p("Body Care", "L'Oréal Paris", "L'Oréal Paris Age Perfect Nourishing Hand Cream", "loreal-age-perfect-hand-cream", ["dry", "mature"], "volumes", "75ml", "12.50", "https://plus.unsplash.com/premium_photo-1679046947964-139a2256afb5?auto=format&fit=crop&w=800&q=80"),
-
-    # --- Fragrance (8 distinct viral luxury scents - zero cats, zero wrong brand bottles) ---
-    _p("Fragrance", "Maison Francis Kurkdjian", "Maison Francis Kurkdjian Baccarat Rouge 540 Eau de Parfum", "mfk-baccarat-rouge-540", ["all"], "volumes", "70ml", "325.00", "https://images.unsplash.com/photo-1632928145408-ef47a7672964?auto=format&fit=crop&w=800&q=80"),
+    # =========================================================================
+    # 5. FRAGRANCE (20 distinct viral products)
+    # =========================================================================
+    _p("Fragrance", "Maison Francis Kurkdjian", "Maison Francis Kurkdjian Baccarat Rouge 540", "mfk-baccarat-rouge-540", ["all"], "volumes", "70ml", "325.00", "https://images.unsplash.com/photo-1632928145408-ef47a7672964?auto=format&fit=crop&w=800&q=80"),
     _p("Fragrance", "Le Labo", "Le Labo Santal 33 Eau de Parfum", "le-labo-santal-33", ["all"], "volumes", "50ml", "230.00", "https://images.unsplash.com/photo-1609175235148-2fe181db7f36?auto=format&fit=crop&w=800&q=80"),
-    _p("Fragrance", "Yves Saint Laurent", "YSL Libre Eau De Parfum", "ysl-libre-eau-de-parfum", ["all"], "volumes", "50ml", "98.00", "https://cdn.dummyjson.com/product-images/fragrances/chanel-coco-noir-eau-de/thumbnail.webp"),
-    _p("Fragrance", "Parfums de Marly", "Parfums de Marly Delina Eau de Parfum", "pdm-delina-eau-de-parfum", ["all"], "volumes", "75ml", "355.00", "https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/thumbnail.webp"),
+    _p("Fragrance", "Yves Saint Laurent", "Yves Saint Laurent Libre Eau de Parfum", "ysl-libre-eau-de-parfum", ["all"], "volumes", "50ml", "98.00", "https://cdn.dummyjson.com/product-images/fragrances/chanel-coco-noir-eau-de/thumbnail.webp"),
+    _p("Fragrance", "Parfums de Marly", "Parfums de Marly Delina", "pdm-delina-eau-de-parfum", ["all"], "volumes", "75ml", "355.00", "https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/thumbnail.webp"),
     _p("Fragrance", "Sol de Janeiro", "Sol de Janeiro Cheirosa 62 Perfume Mist", "sdj-cheirosa-62-mist", ["all"], "volumes", "90ml", "24.00", "https://images.unsplash.com/photo-1784902538196-c7d914e3ecce?auto=format&fit=crop&w=800&q=80"),
-    _p("Fragrance", "Dior", "Miss Dior Blooming Bouquet Eau de Toilette", "miss-dior-blooming-bouquet", ["all"], "volumes", "50ml", "95.00", "https://cdn.dummyjson.com/product-images/fragrances/dior-j'adore/thumbnail.webp"),
-    _p("Fragrance", "Jo Malone", "Jo Malone Wood Sage & Sea Salt Cologne", "jo-malone-wood-sage-sea-salt", ["all"], "volumes", "100ml", "165.00", "https://images.unsplash.com/photo-1666621630026-862eea07236c?auto=format&fit=crop&w=800&q=80"),
-    _p("Fragrance", "Maison Margiela", "Maison Margiela REPLICA By the Fireplace", "maison-margiela-replica-fireplace", ["all"], "volumes", "100ml", "165.00", "https://cdn.dummyjson.com/product-images/fragrances/calvin-klein-ck-one/thumbnail.webp"),
+    _p("Fragrance", "Dior", "Dior Miss Dior Blooming Bouquet", "miss-dior-blooming-bouquet", ["all"], "volumes", "50ml", "95.00", "https://cdn.dummyjson.com/product-images/fragrances/dior-j'adore/thumbnail.webp"),
+    _p("Fragrance", "Jo Malone", "Jo Malone Wood Sage & Sea Salt", "jo-malone-wood-sage-sea-salt", ["all"], "volumes", "100ml", "165.00", "https://images.unsplash.com/photo-1666621630026-862eea07236c?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Byredo", "Byredo Mojave Ghost", "byredo-mojave-ghost", ["all"], "volumes", "100ml", "290.00", "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Maison Margiela", "Maison Margiela Replica By the Fireplace", "maison-margiela-replica-fireplace", ["all"], "volumes", "100ml", "165.00", "https://cdn.dummyjson.com/product-images/fragrances/calvin-klein-ck-one/thumbnail.webp"),
+    _p("Fragrance", "Chanel", "Chanel Coco Mademoiselle", "chanel-coco-mademoiselle", ["all"], "volumes", "100ml", "172.00", "https://cdn.dummyjson.com/product-images/fragrances/dolce-shine-eau-de/thumbnail.webp"),
+    _p("Fragrance", "Tom Ford", "Tom Ford Lost Cherry", "tom-ford-lost-cherry", ["all"], "volumes", "50ml", "395.00", "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Kayali", "Kayali Vanilla 28", "kayali-vanilla-28", ["all"], "volumes", "50ml", "89.00", "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Ariana Grande", "Ariana Grande Cloud Eau de Parfum", "ariana-grande-cloud-edp", ["all"], "volumes", "100ml", "65.00", "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Glossier", "Glossier You Eau de Parfum", "glossier-you-edp", ["all"], "volumes", "50ml", "68.00", "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Burberry", "Burberry Goddess Eau de Parfum", "burberry-goddess-edp", ["all"], "volumes", "50ml", "110.00", "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Valentino", "Valentino Donna Born In Roma", "valentino-donna-born-in-roma", ["all"], "volumes", "50ml", "135.00", "https://images.unsplash.com/photo-1615397349754-cfa2066a298e?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Prada", "Prada Paradoxe Eau de Parfum", "prada-paradoxe-edp", ["all"], "volumes", "50ml", "135.00", "https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Diptyque", "Diptyque Philosykos Eau de Toilette", "diptyque-philosykos-edt", ["all"], "volumes", "100ml", "175.00", "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Carolina Herrera", "Carolina Herrera Good Girl", "carolina-herrera-good-girl", ["all"], "volumes", "80ml", "140.00", "https://images.unsplash.com/photo-1528720208104-3d9bd03cc9d4?auto=format&fit=crop&w=800&q=80"),
+    _p("Fragrance", "Marc Jacobs", "Marc Jacobs Daisy Eau So Fresh", "marc-jacobs-daisy-eau-so-fresh", ["all"], "volumes", "75ml", "118.00", "https://images.unsplash.com/photo-1587017539504-67cfbddac569?auto=format&fit=crop&w=800&q=80"),
 
-    # --- Beauty Tools (10 distinct viral tools & brushes - zero Clorox, zero failed URLs) ---
-    _p("Beauty Tools", "Dyson", "Dyson Airwrap Multi-Styler Complete Long", "dyson-airwrap-multi-styler", ["all"], "sizes", "Set", "599.00", "https://images.unsplash.com/photo-1712641966810-611ff1503c6d?auto=format&fit=crop&w=800&q=80"),
+    # =========================================================================
+    # 6. BEAUTY TOOLS (20 distinct viral tools & styling devices)
+    # =========================================================================
+    _p("Beauty Tools", "Dyson", "Dyson Airwrap Multi-Styler", "dyson-airwrap-multi-styler", ["all"], "sizes", "Set", "599.00", "https://images.unsplash.com/photo-1712641966810-611ff1503c6d?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Dyson", "Dyson Supersonic Hair Dryer", "dyson-supersonic-hair-dryer", ["all"], "sizes", "Device", "429.00", "https://images.unsplash.com/photo-1727364438136-6edc10ef0a52?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Medicube", "Medicube Age-R Booster Pro", "medicube-age-r-booster-pro", ["all", "mature"], "sizes", "Device", "280.00", "https://plus.unsplash.com/premium_photo-1734469071552-3ac334be70f7?auto=format&fit=crop&w=800&q=80"),
-    _p("Beauty Tools", "Real Techniques", "Real Techniques Everyday Essentials Brush Set", "real-techniques-brush-set", ["all"], "sizes", "5-pc Set", "22.00", "https://images.unsplash.com/photo-1748899440472-d044c12e8316?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Hourglass", "Hourglass Vanish Seamless Finish Foundation Brush", "hourglass-vanish-foundation-brush", ["all"], "sizes", "1 pc", "48.00", "https://images.unsplash.com/photo-1553380155-da0ccd2e55e0?auto=format&fit=crop&w=800&q=80"),
-    _p("Beauty Tools", "Shu Uemura", "Shu Uemura Eyelash Curler", "shu-uemura-eyelash-curler", ["all"], "sizes", "1 pc", "25.00", "/images/products/unbranded-mascara.jpg"),
+    _p("Beauty Tools", "Rare Beauty", "Rare Beauty Liquid Blush Brush", "rare-beauty-liquid-blush-brush", ["all"], "sizes", "1 pc", "18.00", "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Real Techniques", "Real Techniques Everyday Essentials Brush Set", "real-techniques-brush-set", ["all"], "sizes", "5-pc Set", "22.00", "https://images.unsplash.com/photo-1748899440472-d044c12e8316?auto=format&fit=crop&w=800&q=80"),
     _p("Beauty Tools", "Beautyblender", "Beautyblender Original Makeup Sponge", "beautyblender-original-sponge", ["all"], "sizes", "1 pc", "20.00", "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80"),
-    _p("Beauty Tools", "Slip", "Slip Pure Silk Queen Pillowcase", "slip-pure-silk-pillowcase", ["all", "sensitive"], "sizes", "Queen", "89.00", "https://plus.unsplash.com/premium_photo-1664543258940-69c4480c5e8f?auto=format&fit=crop&w=800&q=80"),
-    _p("Beauty Tools", "Mount Lai", "Mount Lai Jade Gua Sha Facial Lifting Tool", "mount-lai-jade-gua-sha", ["all"], "sizes", "1 pc", "34.00", "https://plus.unsplash.com/premium_photo-1661583880955-7b21fe8f7f00?auto=format&fit=crop&w=800&q=80"),
-    _p("Beauty Tools", "Tangle Teezer", "Tangle Teezer The Ultimate Detangler Hairbrush", "tangle-teezer-ultimate-detangler", ["all"], "sizes", "1 pc", "16.00", "https://images.unsplash.com/photo-1713180758582-9bac6bc62a26?auto=format&fit=crop&w=800&q=80"),
-
-    # --- Makeup Sets (6 distinct viral sets) ---
-    _p("Makeup Sets", "Rare Beauty", "Rare Beauty Pinch & Glow Mini Set", "rare-beauty-pinch-glow-set", ["all"], "sizes", "2-pc Set", "32.00", "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup Sets", "Fenty Beauty", "Fenty Beauty Glossy Posse Trio Set", "fenty-glossy-posse-set", ["all"], "sizes", "3-pc Set", "42.00", "https://plus.unsplash.com/premium_photo-1684407616442-8d5a1b7c978e?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup Sets", "COSRX", "COSRX Snail Glass Skin Starter Kit", "cosrx-glass-skin-kit", ["dry", "all"], "sizes", "4-pc Kit", "38.00", "https://images.unsplash.com/photo-1512437136892-3d200c4645b9?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup Sets", "Beauty of Joseon", "Beauty of Joseon Hanbang Discovery Bundle", "boj-hanbang-bundle", ["all", "sensitive"], "sizes", "4-pc Bundle", "45.00", "https://plus.unsplash.com/premium_photo-1674949802338-f94005eb5b0a?auto=format&fit=crop&w=800&q=80"),
-    _p("Makeup Sets", "Bella Cosmetics", "Bella Iconic Yangon Glam Beauty Set", "bella-yangon-glam-set", ["all"], "sizes", "4-pc Set", "28.00", "/images/products/compact-cushion-hand.jpg"),
-    _p("Makeup Sets", "Charlotte Tilbury", "Charlotte Tilbury Hollywood Travel Brush & Pouch Set", "ct-travel-brush-pouch-set", ["all"], "sizes", "5-pc Set", "75.00", "https://images.unsplash.com/photo-1538022890810-8f4000ca9a10?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Shu Uemura", "Shu Uemura Eyelash Curler", "shu-uemura-eyelash-curler", ["all"], "sizes", "1 pc", "25.00", "/images/products/unbranded-mascara.jpg"),
+    _p("Beauty Tools", "Mount Lai", "Mount Lai Jade Gua Sha", "mount-lai-jade-gua-sha", ["all"], "sizes", "1 pc", "34.00", "https://plus.unsplash.com/premium_photo-1661583880955-7b21fe8f7f00?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Slip", "Slip Pure Silk Pillowcase", "slip-pure-silk-pillowcase", ["all", "sensitive"], "sizes", "Queen", "89.00", "https://plus.unsplash.com/premium_photo-1664543258940-69c4480c5e8f?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Tangle Teezer", "Tangle Teezer Ultimate Detangler", "tangle-teezer-ultimate-detangler", ["all"], "sizes", "1 pc", "16.00", "https://images.unsplash.com/photo-1713180758582-9bac6bc62a26?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "NuFACE", "NuFACE Trinity+ Facial Toning Device", "nuface-trinity-facial-toning", ["all", "mature"], "sizes", "Device", "395.00", "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Foreo", "Foreo Luna 4 Facial Cleansing Brush", "foreo-luna-4-cleansing-brush", ["all"], "sizes", "Device", "219.00", "https://images.unsplash.com/photo-1512437136892-3d200c4645b9?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Revlon", "Revlon One-Step Volumizer", "revlon-one-step-volumizer", ["all"], "sizes", "Styling Tool", "59.99", "https://plus.unsplash.com/premium_photo-1674949802338-f94005eb5b0a?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Tweezerman", "Tweezerman Slant Tweezer", "tweezerman-slant-tweezer", ["all"], "sizes", "1 pc", "24.00", "https://s3.amazonaws.com/donovanbailey/products/api_featured_images/000/000/985/original/data?1514082775"),
+    _p("Beauty Tools", "Fenty Beauty", "Fenty Beauty Precision Makeup Sponge", "fenty-precision-makeup-sponge", ["all"], "sizes", "1 pc", "16.00", "https://plus.unsplash.com/premium_photo-1684407616442-8d5a1b7c978e?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Charlotte Tilbury", "Charlotte Tilbury Hollywood Complexion Brush", "ct-hollywood-complexion-brush", ["all"], "sizes", "1 pc", "45.00", "https://images.unsplash.com/photo-1538022890810-8f4000ca9a10?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "E.l.f.", "E.l.f. Putty Primer Applicator", "elf-putty-primer-applicator", ["all"], "sizes", "1 pc", "6.00", "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "Mason Pearson", "Mason Pearson Handy Bristle Hair Brush", "mason-pearson-handy-bristle-brush", ["all"], "sizes", "1 pc", "175.00", "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=800&q=80"),
+    _p("Beauty Tools", "PMD", "PMD Clean Smart Facial Cleansing Device", "pmd-clean-smart-device", ["all"], "sizes", "Device", "99.00", "https://images.unsplash.com/photo-1512207576147-99bc3066b621?auto=format&fit=crop&w=800&q=80"),
 ]
 
-assert len(PRODUCTS_100) == 100, f"Expected 100 products, got {len(PRODUCTS_100)}"
-assert len({p["image_url"] for p in PRODUCTS_100}) == 100, "Duplicate image_url in PRODUCTS_100!"
-assert len({p["slug"] for p in PRODUCTS_100}) == 100, "Duplicate slug in PRODUCTS_100!"
-assert len({p["name"] for p in PRODUCTS_100}) == 100, "Duplicate name in PRODUCTS_100!"
+assert len(PRODUCTS_120) == 120, f"Expected 120 products, got {len(PRODUCTS_120)}"
+assert len({p["image_url"] for p in PRODUCTS_120}) == 120, "Duplicate image_url in PRODUCTS_120!"
+assert len({p["slug"] for p in PRODUCTS_120}) == 120, "Duplicate slug in PRODUCTS_120!"
+assert len({p["name"] for p in PRODUCTS_120}) == 120, "Duplicate name in PRODUCTS_120!"
 
-SLUG_IMAGE_MAP: dict[str, str] = {p["slug"]: p["image_url"] for p in PRODUCTS_100}
+# Backwards compatibility alias
+PRODUCTS_100: list[dict] = PRODUCTS_120
+
+SLUG_IMAGE_MAP: dict[str, str] = {p["slug"]: p["image_url"] for p in PRODUCTS_120}
 
 CATALOG_BLUEPRINT = [
     (
@@ -793,7 +871,7 @@ def seed_demo_data(db: Session) -> None:
             db.add(Wishlist(user_id=u.id))
 
     cat_map, brand_map = _ensure_categories_and_brands(db)
-    sync_catalog_100(db, cat_map=cat_map, brand_map=brand_map)
+    sync_catalog_120(db, cat_map=cat_map, brand_map=brand_map)
 
     # Demo Promotion & Coupon
     now = datetime.now(timezone.utc)
@@ -988,16 +1066,16 @@ def cleanup_generic_generated_products(db: Session) -> int:
     return _delete_or_archive_products(db, candidates)
 
 
-def sync_catalog_100(
+def sync_catalog_120(
     db: Session,
     cat_map: dict[str, Category] | None = None,
     brand_map: dict[str, Brand] | None = None,
 ) -> dict[str, int]:
-    """Force-sync the live catalog to the exact 100 distinct products and 100 unique Unsplash images."""
+    """Force-sync the live catalog to the exact 120 distinct products and 120 unique verified images."""
     if cat_map is None or brand_map is None:
         cat_map, brand_map = _ensure_categories_and_brands(db)
 
-    # 1. Remove/archive any old demo/stale products not in PRODUCTS_100 (preserve non-demo admin products)
+    # 1. Remove/archive any old demo/stale products not in PRODUCTS_120 (preserve non-demo admin products)
     stale_candidates = [
         p
         for p in db.query(Product).all()
@@ -1005,14 +1083,14 @@ def sync_catalog_100(
     ]
     removed = _delete_or_archive_products(db, stale_candidates)
 
-    # 2. Seed any missing products from PRODUCTS_100
+    # 2. Seed any missing products from PRODUCTS_120
     all_blueprint_entries = list(enumerate(CATALOG_BLUEPRINT, start=1))
     created = _seed_blueprint_entries(db, all_blueprint_entries, cat_map, brand_map)
 
-    # 3. Force-refresh metadata and ProductImage URLs for all 100 products
+    # 3. Force-refresh metadata and ProductImage URLs for all 120 products
     prod_by_slug = {p.slug: p for p in db.query(Product).all()}
     refreshed_images = 0
-    for item in PRODUCTS_100:
+    for item in PRODUCTS_120:
         prod = prod_by_slug.get(item["slug"])
         if prod is None:
             continue
@@ -1064,10 +1142,13 @@ def sync_catalog_100(
     return {"removed": removed, "created": created, "refreshed_images": refreshed_images}
 
 
+sync_catalog_100 = sync_catalog_120
+
+
 def ensure_initial_data(db: Session) -> bool:
-    """Ensure default admin exists and force-sync the 100 distinct products and 100 unique images."""
+    """Ensure default admin exists and force-sync the 120 distinct products and 120 unique images."""
     ensure_default_admin_and_roles(db)
-    stats = sync_catalog_100(db)
+    stats = sync_catalog_120(db)
     return (stats["removed"] + stats["created"] + stats["refreshed_images"]) > 0
 
 

@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.exceptions import GlowCartError
-from app.db.seed import ensure_initial_data, sync_catalog_100
+from app.db.seed import ensure_initial_data, sync_catalog_100, sync_catalog_120
 from app.db.session import SessionLocal
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ async def lifespan(_app: FastAPI):
             with SessionLocal() as db:
                 seeded = ensure_initial_data(db)
                 if seeded:
-                    logger.info("GlowCart startup sync refreshed 100 distinct catalog products and 100 unique Unsplash images.")
+                    logger.info("GlowCart startup sync refreshed 120 distinct catalog products and 120 unique verified images.")
         except Exception as exc:  # pragma: no cover - surfaced in startup logs if DB unreachable
             logger.exception("Startup auto-seed skipped or failed: %s", exc)
     yield

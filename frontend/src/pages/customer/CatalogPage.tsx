@@ -1,5 +1,5 @@
 import React, { useDeferredValue, useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Sparkles, X } from 'lucide-react';
 import { catalogApi } from '@/services/api';
@@ -401,6 +401,43 @@ export const CatalogPage: React.FC = () => {
             </div>
           );
         })()}
+
+        {/* Quick Category Navigation Tabs across all 6 core categories */}
+        <nav aria-label="Browse categories" className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <Link
+            to="/catalog"
+            className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+              !activeCategorySlug
+                ? 'bg-primary text-primary-fg shadow-sm'
+                : 'border border-border/80 bg-card text-muted-fg hover:border-primary/40 hover:text-foreground'
+            }`}
+          >
+            All Products
+          </Link>
+          {[
+            { name: 'Makeup', slug: 'makeup' },
+            { name: 'Skincare', slug: 'skincare' },
+            { name: 'Sun Care', slug: 'sun-care' },
+            { name: 'Hair Care', slug: 'hair-care' },
+            { name: 'Fragrance', slug: 'fragrance' },
+            { name: 'Tools & Brushes', slug: 'beauty-tools' },
+          ].map((cat) => {
+            const isActive = activeCategorySlug === cat.slug;
+            return (
+              <Link
+                key={cat.slug}
+                to={`/category/${cat.slug}`}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+                  isActive
+                    ? 'bg-primary text-primary-fg shadow-sm'
+                    : 'border border-border/80 bg-card text-muted-fg hover:border-primary/40 hover:text-foreground'
+                }`}
+              >
+                {cat.name}
+              </Link>
+            );
+          })}
+        </nav>
 
         {/* Interactive Removable Active Filter Chips */}
         {hasExtraFilters && (

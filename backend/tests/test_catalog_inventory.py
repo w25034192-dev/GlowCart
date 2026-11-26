@@ -256,7 +256,7 @@ def test_demo_seeder_meets_minimum_catalog_counts(db_session):
     from app.models import Brand, Category, Product, ProductVariant
 
     seed_demo_data(db_session)
-    assert db_session.query(Category).count() >= 8
+    assert db_session.query(Category).count() >= 6
     assert db_session.query(Brand).count() >= 15
     assert db_session.query(Product).count() >= 50
     assert db_session.query(ProductVariant).count() >= 100
@@ -675,7 +675,7 @@ def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
         "charlotte tilbury airbrush flawless setting spray",
         "mac matte lipstick velvet teddy",
         "estée lauder advanced night repair serum",
-        "medicube collagen jelly cream",
+        "medicube collagen night wrapping mask",
     ):
         assert required in lower_names
 
@@ -763,14 +763,14 @@ def test_zero_duplicate_image_urls_across_full_catalog_and_lip_matching(db_sessi
     ensure_initial_data(db_session)
     all_images = db_session.query(ProductImage).all()
     all_urls = [img.image_url for img in all_images]
-    assert len(all_urls) == 100
-    assert len(set(all_urls)) == 100
+    assert len(all_urls) == 120
+    assert len(set(all_urls)) == 120
 
-    # Verify Beauty Tools has 10 distinct items with 10 unique images
+    # Verify Beauty Tools has 20 distinct items with 20 unique images
     beauty_tools = [p for p in db_session.query(Product).all() if p.category.slug == "beauty-tools"]
-    assert len(beauty_tools) == 10
+    assert len(beauty_tools) == 20
     tool_urls = [db_session.query(ProductImage).filter(ProductImage.product_id == p.id).one().image_url for p in beauty_tools]
-    assert len(set(tool_urls)) == 10
+    assert len(set(tool_urls)) == 20
 
 
 def test_all_seeded_products_have_unique_image_urls_and_type_groups(db_session):
@@ -798,23 +798,23 @@ def test_all_seeded_products_have_unique_image_urls_and_type_groups(db_session):
     products = db_session.query(Product).all()
     images = db_session.query(ProductImage).filter(ProductImage.is_primary.is_(True)).all()
     unique_urls = {img.image_url for img in images}
-    assert len(products) == 100
+    assert len(products) == 120
     assert len(unique_urls) == len(products)
 
 
 def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session):
-    """Verify PRODUCTS_100 has 100 unique products & Unsplash URLs, and sync_catalog_100 force-refreshes stale DB rows."""
-    from app.db.seed import PRODUCTS_100, _ensure_categories_and_brands, ensure_initial_data
+    """Verify PRODUCTS_120 has 120 unique products & verified URLs, and sync_catalog_120 force-refreshes stale DB rows."""
+    from app.db.seed import PRODUCTS_120, PRODUCTS_100, _ensure_categories_and_brands, ensure_initial_data
     from app.models import Product, ProductImage
 
-    assert len(PRODUCTS_100) == 100
-    assert len({p["image_url"] for p in PRODUCTS_100}) == 100
-    assert len({p["name"] for p in PRODUCTS_100}) == 100
-    assert len({p["slug"] for p in PRODUCTS_100}) == 100
-    for p in PRODUCTS_100:
+    assert len(PRODUCTS_120) == 120
+    assert len({p["image_url"] for p in PRODUCTS_120}) == 120
+    assert len({p["name"] for p in PRODUCTS_120}) == 120
+    assert len({p["slug"] for p in PRODUCTS_120}) == 120
+    for p in PRODUCTS_120:
         assert p["image_url"].startswith(("https://", "/images/products/"))
 
-    # Seed initial 100 products, then corrupt one image and insert a stale duplicate product
+    # Seed initial 120 products, then corrupt one image and insert a stale duplicate product
     ensure_initial_data(db_session)
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
     brand = next(iter(brand_map.values()))
@@ -841,7 +841,7 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
     assert changed is True
     assert db_session.query(Product).filter(Product.slug == "nyx-blending-sponge").first() is None
     refreshed_img = db_session.query(ProductImage).filter(ProductImage.product_id == brush.id).one()
-    expected_brush_url = next(p["image_url"] for p in PRODUCTS_100 if p["slug"] == "hourglass-vanish-foundation-brush")
+    expected_brush_url = next(p["image_url"] for p in PRODUCTS_120 if p["slug"] == "hourglass-vanish-foundation-brush")
     assert refreshed_img.image_url == expected_brush_url
 
     # Verify realistic seeded ratings (4.7-4.9) and review counts (95-450) via CatalogService

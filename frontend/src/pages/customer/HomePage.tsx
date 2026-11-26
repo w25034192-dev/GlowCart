@@ -1,50 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { catalogApi } from '@/services/api';
+import { ProductCard } from '@/components/customer/ProductCard';
+import type { ProductSummary } from '@/types';
 
-interface ProductItem {
-  id: string | number;
-  name: string;
-  finish: string;
-  price: number;
-  badge?: string;
-  image: string;
-  swatches: string[];
-}
-
-const BESTSELLERS: ProductItem[] = [
+const FALLBACK_TRENDING: ProductSummary[] = [
   {
-    id: 1,
-    name: 'Rosy Day',
-    finish: 'Soft Matte',
-    price: 16,
-    image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80',
-    swatches: ['#C86D7C', '#E09A9F', '#9E3E52'],
+    id: 'fenty-gloss-bomb',
+    name: 'Fenty Beauty Gloss Bomb Universal Lip Luminizer',
+    slug: 'fenty-gloss-bomb-luminizer',
+    category_id: 'cat-makeup',
+    category_name: 'Makeup',
+    brand_id: 'brand-fenty',
+    brand_name: 'Fenty Beauty',
+    min_price: '21.00',
+    primary_image_url: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80',
+    average_rating: 4.8,
+    review_count: 320,
+    in_stock: true,
+    is_featured: true,
+    is_new_arrival: false,
+    is_best_seller: true,
+    is_demo: false,
+    skin_types: ['all'],
   },
   {
-    id: 2,
-    name: 'Berry Crush',
-    finish: 'Soft Matte',
-    price: 16,
-    image: 'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=600&q=80',
-    swatches: ['#9E2A4B', '#C94A6A', '#731C35'],
+    id: 'boj-relief-sun',
+    name: 'Beauty of Joseon Relief Sun Rice + Probiotics SPF50+',
+    slug: 'beauty-of-joseon-relief-sun',
+    category_id: 'cat-suncare',
+    category_name: 'Sun Care',
+    brand_id: 'brand-boj',
+    brand_name: 'Beauty of Joseon',
+    min_price: '18.00',
+    primary_image_url: '/images/products/art-sunscreen-tube.jpg',
+    average_rating: 4.9,
+    review_count: 450,
+    in_stock: true,
+    is_featured: true,
+    is_new_arrival: false,
+    is_best_seller: true,
+    is_demo: false,
+    skin_types: ['all', 'sensitive'],
   },
   {
-    id: 3,
-    name: 'Nude Silk',
-    finish: 'Satin',
-    price: 16,
-    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80',
-    swatches: ['#C68B77', '#D9A796', '#9C6250'],
+    id: 'cosrx-snail-essence',
+    name: 'COSRX Advanced Snail 96 Mucin Power Essence',
+    slug: 'cosrx-advanced-snail-96-mucin-power-essence',
+    category_id: 'cat-skincare',
+    category_name: 'Skincare',
+    brand_id: 'brand-cosrx',
+    brand_name: 'COSRX',
+    min_price: '25.00',
+    primary_image_url: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80',
+    average_rating: 4.8,
+    review_count: 390,
+    in_stock: true,
+    is_featured: true,
+    is_new_arrival: false,
+    is_best_seller: true,
+    is_demo: false,
+    skin_types: ['dry', 'sensitive', 'all'],
   },
   {
-    id: 4,
-    name: 'Coral Pop',
-    finish: 'Gloss',
-    price: 14,
-    badge: 'New',
-    image: 'https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=600&q=80',
-    swatches: ['#E86B63', '#F2948A', '#C4453E'],
+    id: 'gisou-hair-oil',
+    name: 'Gisou Honey Infused Hair Oil',
+    slug: 'gisou-honey-infused-hair-oil',
+    category_id: 'cat-haircare',
+    category_name: 'Hair Care',
+    brand_id: 'brand-gisou',
+    brand_name: 'Gisou',
+    min_price: '46.00',
+    primary_image_url: 'https://images.unsplash.com/photo-1608248597359-58b163351ec1?auto=format&fit=crop&w=800&q=80',
+    average_rating: 4.8,
+    review_count: 215,
+    in_stock: true,
+    is_featured: true,
+    is_new_arrival: false,
+    is_best_seller: true,
+    is_demo: false,
+    skin_types: ['all'],
   },
 ];
 
@@ -113,48 +148,36 @@ const SKIN_TONES = [
 
 export const HomePage: React.FC = () => {
   const [selectedTone, setSelectedTone] = useState(SKIN_TONES[2]); // Default: Medium
-  const [activeSwatches, setActiveSwatches] = useState<Record<number | string, string>>({});
-  const [wishlist, setWishlist] = useState<Record<number | string, boolean>>({});
-  const [products, setProducts] = useState<ProductItem[]>(BESTSELLERS);
+  const [trendCategory, setTrendCategory] = useState<string>('all');
+  const [products, setProducts] = useState<ProductSummary[]>(FALLBACK_TRENDING);
 
-  // Load products from backend catalog API, falling back to local defaults
+  // Load products from backend catalog API, filtered by selected trending category
   useEffect(() => {
+    const params: Record<string, string | number | boolean | undefined> = {
+      page_size: 8,
+      sort: 'rating',
+    };
+    if (trendCategory !== 'all') {
+      params.category_slug = trendCategory;
+    }
     catalogApi
-      .getProducts({ page_size: 4 })
+      .getProducts(params)
       .then((data) => {
         if (data?.items?.length) {
-          const mapped = data.items.slice(0, 4).map((p: any, idx: number) => ({
-            id: p.id,
-            name: p.name,
-            finish: p.category_name || p.category?.name || 'Soft Matte',
-            price: Number(p.min_price || p.price || 16),
-            badge: idx === 3 ? 'New' : undefined,
-            image: p.image_url || p.images?.[0]?.image_url || BESTSELLERS[idx % BESTSELLERS.length].image,
-            swatches: BESTSELLERS[idx % BESTSELLERS.length].swatches,
-          }));
-          setProducts(mapped);
+          setProducts(data.items);
         }
       })
       .catch(() => {
-        fetch('/api/catalog/products?limit=4')
+        fetch(`/api/catalog/products?limit=8&category_slug=${trendCategory !== 'all' ? trendCategory : ''}`)
           .then((res) => (res.ok ? res.json() : null))
           .then((data) => {
             if (data?.items?.length) {
-              const mapped = data.items.slice(0, 4).map((p: any, idx: number) => ({
-                id: p.id,
-                name: p.name,
-                finish: p.category?.name || 'Soft Matte',
-                price: Number(p.price || 16),
-                badge: idx === 3 ? 'New' : undefined,
-                image: p.image_url || BESTSELLERS[idx % BESTSELLERS.length].image,
-                swatches: BESTSELLERS[idx % BESTSELLERS.length].swatches,
-              }));
-              setProducts(mapped);
+              setProducts(data.items);
             }
           })
-          .catch(() => { });
+          .catch(() => {});
       });
-  }, []);
+  }, [trendCategory]);
 
   return (
     <div className="min-h-screen bg-[#FDF7F8] text-stone-900 font-sans">
@@ -257,100 +280,65 @@ export const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. BESTSELLERS ("Our Most-Loved Shades") */}
+      {/* 3. TRENDING NOW / VIRAL BEST-SELLERS */}
       <section className="max-w-7xl mx-auto px-6 py-14">
-        <div className="relative text-center mb-10">
-          <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
-            BESTSELLERS
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">
-            Our Most-Loved Shades
-          </h2>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div>
+            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#B8295B]">
+              TRENDING NOW • BESTSELLERS
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-1">
+              Viral Best-Sellers &amp; Our Most-Loved Shades
+            </h2>
+            <p className="text-xs sm:text-sm text-stone-500 mt-1">
+              Top-rated formulations and pro beauty rituals loved worldwide with FEFO freshness.
+            </p>
+          </div>
           <Link
-            to="/products"
-            className="sm:absolute sm:right-0 sm:bottom-1 inline-block mt-2 sm:mt-0 text-xs font-semibold text-stone-700 hover:text-[#B8295B]"
+            to={trendCategory === 'all' ? '/catalog' : `/category/${trendCategory}`}
+            className="inline-flex items-center text-xs font-semibold text-stone-700 hover:text-[#B8295B] transition-colors"
           >
-            View All →
+            Explore All 120 Products →
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((item) => {
-            const activeColor = activeSwatches[item.id] || item.swatches[0];
-            const isLiked = !!wishlist[item.id];
-
+        {/* Category Filter Pills */}
+        <div
+          className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none"
+          aria-label="Filter trending products by category"
+        >
+          {[
+            { label: 'All Best-Sellers', slug: 'all' },
+            { label: 'Makeup', slug: 'makeup' },
+            { label: 'Skincare', slug: 'skincare' },
+            { label: 'Sun Care', slug: 'sun-care' },
+            { label: 'Hair Care', slug: 'hair-care' },
+            { label: 'Fragrance', slug: 'fragrance' },
+            { label: 'Tools & Brushes', slug: 'beauty-tools' },
+          ].map((cat) => {
+            const active = trendCategory === cat.slug;
             return (
-              <div
-                key={item.id}
-                className="bg-white rounded-2xl p-3.5 border border-rose-100/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+              <button
+                key={cat.slug}
+                type="button"
+                onClick={() => setTrendCategory(cat.slug)}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+                  active
+                    ? 'bg-[#B8295B] text-white shadow-sm'
+                    : 'bg-white border border-rose-100/80 text-stone-600 hover:border-rose-300 hover:text-stone-900'
+                }`}
               >
-                {/* Product Image Box */}
-                <div className="relative rounded-xl overflow-hidden bg-[#F9E8EC] aspect-square mb-3.5">
-                  {item.badge && (
-                    <span className="absolute top-2.5 left-2.5 bg-[#B8295B] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
-
-                  {/* Heart Wishlist Button */}
-                  <button
-                    type="button"
-                    aria-label={`Wishlist ${item.name}`}
-                    onClick={() =>
-                      setWishlist((prev) => ({ ...prev, [item.id]: !prev[item.id] }))
-                    }
-                    className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-xs shadow-sm hover:scale-105 transition"
-                  >
-                    {isLiked ? '❤️' : '🤍'}
-                  </button>
-
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-
-                {/* Shade Swatch Dots */}
-                <div className="flex items-center gap-1.5 mb-2">
-                  {item.swatches.map((hex) => (
-                    <button
-                      key={hex}
-                      type="button"
-                      aria-label={`Select swatch ${hex}`}
-                      onClick={() =>
-                        setActiveSwatches((prev) => ({ ...prev, [item.id]: hex }))
-                      }
-                      className={`w-3.5 h-3.5 rounded-full border transition-transform ${activeColor === hex ? 'border-stone-900 scale-125' : 'border-transparent'
-                        }`}
-                      style={{ backgroundColor: hex }}
-                    />
-                  ))}
-                </div>
-
-                {/* Title & Finish */}
-                <Link
-                  to={`/products/${item.id}`}
-                  className="font-bold text-sm text-stone-900 hover:text-[#B8295B]"
-                >
-                  {item.name}
-                </Link>
-                <p className="text-xs text-stone-500">{item.finish}</p>
-                <p className="text-sm font-bold text-stone-900 mt-1">${item.price}</p>
-
-                {/* Stars + Add to Bag Pill */}
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-stone-100">
-                  <span className="text-amber-400 text-xs tracking-tighter">★★★★★</span>
-                  <button
-                    type="button"
-                    className="bg-stone-900 hover:bg-[#B8295B] text-white text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors"
-                  >
-                    Add to Bag
-                  </button>
-                </div>
-              </div>
+                {cat.label}
+              </button>
             );
           })}
+        </div>
+
+        {/* Product Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((item) => (
+            <ProductCard key={item.id} product={item} />
+          ))}
         </div>
       </section>
 

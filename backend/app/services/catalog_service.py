@@ -306,7 +306,9 @@ class CatalogService:
         if q:
             pattern = f"%{q.strip()}%"
             query = query.filter(
-                (Product.name.ilike(pattern)) | (Product.description.ilike(pattern))
+                (Product.name.ilike(pattern))
+                | (Product.description.ilike(pattern))
+                | (Product.brand.has(Brand.name.ilike(pattern)))
             )
 
         products = query.order_by(Product.created_at.desc()).all()

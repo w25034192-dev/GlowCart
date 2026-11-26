@@ -349,6 +349,9 @@ export const CustomerLayout: React.FC = () => {
               <Link to="/category/fragrance" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center rounded-lg p-2 hover:bg-muted">
                 Fragrance
               </Link>
+              <Link to="/category/beauty-tools" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center rounded-lg p-2 hover:bg-muted">
+                Tools &amp; Brushes
+              </Link>
               <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="touch-target flex items-center rounded-lg p-2 hover:bg-muted">
                 Order History
               </Link>
