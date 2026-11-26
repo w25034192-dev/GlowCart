@@ -339,30 +339,24 @@ VERIFIED_COSMETIC_IMAGE_URLS = [
     "/images/products/luxury-lip-hand.jpg",
     "/images/products/compact-cushion-hand.jpg",
     "/images/products/serum-dropper-hand.jpg",
-    "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+    "/images/products/unbranded-lipstick.jpg",
+    "/images/products/unbranded-blush.jpg",
+    "/images/products/unbranded-mascara.jpg",
+    "/images/products/unbranded-sunscreen.jpg",
+    "/images/products/unbranded-cream-jar.jpg",
+    "/images/products/unbranded-toner.jpg",
     "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80",
 ]
 
 BROKEN_IMAGE_URLS = {
@@ -371,10 +365,17 @@ BROKEN_IMAGE_URLS = {
     "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1608248597359-00109f30325b?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?auto=format&fit=crop&w=600&q=80",
-    # Portrait-only photos (no cosmetic product in frame) — replace on startup
+    # Portrait-only / hair-touching lifestyle photos (no cosmetic product in frame)
     "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800&q=80",
+    # Competing brand logos (Clinique, Chanel, Curology, Maui Moisture)
+    "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80",
 }
 
 SLUG_SHOWCASE_IMAGES: dict[str, str] = {
@@ -384,10 +385,151 @@ SLUG_SHOWCASE_IMAGES: dict[str, str] = {
     "torriden-dive-in-ha-serum": "/images/products/serum-dropper-hand.jpg",
 }
 
+# Strict product-type keyword -> exact matching clean/unbranded photos
+ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
+    (
+        ("foundation", "skin tint"),
+        [
+            "/images/products/fenty-foundation-hand.jpg",
+            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("concealer",),
+        [
+            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+            "/images/products/fenty-foundation-hand.jpg",
+        ],
+    ),
+    (
+        ("cushion", "powder"),
+        [
+            "/images/products/compact-cushion-hand.jpg",
+            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("lip oil", "lip gloss", "luminizer"),
+        [
+            "/images/products/luxury-lip-hand.jpg",
+            "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("lip sleeping mask", "lip balm"),
+        [
+            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
+            "/images/products/luxury-lip-hand.jpg",
+        ],
+    ),
+    (
+        ("lipstick", "lip crayon", "lip tint"),
+        [
+            "/images/products/unbranded-lipstick.jpg",
+            "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("blush",),
+        [
+            "/images/products/unbranded-blush.jpg",
+            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("mascara",),
+        [
+            "/images/products/unbranded-mascara.jpg",
+        ],
+    ),
+    (
+        ("eyeliner",),
+        [
+            "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("eyeshadow", "palette"),
+        [
+            "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("setting spray",),
+        [
+            "/images/products/unbranded-toner.jpg",
+            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("sun", "spf", "uv"),
+        [
+            "/images/products/unbranded-sunscreen.jpg",
+            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("serum", "ampoule", "ampule", "drop"),
+        [
+            "/images/products/serum-dropper-hand.jpg",
+        ],
+    ),
+    (
+        ("toner", "essence", "pad", "solution"),
+        [
+            "/images/products/unbranded-toner.jpg",
+            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("cleanser", "wash"),
+        [
+            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+            "/images/products/unbranded-toner.jpg",
+        ],
+    ),
+    (
+        ("cream", "lotion", "balm", "butter", "mask", "pudding", "thanakha"),
+        [
+            "/images/products/unbranded-cream-jar.jpg",
+            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("shampoo", "conditioner", "hair", "olaplex"),
+        [
+            "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("perfume", "parfum", "toilette", "mist", "fragrance"),
+        [
+            "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("brush", "sponge"),
+        [
+            "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+    (
+        ("set", "kit", "bundle"),
+        [
+            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+        ],
+    ),
+]
+
 
 def _build_category_pool(priority_indices: list[int]) -> list[str]:
-    """Build an ordered 18-item unique URL pool starting with category-specific indices."""
-    ordered = [VERIFIED_COSMETIC_IMAGE_URLS[i] for i in priority_indices]
+    """Build an ordered unique URL pool starting with category-specific indices."""
+    ordered = [VERIFIED_COSMETIC_IMAGE_URLS[i] for i in priority_indices if i < len(VERIFIED_COSMETIC_IMAGE_URLS)]
     for url in VERIFIED_COSMETIC_IMAGE_URLS:
         if url not in ordered:
             ordered.append(url)
@@ -397,15 +539,26 @@ def _build_category_pool(priority_indices: list[int]) -> list[str]:
 
 
 CATEGORY_IMAGE_POOLS: dict[str, list[str]] = {
-    "Makeup": _build_category_pool([0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 17]),
-    "Skincare": _build_category_pool([3, 12, 13, 14, 15, 16, 17, 18, 19, 23, 8, 9]),
-    "Sun Care": _build_category_pool([19, 14, 18, 13, 12, 15, 16, 23, 20, 21]),
-    "Hair Care": _build_category_pool([20, 21, 22, 18, 15, 14, 23, 16, 12, 13]),
-    "Body Care": _build_category_pool([23, 13, 14, 15, 16, 18, 19, 20, 21, 22]),
-    "Fragrance": _build_category_pool([24, 25, 26, 27, 1, 4, 5, 9, 10, 11]),
-    "Beauty Tools": _build_category_pool([9, 10, 11, 2, 5, 6, 7, 8, 0, 1]),
-    "Makeup Sets": _build_category_pool([10, 9, 2, 0, 1, 5, 6, 7, 8, 24]),
+    "Makeup": _build_category_pool([0, 1, 2, 4, 5, 6, 10, 11, 12, 13, 14, 15]),
+    "Skincare": _build_category_pool([3, 8, 9, 13, 16, 17, 18, 7]),
+    "Sun Care": _build_category_pool([7, 8, 9, 13, 16, 17, 18]),
+    "Hair Care": _build_category_pool([18, 19, 20, 9, 13, 16]),
+    "Body Care": _build_category_pool([8, 16, 17, 18, 13, 9]),
+    "Fragrance": _build_category_pool([21, 1, 4, 5, 10, 11]),
+    "Beauty Tools": _build_category_pool([10, 14, 15, 2, 5, 6]),
+    "Makeup Sets": _build_category_pool([10, 14, 15, 0, 1, 2, 4, 5]),
 }
+
+
+def _resolve_item_type_pool(cat_name: str, prod_name: str, slug: str) -> list[str]:
+    """Return the strict list of matching images for a product's item type."""
+    if slug in SLUG_SHOWCASE_IMAGES:
+        return [SLUG_SHOWCASE_IMAGES[slug]]
+    lower_name = prod_name.lower()
+    for keywords, urls in ITEM_TYPE_IMAGE_RULES:
+        if any(kw in lower_name for kw in keywords):
+            return urls
+    return CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
 
 
 def resolve_seed_image_url(
@@ -414,10 +567,8 @@ def resolve_seed_image_url(
     slug: str,
     index: int | None = None,
 ) -> str:
-    """Return a diverse, high-resolution verified cosmetic photograph URL for the product."""
-    if slug in SLUG_SHOWCASE_IMAGES:
-        return SLUG_SHOWCASE_IMAGES[slug]
-    pool = CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
+    """Return a high-resolution verified cosmetic photograph URL matching the exact product type."""
+    pool = _resolve_item_type_pool(cat_name, prod_name, slug)
     selector = index if index is not None else zlib.crc32(slug.encode("utf-8"))
     return pool[selector % len(pool)]
 
@@ -671,22 +822,16 @@ def repair_duplicate_product_images(db: Session) -> int:
     for idx, img in enumerate(images, start=1):
         prod = prod_map.get(img.product_id)
         cat_name = prod.category.name if (prod and prod.category) else "Skincare"
-        pool = CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
+        pool = (
+            _resolve_item_type_pool(cat_name, prod.name, prod.slug)
+            if prod
+            else CATEGORY_IMAGE_POOLS.get(cat_name, VERIFIED_COSMETIC_IMAGE_URLS)
+        )
 
-        showcase_url = SLUG_SHOWCASE_IMAGES.get(prod.slug) if prod else None
-        if showcase_url and img.image_url != showcase_url:
-            if img.image_url and not _is_invalid(img.image_url):
-                used_counts[img.image_url] = max(0, used_counts[img.image_url] - 1)
-            img.image_url = showcase_url
-            used_counts[showcase_url] += 1
-            seen_once.add(showcase_url)
-            prev_url = showcase_url
-            repaired += 1
-            continue
-
-        needs_repair = _is_invalid(img.image_url) or img.image_url in seen_once
-        if needs_repair:
-            # Prefer a URL not yet used at all, otherwise pick the least-used URL in pool != prev_url
+        # Repair if invalid/broken/portrait/competing-logo OR mismatched with strict item-type pool
+        is_mismatched = _is_invalid(img.image_url) or (img.image_url not in pool)
+        is_dup_with_alternatives = len(pool) > 1 and img.image_url in seen_once
+        if is_mismatched or is_dup_with_alternatives:
             candidates = [u for u in pool if u not in seen_once and u != prev_url]
             if not candidates:
                 candidates = sorted(

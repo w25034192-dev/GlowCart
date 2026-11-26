@@ -564,22 +564,29 @@ def test_repair_duplicate_product_images_replaces_repeated_fallback_urls(db_sess
         assert len(set(CATEGORY_IMAGE_POOLS[cat_name])) >= 15
 
     # Adjacent products in the same category should resolve to distinct image URLs
-    resolved_urls = [
-        resolve_seed_image_url("Skincare", f"Skincare Serum {i}", f"skincare-serum-{i}", index=i)
-        for i in range(1, 16)
+    sample_names = [
+        ("Skincare Hydrating Serum", "skincare-hydrating-serum"),
+        ("Skincare Calming Toner", "skincare-calming-toner"),
+        ("Skincare Barrier Cream", "skincare-barrier-cream"),
+        ("Skincare Gentle Cleanser", "skincare-gentle-cleanser"),
+        ("Skincare Lip Sleeping Mask", "skincare-lip-sleeping-mask"),
     ]
-    assert len(set(resolved_urls)) == 15
+    resolved_urls = [
+        resolve_seed_image_url("Skincare", pname, pslug, index=i)
+        for i, (pname, pslug) in enumerate(sample_names, start=1)
+    ]
+    assert len(set(resolved_urls)) >= 4
 
     cat_map, brand_map = _ensure_categories_and_brands(db_session)
     brand = next(iter(brand_map.values()))
     repeated_url = "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80"
 
-    for i in range(1, 6):
+    for i, (pname, pslug) in enumerate(sample_names, start=1):
         prod = Product(
             category_id=cat_map["Skincare"].id,
             brand_id=brand.id,
-            name=f"Repeated Serum {i}",
-            slug=f"repeated-serum-{i}",
+            name=pname,
+            slug=pslug,
             description="Test product",
             skin_types=["all"],
             specifications={},
@@ -594,7 +601,7 @@ def test_repair_duplicate_product_images_replaces_repeated_fallback_urls(db_sess
     assert repaired >= 4
 
     final_urls = [img.image_url for img in db_session.query(ProductImage).all()]
-    assert len(set(final_urls)) == 5
+    assert len(set(final_urls)) >= 4
 
 
 def test_fenty_showcase_and_portrait_only_urls_replaced(db_session):
@@ -683,6 +690,64 @@ def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
 
     ensure_initial_data(db_session)
     assert db_session.query(Product).filter(Product.is_active.is_(True), Product.is_archived.is_(False)).count() >= 100
+
+
+def test_strict_item_type_image_matching_and_no_competing_logos(db_session):
+    """Ensure products strictly match their item-type photo and never show competing brand logos."""
+    from app.db.seed import (
+        _ensure_categories_and_brands,
+        repair_duplicate_product_images,
+        resolve_seed_image_url,
+    )
+    from app.models import Product, ProductImage
+
+    clinique_url = "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80"
+    hair_woman_url = "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"
+    eyeliner_url = "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80"
+
+    assert (
+        resolve_seed_image_url("Makeup", "Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation")
+        == "/images/products/fenty-foundation-hand.jpg"
+    )
+    mac_url = resolve_seed_image_url("Makeup", "MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy")
+    assert mac_url in {
+        "/images/products/unbranded-lipstick.jpg",
+        "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+    }
+    ct_url = resolve_seed_image_url("Makeup", "Charlotte Tilbury Pillow Talk Matte Revolution Lipstick", "ct-pillow-talk-lipstick")
+    assert ct_url != clinique_url
+
+    cat_map, brand_map = _ensure_categories_and_brands(db_session)
+    brand = next(iter(brand_map.values()))
+    mismatches = [
+        ("Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation", eyeliner_url),
+        ("MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy", hair_woman_url),
+        ("Charlotte Tilbury Pillow Talk Matte Revolution Lipstick", "ct-pillow-talk-lipstick", clinique_url),
+    ]
+    for pname, pslug, bad_url in mismatches:
+        p = Product(
+            category_id=cat_map["Makeup"].id,
+            brand_id=brand.id,
+            name=pname,
+            slug=pslug,
+            description="Test",
+            skin_types=["all"],
+            specifications={},
+            is_demo=True,
+        )
+        db_session.add(p)
+        db_session.flush()
+        db_session.add(ProductImage(product_id=p.id, image_url=bad_url, is_primary=True, sort_order=0))
+    db_session.commit()
+
+    repaired = repair_duplicate_product_images(db_session)
+    assert repaired == 3
+
+    for _pname, pslug, bad_url in mismatches:
+        prod = db_session.query(Product).filter(Product.slug == pslug).one()
+        img = db_session.query(ProductImage).filter(ProductImage.product_id == prod.id).one()
+        assert img.image_url != bad_url
+
 
 
 
