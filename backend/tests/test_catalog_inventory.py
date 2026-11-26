@@ -778,6 +778,35 @@ def test_zero_duplicate_image_urls_across_full_catalog_and_lip_matching(db_sessi
     assert mac_img.image_url != mayb_img.image_url
 
 
+def test_all_seeded_products_have_unique_image_urls_and_type_groups(db_session):
+    """Verify all 12 product-type image groups exist and every seeded product gets a distinct image_url."""
+    from app.db.seed import PRODUCT_TYPE_IMAGE_POOLS, seed_demo_data
+    from app.models import Product, ProductImage
+
+    expected_groups = {
+        "serum_ampoule",
+        "toner_essence",
+        "moisturizer_cream",
+        "cleanser",
+        "sunscreen",
+        "foundation_concealer",
+        "blush_powder",
+        "lipstick_gloss",
+        "eye_makeup",
+        "hair_care",
+        "perfume",
+        "body_tools",
+    }
+    assert expected_groups.issubset(set(PRODUCT_TYPE_IMAGE_POOLS.keys()))
+
+    seed_demo_data(db_session)
+    products = db_session.query(Product).all()
+    images = db_session.query(ProductImage).filter(ProductImage.is_primary.is_(True)).all()
+    unique_urls = {img.image_url for img in images}
+    assert len(unique_urls) == len(products)
+
+
+
 
 
 

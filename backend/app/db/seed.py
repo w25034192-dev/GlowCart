@@ -355,12 +355,15 @@ VERIFIED_COSMETIC_IMAGE_URLS = [
     "/images/products/unbranded-toner.jpg",
     "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1656147961287-3f91d30e086e?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
@@ -393,165 +396,92 @@ SLUG_SHOWCASE_IMAGES: dict[str, str] = {
     "torriden-dive-in-ha-serum": "/images/products/serum-dropper-hand.jpg",
 }
 
+PRODUCT_TYPE_IMAGE_POOLS: dict[str, list[str]] = {
+    "foundation_concealer": [
+        "/images/products/fenty-foundation-hand.jpg",
+        "/images/products/unbranded-foundation-square.jpg",
+        "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        "/images/products/compact-cushion-hand.jpg",
+    ],
+    "blush_powder": [
+        "/images/products/unbranded-blush.jpg",
+        "/images/products/compact-cushion-hand.jpg",
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+    ],
+    "lipstick_gloss": [
+        "/images/products/luxury-lip-hand.jpg",
+        "/images/products/unbranded-lipstick.jpg",
+        "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
+    ],
+    "eye_makeup": [
+        "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
+        "/images/products/unbranded-mascara.jpg",
+        "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80",
+    ],
+    "serum_ampoule": [
+        "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80",
+        "/images/products/serum-dropper-hand.jpg",
+        "https://images.unsplash.com/photo-1656147961287-3f91d30e086e?auto=format&fit=crop&w=800&q=80",
+    ],
+    "toner_essence": [
+        "/images/products/unbranded-toner.jpg",
+        "https://images.unsplash.com/photo-1656147961287-3f91d30e086e?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80",
+    ],
+    "cleanser": [
+        "https://images.unsplash.com/photo-1656147961287-3f91d30e086e?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        "/images/products/unbranded-toner.jpg",
+    ],
+    "moisturizer_cream": [
+        "/images/products/unbranded-cream-jar.jpg",
+        "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1656147961287-3f91d30e086e?auto=format&fit=crop&w=800&q=80",
+    ],
+    "sunscreen": [
+        "/images/products/unbranded-sunscreen.jpg",
+        "/images/products/unbranded-toner.jpg",
+        "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
+        "/images/products/unbranded-cream-jar.jpg",
+    ],
+    "hair_care": [
+        "/images/products/serum-dropper-hand.jpg",
+        "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
+        "/images/products/unbranded-cream-jar.jpg",
+        "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80",
+    ],
+    "perfume": [
+        "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
+    ],
+    "body_tools": [
+        "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
+    ],
+}
+
 # Strict product-type keyword -> exact matching clean/unbranded photos
 ITEM_TYPE_IMAGE_RULES: list[tuple[tuple[str, ...], list[str]]] = [
-    (
-        ("foundation", "skin tint"),
-        [
-            "/images/products/fenty-foundation-hand.jpg",
-            "/images/products/unbranded-foundation-square.jpg",
-            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-            "/images/products/compact-cushion-hand.jpg",
-        ],
-    ),
-    (
-        ("concealer",),
-        [
-            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-            "/images/products/unbranded-foundation-square.jpg",
-            "/images/products/fenty-foundation-hand.jpg",
-        ],
-    ),
-    (
-        ("cushion", "powder"),
-        [
-            "/images/products/compact-cushion-hand.jpg",
-            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
-            "/images/products/unbranded-blush.jpg",
-        ],
-    ),
-    (
-        ("lip oil", "lip gloss", "gloss", "luminizer"),
-        [
-            "/images/products/luxury-lip-hand.jpg",
-            "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
-            "/images/products/unbranded-lipstick.jpg",
-            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("lip sleeping mask", "lip mask", "lip balm"),
-        [
-            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
-            "/images/products/luxury-lip-hand.jpg",
-            "/images/products/unbranded-lipstick.jpg",
-        ],
-    ),
-    (
-        ("matte ink", "lipstick", "lip crayon", "lip tint"),
-        [
-            "/images/products/unbranded-lipstick.jpg",
-            "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80",
-            "/images/products/luxury-lip-hand.jpg",
-            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("blush",),
-        [
-            "/images/products/unbranded-blush.jpg",
-            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("mascara",),
-        [
-            "/images/products/unbranded-mascara.jpg",
-        ],
-    ),
-    (
-        ("eyeliner",),
-        [
-            "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("eyeshadow", "palette"),
-        [
-            "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("setting spray",),
-        [
-            "/images/products/unbranded-toner.jpg",
-            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("sun", "spf", "uv"),
-        [
-            "/images/products/unbranded-sunscreen.jpg",
-            "/images/products/unbranded-toner.jpg",
-            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-            "/images/products/unbranded-cream-jar.jpg",
-        ],
-    ),
-    (
-        ("serum", "ampoule", "ampule", "drop"),
-        [
-            "/images/products/serum-dropper-hand.jpg",
-        ],
-    ),
-    (
-        ("toner", "essence", "pad", "solution"),
-        [
-            "/images/products/unbranded-toner.jpg",
-            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("cleanser", "wash"),
-        [
-            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-            "/images/products/unbranded-toner.jpg",
-        ],
-    ),
-    (
-        ("cream", "lotion", "balm", "butter", "mask", "pudding", "thanakha"),
-        [
-            "/images/products/unbranded-cream-jar.jpg",
-            "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("dyson", "airwrap", "styler"),
-        [
-            "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("shampoo", "conditioner", "hair", "olaplex", "gisou", "kérastase", "kerastase", "ouai"),
-        [
-            "/images/products/serum-dropper-hand.jpg",
-            "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800&q=80",
-            "/images/products/unbranded-cream-jar.jpg",
-            "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("perfume", "parfum", "toilette", "mist", "fragrance"),
-        [
-            "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("brush", "sponge"),
-        [
-            "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
-    (
-        ("set", "kit", "bundle"),
-        [
-            "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
-        ],
-    ),
+    (("foundation", "skin tint", "concealer"), PRODUCT_TYPE_IMAGE_POOLS["foundation_concealer"]),
+    (("cushion", "powder", "blush"), PRODUCT_TYPE_IMAGE_POOLS["blush_powder"]),
+    (("lip oil", "lip gloss", "gloss", "luminizer", "lip sleeping mask", "lip mask", "lip balm", "matte ink", "lipstick", "lip crayon", "lip tint"), PRODUCT_TYPE_IMAGE_POOLS["lipstick_gloss"]),
+    (("mascara", "eyeliner", "eyeshadow", "palette"), PRODUCT_TYPE_IMAGE_POOLS["eye_makeup"]),
+    (("setting spray", "toner", "essence", "pad", "solution"), PRODUCT_TYPE_IMAGE_POOLS["toner_essence"]),
+    (("sun", "spf", "uv"), PRODUCT_TYPE_IMAGE_POOLS["sunscreen"]),
+    (("serum", "ampoule", "ampule", "drop"), PRODUCT_TYPE_IMAGE_POOLS["serum_ampoule"]),
+    (("cleanser", "wash"), PRODUCT_TYPE_IMAGE_POOLS["cleanser"]),
+    (("cream", "lotion", "balm", "butter", "mask", "pudding", "thanakha"), PRODUCT_TYPE_IMAGE_POOLS["moisturizer_cream"]),
+    (("dyson", "airwrap", "styler"), ["https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=800&q=80"]),
+    (("shampoo", "conditioner", "hair", "olaplex", "gisou", "kérastase", "kerastase", "ouai"), PRODUCT_TYPE_IMAGE_POOLS["hair_care"]),
+    (("perfume", "parfum", "toilette", "mist", "fragrance"), PRODUCT_TYPE_IMAGE_POOLS["perfume"]),
+    (("brush", "sponge", "set", "kit", "bundle"), PRODUCT_TYPE_IMAGE_POOLS["body_tools"]),
 ]
 
 
