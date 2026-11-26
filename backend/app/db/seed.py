@@ -162,6 +162,50 @@ CATALOG_BLUEPRINT = [
     ("Makeup", "NARS", "NARS Orgasm Powder Blush", "nars-orgasm-powder-blush", ["all"], "shades_blush", "34.00"),
     ("Makeup", "Yves Saint Laurent", "YSL Rouge Pur Couture The Slim Velvet Radical Lipstick", "ysl-rouge-pur-couture-slim", ["all"], "shades_lip", "45.00"),
     ("Fragrance", "Yves Saint Laurent", "YSL Libre Eau De Parfum", "ysl-libre-eau-de-parfum", ["all"], "volumes", "98.00"),
+
+    # --- Batch 3: 30 New Products (Sun Care / Hair Care / Fragrance / Body Care / Skincare / Makeup) ---
+
+    # Sun Care (6)
+    ("Sun Care", "Beauty of Joseon", "Beauty of Joseon Relief Sun Rice + Probiotics SPF50+ PA++++", "boj-relief-sun-rice-probiotics", ["sensitive", "all"], "volumes", "50ml", "15.00"),
+    ("Sun Care", "COSRX", "COSRX Aloe Soothing Sun Cream SPF50+ PA+++", "cosrx-aloe-sun-cream-spf50", ["sensitive", "dry"], "volumes", "50ml", "14.00"),
+    ("Sun Care", "La Roche-Posay", "La Roche-Posay Anthelios Invisible Fluid SPF50+", "lrp-anthelios-invisible-fluid-spf50", ["all", "oily"], "volumes", "50ml", "29.00"),
+    ("Sun Care", "Anua", "Anua Heartleaf Calming Sun Serum SPF50+ PA++++", "anua-heartleaf-sun-serum-spf50", ["sensitive", "acne-prone"], "volumes", "50ml", "18.00"),
+    ("Sun Care", "Round Lab", "Round Lab Birch Juice Moisturizing Sun Cream SPF50+ PA++++", "round-lab-birch-sun-cream-spf50", ["dry", "sensitive"], "volumes", "50ml", "16.00"),
+    ("Sun Care", "Torriden", "Torriden Dive-In Sun Serum SPF50+ PA++++", "torriden-dive-in-sun-serum-spf50", ["dry", "dehydrated"], "volumes", "50ml", "17.00"),
+
+    # Hair Care (6)
+    ("Hair Care", "Olaplex", "Olaplex No. 3 Hair Perfector Bond Repair Treatment", "olaplex-no3-hair-perfector", ["all"], "volumes", "100ml", "30.00"),
+    ("Hair Care", "Olaplex", "Olaplex No. 8 Bond Intense Moisture Mask", "olaplex-no8-moisture-mask", ["all"], "volumes", "100ml", "32.00"),
+    ("Hair Care", "L'Oréal Paris", "L'Oréal Paris Elvive Extraordinary Oil Hair Serum", "loreal-elvive-extraordinary-oil-serum", ["all"], "volumes", "100ml", "12.00"),
+    ("Hair Care", "L'Oréal Paris", "L'Oréal Paris EverPure Sulfate Free Color Care Shampoo", "loreal-everpure-color-shampoo", ["all"], "volumes", "250ml", "9.99"),
+    ("Hair Care", "COSRX", "COSRX Full Fit Propolis Nourishing Hair Ampoule", "cosrx-propolis-hair-ampoule", ["dry", "damaged"], "volumes", "100ml", "22.00"),
+    ("Hair Care", "Innisfree", "Innisfree My Hair Recipe Moisture Treatment", "innisfree-hair-recipe-moisture", ["dry", "all"], "volumes", "150ml", "14.00"),
+
+    # Fragrance (5)
+    ("Fragrance", "Sol de Janeiro", "Sol de Janeiro Cheirosa 71 Perfume Mist", "sdj-cheirosa-71-mist", ["all"], "volumes", "240ml", "36.00"),
+    ("Fragrance", "Sol de Janeiro", "Sol de Janeiro Bum Bum Body Lotion Limited Edition Mist", "sdj-bum-bum-mist-lotion", ["all"], "volumes", "240ml", "26.00"),
+    ("Fragrance", "Dior", "Dior Sauvage Eau de Parfum", "dior-sauvage-eau-de-parfum", ["all"], "volumes", "100ml", "120.00"),
+    ("Fragrance", "Innisfree", "Innisfree Jeju Blossom Eau de Toilette", "innisfree-jeju-blossom-edt", ["all"], "volumes", "50ml", "28.00"),
+    ("Fragrance", "Estée Lauder", "Estée Lauder Beautiful Magnolia Eau de Parfum", "estee-lauder-beautiful-magnolia-edp", ["all"], "volumes", "50ml", "95.00"),
+
+    # Body Care (5)
+    ("Body Care", "Sol de Janeiro", "Sol de Janeiro Brazilian Bum Bum Cream 240ml XL Edition", "sdj-bum-bum-cream-240ml", ["all"], "volumes", "240ml", "52.00"),
+    ("Body Care", "CeraVe", "CeraVe Moisturizing Cream Body & Face", "cerave-moisturizing-cream-body-face", ["dry", "sensitive"], "volumes", "454g", "19.99"),
+    ("Body Care", "La Roche-Posay", "La Roche-Posay Lipikar Syndet AP+ Wash Cream", "lrp-lipikar-syndet-ap-wash", ["dry", "sensitive", "eczema"], "volumes", "400ml", "24.00"),
+    ("Body Care", "COSRX", "COSRX Advanced Snail 92 All In One Cream Body", "cosrx-snail-92-body-cream", ["all", "dry"], "volumes", "200ml", "21.00"),
+    ("Body Care", "Anua", "Anua Peach 70% Niacin Peptide Moisture Body Lotion", "anua-peach-niacin-body-lotion", ["all", "dry"], "volumes", "200ml", "19.00"),
+
+    # Skincare (4)
+    ("Skincare", "COSRX", "COSRX Propolis Light Ampule 70%", "cosrx-propolis-light-ampule-70", ["all", "combination"], "volumes", "35ml", "24.00"),
+    ("Skincare", "Beauty of Joseon", "Beauty of Joseon Revive Eye Serum Ginseng + Retinal", "boj-revive-eye-serum-ginseng-retinal", ["all", "mature"], "volumes", "30ml", "22.00"),
+    ("Skincare", "Torriden", "Torriden Dive-In Low Molecular Hyaluronic Acid Serum", "torriden-dive-in-ha-serum", ["dry", "dehydrated", "all"], "volumes", "50ml", "20.00"),
+    ("Skincare", "Round Lab", "Round Lab 1025 Dokdo Toner Pore Minimizing Calming", "round-lab-dokdo-toner", ["oily", "sensitive", "combination"], "volumes", "200ml", "18.00"),
+
+    # Makeup (4)
+    ("Makeup", "Fenty Beauty", "Fenty Beauty Pro Filt'r Soft Matte Longwear Foundation", "fenty-pro-filtr-soft-matte-foundation", ["oily", "combination"], "shades_foundation", "30ml", "40.00"),
+    ("Makeup", "MAC", "MAC Studio Fix Fluid SPF15 Foundation", "mac-studio-fix-fluid-spf15", ["oily", "combination"], "shades_foundation", "30ml", "35.00"),
+    ("Makeup", "Huda Beauty", "Huda Beauty GloWish Multidew Skin Tint", "huda-glowish-multidew-skin-tint", ["dry", "normal"], "shades_foundation", "30ml", "44.00"),
+    ("Makeup", "NYX", "NYX Professional Makeup Butter Gloss Lip Gloss", "nyx-butter-gloss-lip-gloss", ["all"], "shades_lip", "8ml", "7.00"),
 ]
 
 VARIANT_TEMPLATES = {
