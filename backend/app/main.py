@@ -39,7 +39,10 @@ async def lifespan(_app: FastAPI):
                     logger.info("Startup purge removed %d deprecated product records from PostgreSQL.", purged)
                 seeded = ensure_initial_data(db)
                 if seeded:
-                    logger.info("GlowCart startup sync refreshed 100 distinct catalog products and 100 unique verified images.")
+                    logger.info(
+                        "GlowCart startup sync refreshed %d verified Pinterest catalog products.",
+                        len(CURATED_CATALOG),
+                    )
         except Exception as exc:  # pragma: no cover - surfaced in startup logs if DB unreachable
             logger.exception("Startup auto-seed skipped or failed: %s", exc)
     yield

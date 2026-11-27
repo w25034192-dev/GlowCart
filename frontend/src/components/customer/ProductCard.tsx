@@ -56,19 +56,6 @@ const CATEGORY_RITUAL_FALLBACK: Record<string, string> = {
   'Beauty Tools': 'ATELIER PRO INSTRUMENT',
 };
 
-function getBrandMonogram(brand: string): string {
-  const words = brand
-    .replace(/[^a-zA-Z0-9\s]/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-  if (words.length >= 2) {
-    return `${words[0][0]}${words[1][0]}`.toUpperCase();
-  }
-  const single = words[0] || 'GC';
-  return single.slice(0, 2).toUpperCase();
-}
-
 export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) => {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => Boolean(s.user));
@@ -80,8 +67,6 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
   const [added, setAdded] = useState(false);
   const [selectedSwatchIdx, setSelectedSwatchIdx] = useState(0);
 
-  const displayBrand = (product.brand_name || product.name || 'GLOWCART').toUpperCase();
-  const monogram = useMemo(() => getBrandMonogram(displayBrand), [displayBrand]);
   const swatches = useMemo(
     () => CATEGORY_SWATCHES[product.category_name] || CATEGORY_SWATCHES.Skincare,
     [product.category_name]
@@ -178,34 +163,23 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
           />
         </Link>
 
-        {/* Top-Left Frosted Glass Brand Monogram Crest + Status Badges */}
-        <div className="pointer-events-none absolute left-3 top-3 flex max-w-[calc(100%-4.5rem)] flex-col items-start gap-1.5">
-          <span
-            data-testid="brand-monogram-crest"
-            className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/60 bg-white/75 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-stone-900 shadow-sm backdrop-blur-md"
-          >
-            <span className="font-serif text-[11px] font-bold text-plum">{monogram}</span>
-            <span className="text-amber-700" aria-hidden="true">•</span>
-            <span className="truncate uppercase">{displayBrand}</span>
-          </span>
-
-          <div className="flex flex-wrap gap-1.5">
-            {product.is_best_seller && (
-              <span className="inline-flex items-center rounded-full bg-plum/90 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow-sm backdrop-blur-sm">
-                Best Seller
-              </span>
-            )}
-            {hasDiscount && discountPct > 0 && (
-              <span className="inline-flex items-center rounded-full bg-rose px-2 py-0.5 font-mono text-[10px] font-bold text-white shadow-sm">
-                -{discountPct}%
-              </span>
-            )}
-            {!product.in_stock && (
-              <span className="inline-flex items-center rounded-full bg-foreground/90 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow-sm">
-                Sold Out
-              </span>
-            )}
-          </div>
+        {/* Top-Left Status Badges (Brand Name is shown cleanly once below the image) */}
+        <div className="pointer-events-none absolute left-3 top-3 flex max-w-[calc(100%-4.5rem)] flex-wrap gap-1.5">
+          {product.is_best_seller && (
+            <span className="inline-flex items-center rounded-full bg-plum/90 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow-sm backdrop-blur-sm">
+              Best Seller
+            </span>
+          )}
+          {hasDiscount && discountPct > 0 && (
+            <span className="inline-flex items-center rounded-full bg-rose px-2 py-0.5 font-mono text-[10px] font-bold text-white shadow-sm">
+              -{discountPct}%
+            </span>
+          )}
+          {!product.in_stock && (
+            <span className="inline-flex items-center rounded-full bg-foreground/90 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow-sm">
+              Sold Out
+            </span>
+          )}
         </div>
 
         {/* Floating Wishlist Button (44x44px accessible touch target) */}
