@@ -313,6 +313,30 @@ describe('GlowCart Frontend', () => {
     expect(await screen.findByText('GlowCart Catalog Item Page 2')).toBeInTheDocument();
     expect(screen.getByText('Page 2 / 5')).toBeInTheDocument();
   });
+
+  it('renders Quick View modal in document.body via React Portal, locks scroll, and closes cleanly', async () => {
+    useAuthStore.setState({ user: null, isLoading: false });
+    const user = userEvent.setup();
+    renderAt('/category/makeup');
+
+    expect(await screen.findByText('Soft Pinch Liquid Blush')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Quick view Soft Pinch Liquid Blush/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveClass('z-[9999]');
+    // Rendered directly into document.body (not trapped inside <article> ProductCard)
+    expect(dialog.closest('article')).toBeNull();
+    expect(dialog.parentElement).toBe(document.body);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    await user.click(screen.getByRole('button', { name: /Close quick view/i }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(document.body.style.overflow).toBe('');
+    // Remains on category page (did not accidentally navigate to product details)
+    expect(screen.getByText('1 products available')).toBeInTheDocument();
+  });
 });
 
 

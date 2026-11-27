@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { Check, ShoppingBag, Sparkles, X } from 'lucide-react';
 import { StarRating } from '@/components/common/UI';
@@ -52,11 +53,16 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen,
 
   useEffect(() => {
     if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -102,23 +108,29 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen,
     }
   };
 
-  return (
+  const handleBackdropClose = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClose();
+  };
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={`qv-title-${product.id}`}
-      onClick={onClose}
+      onClick={handleBackdropClose}
     >
       <div
-        className="relative grid max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-border bg-card shadow-2xl md:grid-cols-2"
+        className="relative grid max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-white shadow-2xl md:grid-cols-2"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleBackdropClose}
           aria-label="Close quick view"
-          className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-card/90 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-beige focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-blush-soft focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
@@ -238,7 +250,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen,
               type="button"
               disabled={!product.in_stock || adding}
               onClick={handleAddToBag}
-              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-fg transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-mauve-deep px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-plum focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             >
               {added ? (
                 <>
@@ -255,13 +267,14 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen,
             <Link
               to={`/products/${product.id}`}
               onClick={onClose}
-              className="flex min-h-[40px] w-full items-center justify-center rounded-xl border border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:bg-beige/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex min-h-[40px] w-full items-center justify-center rounded-xl border border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:bg-blush-soft focus-visible:ring-2 focus-visible:ring-ring"
             >
               View Full Product Details
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
