@@ -710,7 +710,7 @@ def test_strict_item_type_image_matching_and_no_competing_logos(db_session):
         == "https://plus.unsplash.com/premium_photo-1673628167571-532a6c5f5d16?auto=format&fit=crop&w=800&q=80"
     )
     mac_url = resolve_seed_image_url("Makeup", "MAC Matte Lipstick Velvet Teddy", "mac-matte-lipstick-velvet-teddy")
-    assert mac_url == "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80"
+    assert mac_url == "/images/products/art-mac-velvet-teddy-lipstick.jpg"
     ct_url = resolve_seed_image_url("Makeup", "Charlotte Tilbury Airbrush Flawless Setting Spray", "ct-airbrush-flawless-setting-spray")
     assert ct_url != clinique_url
 

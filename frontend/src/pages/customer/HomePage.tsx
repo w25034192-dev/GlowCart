@@ -129,7 +129,7 @@ const FALLBACK_BEST_SELLERS: ProductSummary[] = [
     brand_id: 'brand-rare',
     brand_name: 'Rare Beauty',
     min_price: '23.00',
-    primary_image_url: '/images/products/art-blush-compact.jpg',
+    primary_image_url: '/images/products/art-rare-beauty-liquid-blush.jpg',
     average_rating: 4.8,
     review_count: 424,
     in_stock: true,
