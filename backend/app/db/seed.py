@@ -180,7 +180,32 @@ BRANDS_DATA = [
     ("Olay", "olay", "USA", True),
     ("Urban Decay", "urban-decay", "USA", True),
     ("Versace", "versace", "Italy", True),
+    # GlowCart Signature In-House Luxury Maison Lines
+    ("GLOWCART LABS", "glowcart-labs", "France", True),
+    ("ATELIER VELVET", "atelier-velvet", "France", True),
+    ("MAISON LUMIÈRE", "maison-lumiere", "France", True),
+    ("SOIE BOTANIQUE", "soie-botanique", "France", True),
+    ("SOLEIL PURE", "soleil-pure", "France", True),
+    ("ARTISAN PRO", "artisan-pro", "France", True),
 ]
+
+REAL_LOGO_BRANDS: set[str] = {
+    "Chanel",
+    "Olay",
+    "Estée Lauder",
+    "Dior",
+    "Gucci",
+    "Calvin Klein",
+}
+
+MAISON_BY_CATEGORY: dict[str, str] = {
+    "Skincare": "GLOWCART LABS",
+    "Makeup": "ATELIER VELVET",
+    "Fragrance": "MAISON LUMIÈRE",
+    "Hair Care": "SOIE BOTANIQUE",
+    "Sun Care": "SOLEIL PURE",
+    "Beauty Tools": "ARTISAN PRO",
+}
 
 def _p(
     category: str,
@@ -196,10 +221,13 @@ def _p(
     digest = zlib.crc32(slug.encode("utf-8"))
     rating = round(4.7 + (digest % 3) * 0.1, 1)  # 4.7, 4.8, or 4.9
     review_count = 95 + (digest % 356)  # 95 .. 450
+    cohesive_brand = brand if brand in REAL_LOGO_BRANDS else MAISON_BY_CATEGORY[category]
+    ritual_label = f"{name.upper()} • {size.upper()}"
     return {
         "category": category,
-        "brand": brand,
-        "name": brand,
+        "brand": cohesive_brand,
+        "name": cohesive_brand,
+        "ritual_label": ritual_label,
         "slug": slug,
         "skin_types": skin_types,
         "variant_template": variant_template,
@@ -1118,6 +1146,7 @@ def sync_curated_catalog(
     # 3. Force-refresh metadata and ProductImage URLs for all 100 products
     prod_by_slug = {p.slug: p for p in db.query(Product).all()}
     refreshed_images = 0
+    updated_metadata = 0
     for item in CURATED_CATALOG:
         prod = prod_by_slug.get(item["slug"])
         if prod is None:
@@ -1126,17 +1155,24 @@ def sync_curated_catalog(
         target_brand = brand_map.get(item["brand"])
         if target_cat and prod.category_id != target_cat.id:
             prod.category_id = target_cat.id
+            updated_metadata += 1
         if target_brand and prod.brand_id != target_brand.id:
             prod.brand_id = target_brand.id
-        if prod.name != item["name"]:
+            updated_metadata += 1
+        expected_short = item.get("ritual_label") or f"{item['category'].upper()} • {item['size'].upper()}"
+        expected_desc = f"{item['name']} — {expected_short}. Authentic formulation with batch-verified freshness."
+        if prod.name != item["name"] or prod.short_description != expected_short:
             prod.name = item["name"]
-            prod.short_description = f"Curated beauty essential — {item['name']}."
-            prod.description = f"{item['name']} by {item['brand']}. Authentic formulation with batch-verified freshness."
+            prod.short_description = expected_short
+            prod.description = expected_desc
+            updated_metadata += 1
         if prod.skin_types != item["skin_types"]:
             prod.skin_types = item["skin_types"]
+            updated_metadata += 1
         if not prod.is_active or prod.is_archived:
             prod.is_active = True
             prod.is_archived = False
+            updated_metadata += 1
 
         cur_specs = dict(prod.specifications or {})
         if cur_specs.get("rating") != item["rating"] or cur_specs.get("review_count") != item["review_count"]:
@@ -1167,9 +1203,14 @@ def sync_curated_catalog(
         )
         refreshed_images += 1
 
-    if created > 0 or refreshed_images > 0 or removed > 0:
+    if created > 0 or refreshed_images > 0 or removed > 0 or updated_metadata > 0:
         db.commit()
-    return {"removed": removed, "created": created, "refreshed_images": refreshed_images}
+    return {
+        "removed": removed,
+        "created": created,
+        "refreshed_images": refreshed_images,
+        "updated_metadata": updated_metadata,
+    }
 
 
 sync_catalog_100 = sync_curated_catalog

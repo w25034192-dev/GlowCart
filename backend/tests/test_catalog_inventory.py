@@ -672,10 +672,15 @@ def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
     assert all(e[2] == e[1] for e in CATALOG_BLUEPRINT)
     lower_names = {n.lower() for n in names}
     for required in (
-        "charlotte tilbury",
-        "mac",
+        "glowcart labs",
+        "atelier velvet",
+        "maison lumière",
+        "soie botanique",
+        "soleil pure",
+        "artisan pro",
+        "chanel",
+        "olay",
         "estée lauder",
-        "medicube",
     ):
         assert required in lower_names
 
@@ -966,9 +971,29 @@ def test_single_source_curated_catalog_integrity(db_session):
     # 3. Zero duplicate slugs
     assert len({p["slug"] for p in CURATED_CATALOG}) == 100
 
-    # 4. Every product name is strictly its exact brand name only
+    # 4. Every product name is strictly its exact brand name only, and only approved
+    #    real-logo brands or GlowCart's 6 signature maison lines are used
+    allowed_real_logo_brands = {
+        "Chanel",
+        "Olay",
+        "Estée Lauder",
+        "Dior",
+        "Gucci",
+        "Calvin Klein",
+    }
+    maison_by_category = {
+        "Skincare": "GLOWCART LABS",
+        "Makeup": "ATELIER VELVET",
+        "Fragrance": "MAISON LUMIÈRE",
+        "Hair Care": "SOIE BOTANIQUE",
+        "Sun Care": "SOLEIL PURE",
+        "Beauty Tools": "ARTISAN PRO",
+    }
     for p in CURATED_CATALOG:
         assert p["name"] == p["brand"], f"Expected name == brand: {p['brand']} != {p['name']}"
+        assert p["brand"] in allowed_real_logo_brands or p["brand"] == maison_by_category[p["category"]], (
+            f"Unexpected brand {p['brand']} for category {p['category']}"
+        )
         assert p["image_url"].startswith(("https://", "/images/products/"))
         assert 4.7 <= p["rating"] <= 4.9
         assert 95 <= p["review_count"] <= 450
@@ -977,6 +1002,14 @@ def test_single_source_curated_catalog_integrity(db_session):
     sync_curated_catalog(db_session)
     prods = db_session.query(Product).filter(Product.is_active.is_(True), Product.is_archived.is_(False)).all()
     assert len(prods) == 100
+
+    # 8. Startup sync commits brand_id and name updates even when images already match
+    sample = prods[0]
+    sample.name = "Stale Old Name"
+    db_session.commit()
+    sync_curated_catalog(db_session)
+    db_session.refresh(sample)
+    assert sample.name != "Stale Old Name"
 
     images = db_session.query(ProductImage).filter(ProductImage.is_primary.is_(True)).all()
     assert len(images) == 100

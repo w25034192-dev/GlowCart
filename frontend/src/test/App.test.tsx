@@ -325,6 +325,20 @@ describe('GlowCart Frontend', () => {
     expect(links.length).toBeGreaterThanOrEqual(1);
     links.forEach((link) => expect(link).toHaveAttribute('href', '/products/prod-1'));
   });
+
+  it('renders luxury glass monogram crest, editorial hover ritual strip, and interactive swatches on ProductCard', async () => {
+    const user = userEvent.setup();
+    useAuthStore.setState({ user: null, isLoading: false });
+    renderAt('/category/makeup');
+
+    expect(await screen.findByText('Soft Pinch Liquid Blush')).toBeInTheDocument();
+    expect(screen.getByTestId('brand-monogram-crest')).toHaveTextContent(/GD\s*•\s*GLOWCART DEMO/);
+    expect(screen.getByTestId('editorial-ritual-strip')).toBeInTheDocument();
+    const swatches = screen.getAllByRole('button', { name: /Select shade/i });
+    expect(swatches.length).toBeGreaterThanOrEqual(3);
+    await user.click(swatches[1]);
+    expect(swatches[1]).toHaveAttribute('aria-pressed', 'true');
+  });
 });
 
 
