@@ -664,18 +664,18 @@ def test_cleanup_generic_products_and_curated_100_blueprint(db_session):
     )
     from app.models import Product
 
-    # 1. Blueprint itself must have >= 100 unique real products with zero duplicate names/slugs
+    # 1. Blueprint itself must have >= 100 unique real products with zero duplicate slugs and brand-only names
     assert len(CATALOG_BLUEPRINT) >= 100
     names = [e[2] for e in CATALOG_BLUEPRINT]
     slugs = [e[3] for e in CATALOG_BLUEPRINT]
-    assert len(set(names)) == len(CATALOG_BLUEPRINT)
     assert len(set(slugs)) == len(CATALOG_BLUEPRINT)
+    assert all(e[2] == e[1] for e in CATALOG_BLUEPRINT)
     lower_names = {n.lower() for n in names}
     for required in (
-        "airbrush flawless setting spray",
-        "matte lipstick velvet teddy",
-        "advanced night repair serum",
-        "collagen night wrapping mask",
+        "charlotte tilbury",
+        "mac",
+        "estée lauder",
+        "medicube",
     ):
         assert required in lower_names
 
@@ -809,12 +809,10 @@ def test_products_100_hardcoded_unique_urls_and_startup_force_refresh(db_session
 
     assert len(CURATED_CATALOG) == 100
     assert len({p["image_url"] for p in CURATED_CATALOG}) == 100
-    assert len({p["name"] for p in CURATED_CATALOG}) == 100
     assert len({p["slug"] for p in CURATED_CATALOG}) == 100
-    assert len({(p["brand"], p["name"]) for p in CURATED_CATALOG}) == 100
     for p in CURATED_CATALOG:
         assert p["image_url"].startswith(("https://", "/images/products/"))
-        assert not p["name"].lower().startswith(p["brand"].lower() + " ")
+        assert p["name"] == p["brand"]
 
     # Seed initial 100 products, then corrupt one image and insert a stale duplicate product
     ensure_initial_data(db_session)
@@ -892,11 +890,11 @@ def test_purge_deprecated_ugly_products_and_verify_clean_replacements(db_session
     assert "eltamd uv clear broad-spectrum spf 46" not in names_120
     assert "anessa perfect uv sunscreen skincare milk" not in names_120
 
-    # 100 total distinct products with 100 unique images
+    # 100 total distinct products with 100 unique images and 100 unique slugs
     assert len(CURATED_CATALOG) == 100
     assert len(set(urls_120)) == 100
     assert len(set(slugs_120)) == 100
-    assert len(names_120) == 100
+    assert all(p["name"] == p["brand"] for p in CURATED_CATALOG)
 
     # The 8 clean replacements are in CURATED_CATALOG
     for req_slug in (
@@ -963,18 +961,14 @@ def test_single_source_curated_catalog_integrity(db_session):
 
     # 1. Exact 100 distinct items
     assert len(CURATED_CATALOG) == 100
-    # 2. Zero duplicate (brand, name) pairs
-    assert len({(p["brand"], p["name"]) for p in CURATED_CATALOG}) == 100
-    # 3. Zero duplicate image URLs
+    # 2. Zero duplicate image URLs
     assert len({p["image_url"] for p in CURATED_CATALOG}) == 100
-    # 4. Zero duplicate slugs
+    # 3. Zero duplicate slugs
     assert len({p["slug"] for p in CURATED_CATALOG}) == 100
-    # 5. Zero duplicate product names
-    assert len({p["name"] for p in CURATED_CATALOG}) == 100
 
-    # 6. No product name redundantly repeats the brand name
+    # 4. Every product name is strictly its exact brand name only
     for p in CURATED_CATALOG:
-        assert not p["name"].lower().startswith(p["brand"].lower() + " "), f"Brand in name: {p['brand']} - {p['name']}"
+        assert p["name"] == p["brand"], f"Expected name == brand: {p['brand']} != {p['name']}"
         assert p["image_url"].startswith(("https://", "/images/products/"))
         assert 4.7 <= p["rating"] <= 4.9
         assert 95 <= p["review_count"] <= 450

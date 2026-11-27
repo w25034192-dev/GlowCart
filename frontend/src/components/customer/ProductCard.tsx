@@ -144,18 +144,14 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
         </div>
       </div>
 
-      {/* Centered Card Details & Full-Width Dusty-Rose ADD TO CART CTA */}
+      {/* Centered Single Brand Name Title & Full-Width Dusty-Rose ADD TO CART CTA */}
       <div className="flex flex-1 flex-col justify-between p-4 text-center sm:p-5">
-        <div className="space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mauve-deep">
-            {product.brand_name}
-          </p>
-
+        <div className="space-y-1">
           <Link
             to={`/products/${product.id}`}
-            className="line-clamp-2 block font-serif text-lg font-semibold leading-snug text-plum transition-colors duration-200 hover:text-mauve-deep"
+            className="line-clamp-2 block font-serif text-xl font-bold leading-snug tracking-wide text-plum transition-colors duration-200 hover:text-mauve-deep"
           >
-            {product.name}
+            {product.name || product.brand_name}
           </Link>
         </div>
 

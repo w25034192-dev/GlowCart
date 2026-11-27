@@ -199,7 +199,7 @@ def _p(
     return {
         "category": category,
         "brand": brand,
-        "name": name,
+        "name": brand,
         "slug": slug,
         "skin_types": skin_types,
         "variant_template": variant_template,
@@ -315,12 +315,10 @@ CURATED_CATALOG: list[dict] = [
 ]
 
 assert len(CURATED_CATALOG) == 100, f"Expected 100 products, got {len(CURATED_CATALOG)}"
-assert len({(p["brand"], p["name"]) for p in CURATED_CATALOG}) == 100, "Duplicate (brand, name) pair in CURATED_CATALOG!"
 assert len({p["image_url"] for p in CURATED_CATALOG}) == 100, "Duplicate image_url in CURATED_CATALOG!"
 assert len({p["slug"] for p in CURATED_CATALOG}) == 100, "Duplicate slug in CURATED_CATALOG!"
-assert len({p["name"] for p in CURATED_CATALOG}) == 100, "Duplicate name in CURATED_CATALOG!"
 for p in CURATED_CATALOG:
-    assert not p["name"].lower().startswith(p["brand"].lower() + " "), f"Brand redundantly in name: {p['brand']} - {p['name']}"
+    assert p["name"] == p["brand"], f"Expected name == brand, got {p['brand']} != {p['name']}"
     assert p["image_url"].startswith(("https://", "/images/products/"))
     assert 4.7 <= p["rating"] <= 4.9
     assert 95 <= p["review_count"] <= 450

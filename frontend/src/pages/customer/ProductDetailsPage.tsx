@@ -171,11 +171,15 @@ export const ProductDetailsPage: React.FC = () => {
 
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-fg">
-            <span className="font-semibold uppercase tracking-widest text-primary">
-              {product.brand_name}
-            </span>
-            <span>·</span>
-            <span>{product.category_name}</span>
+            {product.name !== product.brand_name && (
+              <>
+                <span className="font-semibold uppercase tracking-widest text-primary">
+                  {product.brand_name}
+                </span>
+                <span>·</span>
+              </>
+            )}
+            <span className="font-semibold uppercase tracking-widest text-mauve-deep">{product.category_name}</span>
           </div>
 
           <h1 className="font-serif text-3xl font-bold sm:text-4xl">{product.name}</h1>
