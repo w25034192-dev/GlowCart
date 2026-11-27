@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye } from 'lucide-react';
 import { StarRating } from '@/components/common/UI';
 import { cartApi, catalogApi } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
-import { useQuickViewStore } from '@/store/quickViewStore';
 import { useToastStore } from '@/store/toastStore';
 import { getRealFallbackImage, resolveMediaUrl } from '@/utils/media';
 import type { ProductSummary } from '@/types';
 
-export const ProductCard: React.FC<{
-  product: ProductSummary;
-  onQuickView?: (product: ProductSummary) => void;
-}> = ({ product, onQuickView }) => {
+export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) => {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => Boolean(s.user));
   const setCart = useCartStore((s) => s.setCart);
   const showBagToast = useToastStore((s) => s.showBagToast);
-  const openQuickView = useQuickViewStore((s) => s.openQuickView);
 
   const [wishlisted, setWishlisted] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -123,8 +117,8 @@ export const ProductCard: React.FC<{
           )}
         </div>
 
-        {/* Floating Wishlist & Quick View Buttons (44x44px accessible touch targets) */}
-        <div className="absolute right-2.5 top-2.5 flex flex-col gap-2">
+        {/* Floating Wishlist Button (44x44px accessible touch target) */}
+        <div className="absolute right-2.5 top-2.5">
           <button
             type="button"
             onClick={handleToggleWishlist}
@@ -146,23 +140,6 @@ export const ProductCard: React.FC<{
                 d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
               />
             </svg>
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (onQuickView) {
-                onQuickView(product);
-              } else {
-                openQuickView(product);
-              }
-            }}
-            aria-label={`Quick view ${product.name}`}
-            title="Quick View"
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-card/95 text-foreground opacity-100 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-card focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring md:opacity-0 md:group-hover:opacity-100"
-          >
-            <Eye className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

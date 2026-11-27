@@ -18,9 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
-import { useQuickViewStore } from '@/store/quickViewStore';
 import { AtelierBagToast } from '@/components/customer/AtelierBagToast';
-import { QuickViewModal } from '@/components/customer/QuickViewModal';
 
 const NAV_LINKS = [
   { to: '/', label: 'Home', exact: true },
@@ -45,12 +43,6 @@ export const CustomerLayout: React.FC = () => {
   const location = useLocation();
   const { user, clearSession } = useAuthStore();
   const { itemCount, resetCart } = useCartStore();
-  const quickViewProduct = useQuickViewStore((s) => s.product);
-  const closeQuickView = useQuickViewStore((s) => s.closeQuickView);
-
-  React.useEffect(() => {
-    closeQuickView();
-  }, [location.pathname, closeQuickView]);
 
   const isHome = location.pathname === '/';
 
@@ -528,13 +520,6 @@ export const CustomerLayout: React.FC = () => {
       </footer>
 
       <AtelierBagToast />
-      {quickViewProduct && (
-        <QuickViewModal
-          product={quickViewProduct}
-          isOpen={Boolean(quickViewProduct)}
-          onClose={closeQuickView}
-        />
-      )}
     </div>
   );
 };
