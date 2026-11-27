@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import { StarRating } from '@/components/common/UI';
-import { QuickViewModal } from '@/components/customer/QuickViewModal';
 import { cartApi, catalogApi } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useQuickViewStore } from '@/store/quickViewStore';
 import { useToastStore } from '@/store/toastStore';
 import { getRealFallbackImage, resolveMediaUrl } from '@/utils/media';
 import type { ProductSummary } from '@/types';
 
-export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) => {
+export const ProductCard: React.FC<{
+  product: ProductSummary;
+  onQuickView?: (product: ProductSummary) => void;
+}> = ({ product, onQuickView }) => {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => Boolean(s.user));
   const setCart = useCartStore((s) => s.setCart);
   const showBagToast = useToastStore((s) => s.showBagToast);
+  const openQuickView = useQuickViewStore((s) => s.openQuickView);
 
   const [wishlisted, setWishlisted] = useState(false);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
-  const [quickViewOpen, setQuickViewOpen] = useState(false);
 
   const hasDiscount =
     product.original_price &&
@@ -149,7 +152,11 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setQuickViewOpen(true);
+              if (onQuickView) {
+                onQuickView(product);
+              } else {
+                openQuickView(product);
+              }
             }}
             aria-label={`Quick view ${product.name}`}
             title="Quick View"
@@ -206,12 +213,6 @@ export const ProductCard: React.FC<{ product: ProductSummary }> = ({ product }) 
           </button>
         </div>
       </div>
-
-      <QuickViewModal
-        product={product}
-        isOpen={quickViewOpen}
-        onClose={() => setQuickViewOpen(false)}
-      />
     </article>
   );
 };
